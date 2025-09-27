@@ -1,0 +1,16 @@
+
+fastapi
+uvicorn[standard]  # ASGI server with performance extras
+pydantic
+
+# --- Web Scraping ---
+selenium          # For running a headless browser to get product details
+beautifulsoup4    # For parsing HTML
+apify-client      # For interacting with the Apify API to get reviews
+
+# --- Data Analysis & AI ---
+scikit-learn      # For TF-IDF keyword extraction
+pandas            # For data manipulation (used in the TF-IDF function)
+transformers      # Hugging Face library for NLP models
+sentencepiece     # Required tokenizer for many Hugging Face models
+torch             # The deep learning framework for running the models

@@ -1,3 +1,7 @@
-django
+Django~=5.0
 python-dotenv
 django-widget-tweaks
+requests
+Pillow~=10.4
+
+
