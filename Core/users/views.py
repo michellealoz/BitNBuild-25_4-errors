@@ -3,7 +3,6 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import authenticate, login
 from django.contrib import messages
-from django import forms
 from users.models import UserProfile
 import requests
 
@@ -70,10 +69,21 @@ def user_profile_complete(request):
 # Dashboard
 @login_required(login_url='/user/login/')
 def user_dashboard(request):
+    # Get user profile
     profile = UserProfile.objects.filter(user=request.user).first()
     if not profile:
         return redirect('user_profile_setup')
-    return render(request, 'users/dashboard.html', {'profile': profile})
+    
+    # For now, use placeholder values for stats
+    context = {
+        'profile': profile,
+        'analyses_count': 18,
+        'saved_records_count': 5,
+        'comparisons_count': 9,
+    }
+    
+    return render(request, 'users/dashboard.html', context)
+
 
 def user_login_view(request):
     if request.method == 'POST':
@@ -86,6 +96,7 @@ def user_login_view(request):
         else:
             messages.error(request, 'Invalid username or password.')
     return render(request, 'users/login.html')
+
 
 @login_required(login_url='/user/login/')
 def analysis_view(request):
@@ -138,6 +149,7 @@ def analysis_view(request):
 
     return render(request, "users/analyzer.html", context)
 
+
 @login_required(login_url='/user/login/')
 def compare_product(request):
     """
@@ -169,6 +181,7 @@ def compare_product(request):
 
     return render(request, 'users/compare.html', context)
 
+
 def custom_product_analysis(url: str) -> dict:
     """
     Custom product analysis using only Selenium scraper without AI models.
@@ -187,6 +200,7 @@ def custom_product_analysis(url: str) -> dict:
         
     except Exception as e:
         return {"error": f"Analysis failed: {str(e)}"}
+
 
 def enhanced_amazon_scraper(url: str) -> dict:
     """Enhanced Selenium scraper for Amazon product details."""
@@ -276,6 +290,7 @@ def enhanced_amazon_scraper(url: str) -> dict:
             driver.quit()
             
     return product_details
+
 
 def generate_simple_analysis(product_data: dict) -> dict:
     """

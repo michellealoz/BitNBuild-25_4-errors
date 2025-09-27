@@ -1,77 +1,118 @@
 {% extends 'users/base.html' %}
 
-{% block title %}User Dashboard{% endblock %}
+{% block title %}User Dashboard - Review Radar{% endblock %}
 
-{% block content_header %}
-<div class="content-header">
-    <h1>{% block page_title %}Dashboard{% endblock %}</h1>
-    <p>Welcome back! Here's a summary of your activity.</p>
-</div>
-{% endblock %}
+{% block page_title %}<span style="color: #4A90E2;">User</span> Dashboard{% endblock %}
+{% block page_subtitle %}Welcome back! Here's a summary of your activity.{% endblock %}
 
 {% block content %}
-<div class="card mb-4">
-    <div class="card-body p-4">
-        <div class="d-flex align-items-center">
-            <div class="flex-shrink-0 me-3">
-                <img src="https://via.placeholder.com/80" alt="User Avatar" class="rounded-circle">
+<!-- User Profile Card -->
+<div class="app-card mb-8" style="box-shadow: 0 0 15px rgba(74, 144, 226, 0.2);">
+    <div class="p-6">
+        <div style="display: flex; align-items: center;">
+            <div style="flex-shrink: 0; margin-right: 1rem;">
+                <img src="https://placehold.co/80x80/101010/4A90E2?text={{ profile.full_name.0|default:user.username.0|upper }}" 
+                     alt="User Avatar" style="border-radius: 50%; border: 2px solid #4A90E2;">
             </div>
             <div>
-                <h2 class="h4 card-title fw-bold mb-0">Jane Doe</h2>
-                <p class="text-muted mb-0">@janedoe</p>
+                <h2 style="font-size: 1.5rem; font-weight: 800; color: #4A90E2; margin-bottom: 0;">
+                    {{ profile.full_name }}
+                </h2>
+                <p style="color: #6B7280; margin-bottom: 0;">@{{ user.username }}</p>
             </div>
         </div>
     </div>
-    <div class="card-footer bg-light p-4">
-        <h3 class="h6 text-dark fw-semibold mb-3">Your Profile Details</h3>
-        <div class="row">
-            <div class="col-md-6 mb-3">
-                <small class="text-muted d-block">Email address</small>
-                <span class="fw-medium">jane.doe@example.com</span>
+    
+    <div class="p-6" style="border-top: 1px solid rgba(255, 255, 255, 0.1);">
+        <h3 style="font-size: 1.25rem; color: white; font-weight: 600; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid rgba(154, 228, 154, 0.3);">
+            Your Profile <span style="color: #9ae49a;">Details</span>
+        </h3>
+        <div style="display: grid; grid-template-columns: 1fr; gap: 1rem;">
+            <div style="border-bottom: 1px solid #1A1A1A; padding-bottom: 0.5rem; margin-bottom: 1rem;">
+                <small style="color: #6B7280; display: block;">Email address</small>
+                <span style="font-weight: 500; color: white;">{{ profile.email }}</span>
             </div>
-            <div class="col-md-6 mb-3">
-                <small class="text-muted d-block">Phone number</small>
-                <span class="fw-medium">+1 (555) 123-4567</span>
+            
+            <div style="border-bottom: 1px solid #1A1A1A; padding-bottom: 0.5rem; margin-bottom: 1rem;">
+                <small style="color: #6B7280; display: block;">Phone number</small>
+                <span style="font-weight: 500; color: white;">
+                    {% if profile.phone %}
+                        {{ profile.phone }}
+                    {% else %}
+                        Not provided
+                    {% endif %}
+                </span>
             </div>
-            <div class="col-md-6 mb-3 mb-md-0">
-                <small class="text-muted d-block">Date of Birth</small>
-                <span class="fw-medium">October 26, 1995</span>
+            
+            <div style="border-bottom: 1px solid #1A1A1A; padding-bottom: 0.5rem; margin-bottom: 1rem;">
+                <small style="color: #6B7280; display: block;">Date of Birth</small>
+                <span style="font-weight: 500; color: white;">
+                    {% if profile.dob %}
+                        {{ profile.dob }}
+                    {% else %}
+                        Not provided
+                    {% endif %}
+                </span>
             </div>
-            <div class="col-md-6">
-                <small class="text-muted d-block">Address</small>
-                <span class="fw-medium">123 Innovation Drive, Tech City</span>
+            
+            <div style="padding-bottom: 0.5rem;">
+                <small style="color: #6B7280; display: block;">Address</small>
+                <span style="font-weight: 500; color: white;">
+                    {% if profile.address %}
+                        {{ profile.address }}
+                    {% else %}
+                        Not provided
+                    {% endif %}
+                </span>
             </div>
         </div>
     </div>
 </div>
 
-<div class="row">
-    <div class="col-md-4 mb-4">
-        <div class="card text-center h-100">
-            <div class="card-body">
-                <i class="fas fa-search-dollar fa-3x text-success mb-3"></i>
-                <h5 class="card-title">Analyses Performed</h5>
-                <p class="display-4 fw-bold text-success">18</p>
-            </div>
+<!-- Stats Cards -->
+<div style="display: grid; grid-template-columns: 1fr; gap: 1.5rem;">
+    <div class="app-card text-center" style="padding: 1.5rem; height: 100%;">
+        <div style="padding: 1rem;">
+            <i class="fas fa-search-dollar fa-3x" style="color: #9ae49a; margin-bottom: 0.75rem; text-shadow: 0 0 10px #9ae49a;"></i>
+            <h5 style="font-size: 1.125rem; font-weight: 600; color: white; margin-bottom: 0.5rem;">Analyses Performed</h5>
+            <p style="font-size: 3rem; font-weight: 800; color: #9ae49a;">{{ analyses_count }}</p>
         </div>
     </div>
-    <div class="col-md-4 mb-4">
-        <div class="card text-center h-100">
-            <div class="card-body">
-                <i class="fas fa-save fa-3x text-primary mb-3"></i>
-                <h5 class="card-title">Saved Records</h5>
-                <p class="display-4 fw-bold text-primary">5</p>
-            </div>
+    
+    <div class="app-card text-center" style="padding: 1.5rem; height: 100%;">
+        <div style="padding: 1rem;">
+            <i class="fas fa-save fa-3x" style="color: #4A90E2; margin-bottom: 0.75rem; text-shadow: 0 0 10px #4A90E2;"></i>
+            <h5 style="font-size: 1.125rem; font-weight: 600; color: white; margin-bottom: 0.5rem;">Saved Records</h5>
+            <p style="font-size: 3rem; font-weight: 800; color: #4A90E2;">{{ saved_records_count }}</p>
         </div>
     </div>
-    <div class="col-md-4 mb-4">
-        <div class="card text-center h-100">
-            <div class="card-body">
-                <i class="fas fa-balance-scale fa-3x text-warning mb-3"></i>
-                <h5 class="card-title">Comparisons Made</h5>
-                <p class="display-4 fw-bold text-warning">9</p>
-            </div>
+    
+    <div class="app-card text-center" style="padding: 1.5rem; height: 100%;">
+        <div style="padding: 1rem;">
+            <i class="fas fa-balance-scale fa-3x" style="color: #f8c050; margin-bottom: 0.75rem; text-shadow: 0 0 10px #f8c050;"></i>
+            <h5 style="font-size: 1.125rem; font-weight: 600; color: white; margin-bottom: 0.5rem;">Comparisons Made</h5>
+            <p style="font-size: 3rem; font-weight: 800; color: #f8c050;">{{ comparisons_count }}</p>
         </div>
     </div>
 </div>
+
+<style>
+    @media (min-width: 768px) {
+        div[style*="grid-template-columns: 1fr;"] {
+            grid-template-columns: 1fr 1fr 1fr !important;
+        }
+    }
+    
+    .app-card {
+        background: #0A0A0A;
+        border: 1px solid #1A1A1A;
+        border-radius: 20px;
+        box-shadow: 0 0 5px rgba(255, 255, 255, 0.1);
+        transition: transform 0.3s, box-shadow 0.3s;
+    }
+    
+    .app-card:hover {
+        box-shadow: 0 0 15px rgba(154, 228, 154, 0.5);
+    }
+</style>
 {% endblock %}
