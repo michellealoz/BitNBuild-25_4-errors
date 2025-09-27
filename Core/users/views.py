@@ -5,6 +5,8 @@ from django.contrib.auth import authenticate, login
 from django.contrib import messages
 from users.models import UserProfile
 import requests
+import re
+
 
 # Step 1: Signup
 def user_signup(request):
@@ -150,24 +152,22 @@ def analysis_view(request):
     return render(request, "users/analyzer.html", context)
 
 
-@login_required(login_url='/user/login/')
+login_required(login_url='/user/login/')
 def compare_product(request):
     """
-    Handles the comparison of two products using only custom scraper.
+    Handles the AI-powered comparison of two products by calling the FastAPI service.
     """
     context = {}
     if request.method == "POST":
-        product_url_1 = request.POST.get("product_url_1")
-        product_url_2 = request.POST.get("product_url_2")
+        product_url_1 = request.POST.get("product_url_1", "").strip()
+        product_url_2 = request.POST.get("product_url_2", "").strip()
         
-        # Pass URLs back to the template to repopulate the form
         context['product_url_1'] = product_url_1
         context['product_url_2'] = product_url_2
 
         if product_url_1 and product_url_2:
-            # Use custom scraper instead of FastAPI endpoint
-            data1 = custom_product_analysis(product_url_1)
-            data2 = custom_product_analysis(product_url_2)
+            data1 = fetch_analysis_data(product_url_1)
+            data2 = fetch_analysis_data(product_url_2)
 
             if "error" in data1:
                 context['error'] = f"Product 1 analysis failed: {data1['error']}"
@@ -176,187 +176,121 @@ def compare_product(request):
             else:
                 context['data1'] = data1
                 context['data2'] = data2
+                context['comparison'] = generate_comparison_metrics(data1, data2)
         else:
             context['error'] = "Please provide both product URLs to compare."
 
     return render(request, 'users/compare.html', context)
 
+# ==============================================================================
+# HELPER FUNCTIONS FOR AI ANALYSIS AND COMPARISON
+# ==============================================================================
 
-def custom_product_analysis(url: str) -> dict:
+def fetch_analysis_data(url: str) -> dict:
     """
-    Custom product analysis using only Selenium scraper without AI models.
+    Calls the FastAPI endpoint to get product details and AI analysis.
+    This is now the single source of truth for product data.
     """
+    FASTAPI_ANALYSIS_URL = "http://127.0.0.1:8001/analyze/"
     try:
-        # Scrape basic product data
-        product_data = enhanced_amazon_scraper(url)
+        response = requests.post(FASTAPI_ANALYSIS_URL, json={"url": url}, timeout=120)
+        response.raise_for_status()
+        api_data = response.json()
         
-        if not product_data or product_data.get('product_name') == "Not found":
-            return {"error": "Could not scrape product details"}
+        # Calculate the overall score and add it to the data object
+        api_data['overall_score'] = calculate_overall_score(api_data)
         
-        # Generate simple analysis without AI
-        analysis = generate_simple_analysis(product_data)
-        
-        return {**product_data, **analysis}
-        
-    except Exception as e:
-        return {"error": f"Analysis failed: {str(e)}"}
+        return api_data
 
-
-def enhanced_amazon_scraper(url: str) -> dict:
-    """Enhanced Selenium scraper for Amazon product details."""
-    from selenium import webdriver
-    from selenium.webdriver.firefox.options import Options as FirefoxOptions
-    from selenium.webdriver.common.by import By
-    from selenium.webdriver.support.ui import WebDriverWait
-    from selenium.webdriver.support import expected_conditions as EC
-    from bs4 import BeautifulSoup
-    import time
-    
-    options = FirefoxOptions()
-    options.add_argument("--headless")
-    options.set_preference("general.useragent.override", 
-        "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:89.0) Gecko/20100101 Firefox/89.0")
-    
-    driver = None
-    product_details = {
-        'product_name': "Not found",
-        'price': "Not found", 
-        'rating': "Not found",
-        'description': "Not found",
-    }
-    
-    try:
-        driver = webdriver.Firefox(options=options)
-        driver.get(url)
-        wait = WebDriverWait(driver, 15)
-        
-        # Wait for product page to load
+    except requests.exceptions.Timeout:
+        return {"error": "The analysis took too long to complete. The product page might be complex or the service is busy."}
+    except requests.exceptions.ConnectionError:
+        return {"error": "Cannot connect to the analysis service. Please ensure it is running and try again."}
+    except requests.exceptions.RequestException as e:
         try:
-            wait.until(EC.presence_of_element_located((By.ID, "productTitle")))
+            error_detail = e.response.json().get('detail', str(e))
         except:
-            wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, "h1.a-size-large")))
-        
-        soup = BeautifulSoup(driver.page_source, 'html.parser')
-        
-        # Product Name
-        name_selectors = [
-            {'id': 'productTitle'},
-            {'class': 'a-size-large'},
-        ]
-        for selector in name_selectors:
-            element = soup.find('span', selector) if 'id' in selector else soup.find('h1', selector)
-            if element:
-                product_details['product_name'] = element.get_text(strip=True)
-                break
-        
-        # Price
-        price_selectors = [
-            'span.a-price-whole',
-            '.a-price .a-offscreen',
-            '.a-text-price'
-        ]
-        for selector in price_selectors:
-            element = soup.select_one(selector)
-            if element:
-                price_text = element.get_text(strip=True)
-                if '₹' in price_text:
-                    product_details['price'] = price_text.replace('₹', '').replace(',', '').strip()
-                else:
-                    product_details['price'] = price_text
-                break
-        
-        # Rating
-        rating_element = soup.find('span', {'class': 'a-icon-alt'})
-        if rating_element:
-            rating_text = rating_element.get_text(strip=True)
-            if 'out of' in rating_text:
-                product_details['rating'] = rating_text
-        
-        # Description
-        desc_selectors = [
-            {'id': 'feature-bullets'},
-            {'id': 'productDescription'},
-        ]
-        for selector in desc_selectors:
-            element = soup.find('div', selector)
-            if element:
-                product_details['description'] = element.get_text(separator=' ', strip=True)
-                break
-                
-    except Exception as e:
-        print(f"Scraper error: {e}")
-    finally:
-        if driver:
-            driver.quit()
-            
-    return product_details
+            error_detail = str(e)
+        return {"error": f"An error occurred during analysis: {error_detail}"}
 
-
-def generate_simple_analysis(product_data: dict) -> dict:
+def calculate_overall_score(data: dict) -> float:
     """
-    Generate simple analysis without AI models - using only scraped data.
+    Calculates a weighted score out of 10 based on star rating and AI sentiment.
+    - 60% weight on the actual star rating.
+    - 40% weight on the AI-analyzed positive sentiment from reviews.
     """
-    # Extract numeric rating
-    rating_text = product_data.get('rating', '0 out of 5 stars')
     try:
-        rating_value = float(rating_text.split()[0])
-    except:
-        rating_value = 0.0
-    
-    # Calculate simple scores based on rating
-    overall_score = round((rating_value / 5) * 10, 1)
-    
-    # Simple sentiment approximation based on rating
-    if rating_value >= 4.5:
-        positive_percent = 90
-        negative_percent = 5
-    elif rating_value >= 4.0:
-        positive_percent = 75
-        negative_percent = 15
-    elif rating_value >= 3.0:
-        positive_percent = 50
-        negative_percent = 30
+        rating_text = data.get('rating', '0')
+        rating_match = re.search(r'(\d+\.?\d*)', rating_text)
+        rating_value = float(rating_match.group(1)) if rating_match else 0.0
+        rating_score_on_10 = (rating_value / 5) * 10
+        
+        positive_sentiment_percent = data.get('public_opinion', {}).get('positive_percent', 0)
+        sentiment_score_on_10 = positive_sentiment_percent / 10
+
+        weighted_score = (rating_score_on_10 * 0.6) + (sentiment_score_on_10 * 0.4)
+        return round(weighted_score, 1)
+    except (ValueError, TypeError):
+        return 0.0
+
+def generate_comparison_metrics(data1: dict, data2: dict) -> dict:
+    """
+    Generates detailed comparison metrics between two analyzed products.
+    """
+    score1 = data1.get('overall_score', 0)
+    score2 = data2.get('overall_score', 0)
+
+    if score1 > score2:
+        winner = 'Product A'
+    elif score2 > score1:
+        winner = 'Product B'
     else:
-        positive_percent = 25
-        negative_percent = 60
+        winner = 'It\'s a Tie'
+        
+    price1 = float(str(data1.get('price', '0')).replace(',', ''))
+    price2 = float(str(data2.get('price', '0')).replace(',', ''))
     
-    # Generate simple pros/cons based on product category and rating
-    product_name = product_data.get('product_name', '').lower()
+    rating_match1 = re.search(r'(\d+\.?\d*)', data1.get('rating', '0'))
+    rating1 = float(rating_match1.group(1)) if rating_match1 else 0.0
     
-    if any(word in product_name for word in ['phone', 'mobile', 'smartphone']):
-        pros = ['battery life', 'camera quality', 'performance', 'value for money']
-        cons = ['heating issue', 'average display', 'slow charging', 'bloatware']
-    elif any(word in product_name for word in ['laptop', 'notebook']):
-        pros = ['fast performance', 'good display', 'lightweight', 'battery backup']
-        cons = ['heating problem', 'average keyboard', 'poor webcam', 'short battery']
-    else:
-        pros = ['good quality', 'value for money', 'reliable', 'easy to use']
-        cons = ['could be better', 'average performance', 'not durable', 'poor service']
-    
-    # Adjust pros/cons based on rating
-    if rating_value < 3.0:
-        pros = pros[:2]  # Fewer pros for low-rated products
-        cons = cons + ['poor quality', 'not recommended']
-    elif rating_value > 4.0:
-        cons = cons[:2]  # Fewer cons for high-rated products
-    
+    rating_match2 = re.search(r'(\d+\.?\d*)', data2.get('rating', '0'))
+    rating2 = float(rating_match2.group(1)) if rating_match2 else 0.0
+
     return {
-        'overall_score': overall_score,
-        'public_opinion': {
-            'positive_percent': positive_percent,
-            'negative_percent': negative_percent,
-            'neutral_percent': 100 - positive_percent - negative_percent,
-            'total_reviews_analyzed': 100,  # Placeholder
-            'quick_summary': f"Rated {rating_value}/5 stars based on customer reviews",
-            'average_rating': rating_value
-        },
-        'pros_cons_panel': {
-            'pros': pros[:4],
-            'cons': cons[:4]
-        },
-        'review_summary_generator': f"This product has an average rating of {rating_value} out of 5 stars. Customers generally find it {'excellent' if rating_value > 4.5 else 'good' if rating_value > 4.0 else 'average' if rating_value > 3.0 else 'below average'}.",
-        'review_insights': {
-            'verified_reviews_count': 50,  # Placeholder
-            'recent_review_count': 25      # Placeholder
-        }
+        'winner': winner,
+        'overall_winner_score_diff': round(abs(score1 - score2), 1),
+        'price_difference': abs(price1 - price2),
+        'rating_difference': round(abs(rating1 - rating2), 1),
+        'key_differences': extract_key_differences(data1, data2),
     }
+
+def extract_key_differences(data1: dict, data2: dict) -> list:
+    """
+    Identifies and returns a list of the most significant differences
+    between two products based on their AI-analyzed pros.
+    """
+    pros1 = set(data1.get('pros_cons_panel', {}).get('pros', []))
+    pros2 = set(data2.get('pros_cons_panel', {}).get('pros', []))
+
+    unique_to_1 = list(pros1 - pros2)
+    unique_to_2 = list(pros2 - pros1)
+    
+    differences = []
+    if unique_to_1:
+        differences.append(f"Product A excels with: {', '.join(unique_to_1[:2])}")
+    if unique_to_2:
+        differences.append(f"Product B stands out for: {', '.join(unique_to_2[:2])}")
+
+    price1 = float(str(data1.get('price', '0')).replace(',', ''))
+    price2 = float(str(data2.get('price', '0')).replace(',', ''))
+    if price1 > 0 and price2 > 0:
+        if price1 < price2:
+            differences.append(f"Product A is more affordable by ₹{price2 - price1:,.0f}")
+        elif price2 < price1:
+            differences.append(f"Product B is more affordable by ₹{price1 - price2:,.0f}")
+
+    if not differences:
+        return ["Both products share very similar strengths according to user reviews."]
+        
+    return differences
+
