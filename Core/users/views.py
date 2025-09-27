@@ -99,7 +99,9 @@ def user_login_view(request):
             messages.error(request, 'Invalid username or password.')
     return render(request, 'users/login.html')
 
-from .models import ProductAnalysis
+from .models import ProductAnalysis, ProductComparison 
+from itertools import chain
+from operator import attrgetter
 
 @login_required(login_url='/user/login/')
 def analysis_view(request):
@@ -108,16 +110,21 @@ def analysis_view(request):
     
     if request.method == "POST":
         product_url = request.POST.get("product_url", "").strip()
+        context['product_url'] = product_url # Keep URL in context for re-display
+        
         if product_url:
             try:
+                # Enhanced Amazon URL validation
                 if not any(domain in product_url for domain in ['amazon.com', 'amazon.in', 'amazon.co.uk']):
                     context['error'] = "Please enter a valid Amazon product URL from supported regions (com, in, co.uk)."
                 elif '/dp/' not in product_url and '/product/' not in product_url:
                     context['error'] = "Please enter a direct Amazon product URL containing '/dp/' or '/product/'."
                 else:
+                    # Clean URL
                     if '?' in product_url:
                         product_url = product_url.split('?')[0]
                     
+                    # Make request to FastAPI service
                     response = requests.post(FASTAPI_ANALYSIS_URL, 
                                            json={"url": product_url}, 
                                            timeout=120)
@@ -128,17 +135,15 @@ def analysis_view(request):
                     if 'error' in api_data:
                         context['error'] = api_data['error']
                     else:
+                        # On success, display the data and save the record
                         context['data'] = api_data
-                        context['product_url'] = product_url
 
-                        # --- NEW: Save the successful analysis to the database ---
                         ProductAnalysis.objects.create(
                             user=request.user,
                             product_url=product_url,
                             product_name=api_data.get('product_name', 'Unknown Product'),
                             analysis_data=api_data
                         )
-                        # ---------------------------------------------------------
 
             except requests.exceptions.Timeout:
                 context['error'] = "The analysis took too long to complete. Please try again with a different product."
@@ -164,13 +169,21 @@ def records_view(request):
     Fetches and displays all saved product analyses for the logged-in user.
     """
     # Fetch all analysis records for the current user, ordered by most recent
-    user_records = ProductAnalysis.objects.filter(user=request.user)
+    user_analyses = ProductAnalysis.objects.filter(user=request.user)
+    user_comparisons = ProductComparison.objects.filter(user=request.user)    
+    
+    all_records = sorted(
+        chain(user_analyses, user_comparisons),
+        key=attrgetter('created_at'),
+        reverse=True
+    )
+
     context = {
-        'records': user_records
+        'records': all_records
     }
     return render(request, "users/records.html", context)
 
-login_required(login_url='/user/login/')
+@login_required(login_url='/user/login/')
 def compare_product(request):
     """
     Handles the AI-powered comparison of two products by calling the FastAPI service.
@@ -194,11 +207,24 @@ def compare_product(request):
             else:
                 context['data1'] = data1
                 context['data2'] = data2
-                context['comparison'] = generate_comparison_metrics(data1, data2)
+                comparison_metrics = generate_comparison_metrics(data1, data2)
+                context['comparison'] = comparison_metrics
+
+                ProductComparison.objects.create(
+                    user=request.user,
+                    product_url_1=product_url_1,
+                    product_name_1=data1.get('product_name', 'Unknown Product 1'),
+                    analysis_data_1=data1,
+                    product_url_2=product_url_2,
+                    product_name_2=data2.get('product_name', 'Unknown Product 2'),
+                    analysis_data_2=data2,
+                    comparison_metrics=comparison_metrics
+                )
         else:
             context['error'] = "Please provide both product URLs to compare."
 
     return render(request, 'users/compare.html', context)
+
 
 # ==============================================================================
 # HELPER FUNCTIONS FOR AI ANALYSIS AND COMPARISON

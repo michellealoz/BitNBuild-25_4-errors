@@ -1,0 +1,99 @@
+<div class="p-4" style="background-color: #1A202C;">
+    <div style="display: grid; grid-template-columns: 1fr; gap: 1rem;" class="comparison-grid-records">
+        
+        <!-- Product 1 -->
+        <div class="app-card" style="background-color: #2D3748; border-left: 4px solid {% if data1.overall_score > data2.overall_score %}#9ae49a{% else %}#4A90E2{% endif %};">
+            <div style="padding: 1rem;">
+                <!-- Header -->
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
+                    <h6 style="font-weight: bold; color: white; margin: 0; font-size: 1rem;">{{ data1.product_name|truncatechars:45 }}</h6>
+                    {% if data1.overall_score > data2.overall_score %}
+                    <span style="background: #9ae49a; color: #000000; padding: 0.15rem 0.6rem; border-radius: 9999px; font-size: 0.75rem; font-weight: bold; flex-shrink: 0; margin-left: 0.5rem;">WINNER</span>
+                    {% endif %}
+                </div>
+                
+                <!-- At a Glance Metrics -->
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; text-align: center; margin-bottom: 1rem; padding: 1rem; background-color: #1A202C; border-radius: 8px;">
+                    <div>
+                        <div style="font-size: 1.5rem; font-weight: 700; color: #4A90E2;">{{ data1.overall_score }}<small>/10</small></div>
+                        <small style="color: #9CA3AF; font-size: 0.75rem;">Score</small>
+                    </div>
+                    <div>
+                        <div style="font-size: 1.25rem; font-weight: 700; color: #9ae49a;">{{ data1.public_opinion.average_rating }}/5</div>
+                        <small style="color: #9CA3AF; font-size: 0.75rem;">Rating</small>
+                    </div>
+                     <div>
+                        <div style="font-size: 1.1rem; font-weight: 700; color: white;">₹{{ data1.price|default:"N/A" }}</div>
+                        <small style="color: #9CA3AF; font-size: 0.75rem;">Price</small>
+                    </div>
+                </div>
+
+                <!-- Pros and Cons -->
+                <div style="font-size: 0.875rem;">
+                    <h6 style="color: #9ae49a; font-weight: bold; margin-bottom: 0.5rem; font-size: 0.9rem;"><i class="fas fa-thumbs-up me-2"></i>Strengths</h6>
+                    <ul style="list-style: none; padding-left: 0; margin: 0; display: flex; flex-direction: column; gap: 0.3rem;">
+                        {% for pro in data1.pros_cons_panel.pros|slice:":2" %}<li><i class="fas fa-check me-2" style="font-size: 0.75rem;"></i>{{ pro|title }}</li>{% empty %}<li style="color: #718096;">-</li>{% endfor %}
+                    </ul>
+                    <hr style="border-color: #4A5568; margin: 0.75rem 0;">
+                    <h6 style="color: #f87171; font-weight: bold; margin-bottom: 0.5rem; font-size: 0.9rem;"><i class="fas fa-thumbs-down me-2"></i>Concerns</h6>
+                    <ul style="list-style: none; padding-left: 0; margin: 0; display: flex; flex-direction: column; gap: 0.3rem;">
+                         {% for con in data1.pros_cons_panel.cons|slice:":2" %}<li><i class="fas fa-times me-2" style="font-size: 0.75rem;"></i>{{ con|title }}</li>{% empty %}<li style="color: #718096;">-</li>{% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    
+        <!-- Product 2 -->
+        <div class="app-card" style="background-color: #2D3748; border-left: 4px solid {% if data2.overall_score > data1.overall_score %}#9ae49a{% else %}#4A90E2{% endif %};">
+            <div style="padding: 1rem;">
+                <!-- Header -->
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
+                    <h6 style="font-weight: bold; color: white; margin: 0; font-size: 1rem;">{{ data2.product_name|truncatechars:45 }}</h6>
+                    {% if data2.overall_score > data1.overall_score %}
+                    <span style="background: #9ae49a; color: #000000; padding: 0.15rem 0.6rem; border-radius: 9999px; font-size: 0.75rem; font-weight: bold; flex-shrink: 0; margin-left: 0.5rem;">WINNER</span>
+                    {% endif %}
+                </div>
+
+                <!-- At a Glance Metrics -->
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; text-align: center; margin-bottom: 1rem; padding: 1rem; background-color: #1A202C; border-radius: 8px;">
+                    <div>
+                        <div style="font-size: 1.5rem; font-weight: 700; color: #4A90E2;">{{ data2.overall_score }}<small>/10</small></div>
+                        <small style="color: #9CA3AF; font-size: 0.75rem;">Score</small>
+                    </div>
+                    <div>
+                        <div style="font-size: 1.25rem; font-weight: 700; color: #9ae49a;">{{ data2.public_opinion.average_rating }}/5</div>
+                        <small style="color: #9CA3AF; font-size: 0.75rem;">Rating</small>
+                    </div>
+                     <div>
+                        <div style="font-size: 1.1rem; font-weight: 700; color: white;">₹{{ data2.price|default:"N/A" }}</div>
+                        <small style="color: #9CA3AF; font-size: 0.75rem;">Price</small>
+                    </div>
+                </div>
+
+                <!-- Pros and Cons -->
+                <div style="font-size: 0.875rem;">
+                    <h6 style="color: #9ae49a; font-weight: bold; margin-bottom: 0.5rem; font-size: 0.9rem;"><i class="fas fa-thumbs-up me-2"></i>Strengths</h6>
+                    <ul style="list-style: none; padding-left: 0; margin: 0; display: flex; flex-direction: column; gap: 0.3rem;">
+                        {% for pro in data2.pros_cons_panel.pros|slice:":2" %}<li><i class="fas fa-check me-2" style="font-size: 0.75rem;"></i>{{ pro|title }}</li>{% empty %}<li style="color: #718096;">-</li>{% endfor %}
+                    </ul>
+                     <hr style="border-color: #4A5568; margin: 0.75rem 0;">
+                    <h6 style="color: #f87171; font-weight: bold; margin-bottom: 0.5rem; font-size: 0.9rem;"><i class="fas fa-thumbs-down me-2"></i>Concerns</h6>
+                    <ul style="list-style: none; padding-left: 0; margin: 0; display: flex; flex-direction: column; gap: 0.3rem;">
+                        {% for con in data2.pros_cons_panel.cons|slice:":2" %}<li><i class="fas fa-times me-2" style="font-size: 0.75rem;"></i>{{ con|title }}</li>{% empty %}<li style="color: #718096;">-</li>{% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<style>
+@media (min-width: 768px) {
+    .comparison-grid-records {
+        grid-template-columns: 1fr 1fr;
+    }
+    .analysis-grid-records {
+        grid-template-columns: 1fr 1.5fr;
+    }
+}
+</style>
+
