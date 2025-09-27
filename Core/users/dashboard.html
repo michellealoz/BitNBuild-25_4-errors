@@ -10,11 +10,11 @@
 <style>
 :root
 {
-  --primary-color: #88abe0;
+  --primary-color: #000000;
   --secondary-color: #15426ada;
-  --base-color: #8abead;
-  --text-color: #040507;
-  --background-color:#ffffff;
+  --base-color: #42ea24;
+  --text-color: #EAEAEA;
+  --background-color:#000000;
 
 }
 * {
@@ -63,6 +63,16 @@ main {
     flex: 1 1 350px; /* Grow, shrink, min width */
     min-width: 400px;
     max-width: 900px;
+    background-color: var(--primary-color);
+    color: var(--text-color);
+    margin: 20px auto;
+    padding: 25px;
+    border-radius: 12px;
+    /* Neon glow and dark shadow */
+    box-shadow:
+        0 0 24px 8px #42ea24,         /* Neon green glow */
+        0 8px 32px 0 rgba(0,0,0,0.7); /* Deep dark shadow */
+    transition: transform 0.2s, box-shadow 0.2s;
 }
 /* ...existing code... */
 
@@ -112,7 +122,7 @@ button:hover {
 footer {
     text-align: center;
     padding: 15px 0;
-    background-color: #bdcff5;
+    background-color: var(--base-color);
     color: var(--text-color);
     margin-top: 20px;
     font-size: 0.9rem;
