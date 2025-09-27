@@ -4,60 +4,131 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sign-Up</title>
+    <title>Sign Up - Review Radar</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Poppins', sans-serif; }
-        .frutiger-aero-glass { background: rgba(255, 255, 255, 0.3); backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.15);}
-        .form-input { background: rgba(255, 255, 255, 0.4); border: 1px solid rgba(255,255,255,0.2); transition: all 0.3s ease;}
-        .form-input:focus { background: rgba(255,255,255,0.6); border-color: rgba(2,239,239,0.5); box-shadow: 0 0 0 3px rgba(0,191,255,0.3);}
+        /* Define the Neon Green color for easy reference in CSS */
+        :root {
+            --neon-green: #9ae49a;
+            --neon-shadow: 0 0 10px rgba(154, 228, 154, 0.4);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #000000;
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        /* Card with subtle border */
+        .app-card {
+            background: #0A0A0A;
+            border: 1px solid #1A1A1A;
+            border-radius: 20px;
+            box-shadow: var(--neon-shadow); /* Subtle glow on the card */
+        }
+        /* Input Fields */
+        .form-input {
+            background: #000000;
+            border: 1px solid #333333;
+            color: white;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+        /* Input Focus: Neon Green Border and Shadow */
+        .form-input:focus {
+            outline: none;
+            border-color: var(--neon-green);
+            box-shadow: 0 0 0 2px rgba(154, 228, 154, 0.3);
+        }
+        /* Primary Button: Neon Green Background and Glow */
+        .btn-primary {
+            background: var(--neon-green);
+            color: #000000;
+            border-radius: 12px;
+            font-weight: 700; /* Increased font weight */
+            transition: all 0.3s ease;
+            cursor: pointer;
+            /* Default button glow */
+            box-shadow: 0 4px 15px rgba(154, 228, 154, 0.4); 
+        }
+        /* Stronger glow and scale on hover */
+        .btn-primary:hover {
+            transform: scale(1.02);
+            box-shadow: 0 0 25px rgba(154, 228, 154, 0.8); 
+        }
     </style>
 </head>
-<body class="bg-gradient-to-br from-cyan-200 via-green-200 to-lime-300 min-h-screen flex items-center justify-center">
+<body class="p-4">
     <div class="w-full max-w-md">
-        <div class="frutiger-aero-glass rounded-2xl shadow-2xl p-8">
-            <h1 class="text-3xl font-bold text-gray-800 text-center">Create Account</h1>
-            <p class="text-gray-600 text-center mt-2">Step 1 of 2: Set your credentials.</p>
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <div class="flex items-center justify-center gap-3 mb-4">
+                <!-- Icon container updated to use the neon green color #9ae49a -->
+                <div class="w-12 h-12 bg-[#9ae49a] rounded-2xl flex items-center justify-center shadow-lg shadow-[#9ae49a]/30">
+                    <svg class="w-6 h-6 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                    </svg>
+                </div>
+                <!-- Title: 'Radar' text updated to use the neon green color -->
+                <h1 class="text-3xl font-bold text-white">Review <span class="text-[#9ae49a]">Radar</span></h1>
+            </div>
+            <p class="text-gray-400">Analyze product reviews. Smart. Simple. Secure.</p>
+        </div>
+
+        <!-- Signup Card -->
+        <div class="app-card p-8">
+            <div class="text-center mb-6">
+                <h2 class="text-xl font-semibold text-white">Create Account</h2>
+                <p class="text-gray-400 mt-2">Step 1: Set your credentials</p>
+            </div>
 
             {% if messages %}
-                <ul class="mt-4">
+                <div class="mb-4 p-3 rounded-lg bg-red-500/10 border border-red-500/20">
                     {% for message in messages %}
-                        <li class="text-red-500 text-sm">{{ message }}</li>
+                        <p class="text-red-400 text-sm">{{ message }}</p>
                     {% endfor %}
-                </ul>
+                </div>
             {% endif %}
 
-            <form method="post" class="space-y-4 mt-6">
+            <form method="post" class="space-y-5">
                 {% csrf_token %}
 
-                <!-- Username field -->
                 <div>
-                    <label for="{{ form.username.id_for_label }}" class="block text-sm font-medium text-gray-700">Username</label>
-                    {{ form.username|add_class:"form-input w-full mt-1 px-4 py-2 rounded-lg" }}
+                    <label for="{{ form.username.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-2">Username</label>
+                    {{ form.username|add_class:"form-input w-full px-4 py-3" }}
                 </div>
 
-                <!-- Password field -->
                 <div>
-                    <label for="{{ form.password1.id_for_label }}" class="block text-sm font-medium text-gray-700">Password</label>
-                    {{ form.password1|add_class:"form-input w-full mt-1 px-4 py-2 rounded-lg" }}
+                    <label for="{{ form.password1.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-2">Password</label>
+                    {{ form.password1|add_class:"form-input w-full px-4 py-3" }}
                 </div>
 
-                <!-- Confirm password -->
                 <div>
-                    <label for="{{ form.password2.id_for_label }}" class="block text-sm font-medium text-gray-700">Confirm Password</label>
-                    {{ form.password2|add_class:"form-input w-full mt-1 px-4 py-2 rounded-lg" }}
+                    <label for="{{ form.password2.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-2">Confirm Password</label>
+                    {{ form.password2|add_class:"form-input w-full px-4 py-3" }}
                 </div>
 
-                <button type="submit" class="w-full bg-gradient-to-r from-cyan-400 to-green-400 text-white font-bold py-3 px-4 rounded-lg shadow-lg hover:from-cyan-500 hover:to-green-500 transition-all duration-300 transform hover:scale-105">
-                    Next: Add Details
+                <button type="submit" class="btn-primary w-full py-3 px-4 shadow-lg shadow-[#9ae49a]/30">
+                    Continue to Profile ↓
                 </button>
             </form>
 
-            <p class="text-center text-sm text-gray-600 mt-6">
-                Already have an account? 
-                <a href="{% url 'user_login' %}" class="font-medium text-cyan-600 hover:text-cyan-800">Log in</a>
-            </p>
+            <div class="mt-6 text-center">
+                <p class="text-gray-400 text-sm">
+                    Already have an account? 
+                    <!-- Link updated to use the neon green color -->
+                    <a href="{% url 'user_login' %}" class="text-[#9ae49a] hover:text-white font-medium">Sign In</a>
+                </p>
+            </div>
+        </div>
+
+        <!-- Footer Note -->
+        <div class="text-center mt-6">
+            <p class="text-gray-500 text-sm">Your gateway to smart review analysis</p>
         </div>
     </div>
 </body>

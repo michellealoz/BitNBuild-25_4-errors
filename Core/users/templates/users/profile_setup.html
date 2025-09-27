@@ -4,32 +4,131 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Complete Profile</title>
+    <title>Complete Profile - Review Radar</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Base Dark Theme (Consistent with Sign Up) */
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #000000; /* Deep Black Background */
+            color: #E0F7FA; /* Light Text */
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        /* Dashboard Card - Deep Dark with subtle border */
+        .app-card {
+            background: #0A0A0A; /* Very dark gray */
+            border: 1px solid #1A1A1A;
+            border-radius: 20px;
+            /* Optional subtle internal glow */
+            box-shadow: 0 0 20px rgba(154, 228, 154, 0.05); 
+        }
+        /* Input Fields - Black interior, subtle glow on focus */
+        .form-input {
+            background: #000000;
+            border: 1px solid #333333;
+            color: white;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            padding: 12px 16px; /* Increased padding for better touch target */
+        }
+        /* Neon Green Focus */
+        .form-input:focus {
+            outline: none;
+            border-color: #9ae49a; /* Neon Green */
+            box-shadow: 0 0 0 2px rgba(154, 228, 154, 0.3);
+        }
+        /* Primary Button - Inverse look (Black text on Neon Green) */
+        .btn-primary {
+            background: #9ae49a;
+            color: #000000;
+            border-radius: 12px;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .btn-primary:hover {
+            transform: scale(1.01);
+            box-shadow: 0 0 20px rgba(154, 228, 154, 0.7); /* Stronger glow on hover */
+        }
+    </style>
 </head>
-<body class="bg-gradient-to-br from-cyan-200 via-green-200 to-lime-300 min-h-screen flex items-center justify-center">
+<body class="p-4">
     <div class="w-full max-w-md">
-        <div class="bg-white bg-opacity-30 backdrop-blur-lg p-8 rounded-2xl shadow-2xl">
-            <h1 class="text-2xl font-bold text-center mb-4">Step 2: Complete Your Profile</h1>
+        
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <div class="flex items-center justify-center gap-3 mb-4">
+                <!-- App Icon -->
+                <div class="w-12 h-12 bg-[#9ae49a] rounded-2xl flex items-center justify-center shadow-lg shadow-[#9ae49a]/30">
+                    <svg class="w-6 h-6 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                    </svg>
+                </div>
+                <h1 class="text-3xl font-extrabold text-white">Review <span class="text-[#9ae49a]">Radar</span></h1>
+            </div>
+            <p class="text-gray-400">Secure registration pipeline initiated.</p>
+        </div>
+
+        <!-- Profile Card -->
+        <div class="app-card p-8">
+            <div class="text-center mb-6">
+                <h2 class="text-xl font-semibold text-white">Complete Profile Data</h2>
+                <p class="text-gray-500 mt-2">Step 2: Required identity verification</p>
+            </div>
 
             {% if messages %}
-                <ul class="mb-4">
+                <div class="mb-4 p-3 rounded-lg bg-red-500/10 border border-red-500/20">
                     {% for message in messages %}
-                        <li class="text-red-500 text-sm">{{ message }}</li>
+                        <p class="text-red-400 text-sm">{{ message }}</p>
                     {% endfor %}
-                </ul>
+                </div>
             {% endif %}
 
-            <form method="post" class="space-y-4">
+            <form method="post" class="space-y-5">
                 {% csrf_token %}
-                <input type="text" name="full_name" placeholder="Full Name" class="w-full p-2 rounded-lg form-input" required>
-                <input type="email" name="email" placeholder="Email" class="w-full p-2 rounded-lg form-input" required>
-                <input type="text" name="phone" placeholder="Phone Number" class="w-full p-2 rounded-lg form-input" required>
-                <input type="date" name="dob" class="w-full p-2 rounded-lg form-input" required>
-                <input type="text" name="address" placeholder="Address" class="w-full p-2 rounded-lg form-input" required>
 
-                <button type="submit" class="w-full bg-green-500 text-white font-bold py-2 rounded-lg hover:bg-green-600 transition">Next: Finish</button>
+                <div>
+                    <label for="id_full_name" class="block text-sm font-medium text-gray-300 mb-2">Full Name</label>
+                    <!-- Assuming your Django form has a 'full_name' field, otherwise you must use the widget_tweaks helper -->
+                    <input type="text" name="full_name" id="id_full_name" placeholder="Full Legal Name" class="form-input w-full" required>
+                </div>
+
+                <div>
+                    <label for="id_email" class="block text-sm font-medium text-gray-300 mb-2">Email Address</label>
+                    <input type="email" name="email" id="id_email" placeholder="email@company.com" class="form-input w-full" required>
+                </div>
+
+                <div>
+                    <label for="id_phone" class="block text-sm font-medium text-gray-300 mb-2">Phone Number</label>
+                    <input type="text" name="phone" id="id_phone" placeholder="+1 (555) 555-5555" class="form-input w-full" required>
+                </div>
+                
+                <div>
+                    <label for="id_dob" class="block text-sm font-medium text-gray-300 mb-2">Date of Birth</label>
+                    <!-- Note: For input type="date" to look dark, we apply the same classes -->
+                    <input type="date" name="dob" id="id_dob" class="form-input w-full" required>
+                </div>
+
+                <div>
+                    <label for="id_address" class="block text-sm font-medium text-gray-300 mb-2">Address</label>
+                    <input type="text" name="address" id="id_address" placeholder="123 Analyst Lane, Data City" class="form-input w-full" required>
+                </div>
+
+                <button type="submit" class="btn-primary w-full py-4 px-4">
+                    FINISH REGISTRATION
+                </button>
             </form>
+
+            <div class="mt-6 text-center">
+                <p class="text-gray-500 text-sm">
+                    All data is encrypted and used only for account verification.
+                </p>
+            </div>
         </div>
     </div>
 </body>
