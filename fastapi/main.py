@@ -12,10 +12,11 @@ from bs4 import BeautifulSoup
 from sklearn.feature_extraction.text import TfidfVectorizer
 import pandas as pd
 from apify_client import ApifyClient
-from transformers import pipeline
+from transformers import pipeline, AutoTokenizer, AutoModelForSequenceClassification
 from collections import Counter
 import os
 import logging
+import re
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -23,9 +24,12 @@ logger = logging.getLogger(__name__)
 
 # --- 1. Initialize AI Models ---
 print("Loading AI models...")
-sentiment_classifier = pipeline("sentiment-analysis", model="distilbert-base-uncased-finetuned-sst-2-english", framework="pt")
+# NEW: Using a model specifically trained on Amazon reviews for star ratings
+rating_classifier = pipeline("sentiment-analysis", model="LiYuan/amazon-review-sentiment-analysis", framework="pt")
+# The summarizer remains the same
 summarizer = pipeline("summarization", model="sshleifer/distilbart-cnn-12-6", framework="pt")
 print("Models loaded successfully.")
+
 
 # --- 2. Pydantic Models ---
 class URLInput(BaseModel):
@@ -36,15 +40,16 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Allows all origins
+    allow_origins=["*"],
     allow_credentials=True,
-    allow_methods=["*"],  # Allows all methods (including POST and OPTIONS)
-    allow_headers=["*"],  # Allows all headers
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
-# --- 4. Enhanced Scraping Functions ---
+
+# --- 4. Scraping and Analysis Functions ---
 
 def enhanced_amazon_scraper(url: str) -> dict:
-    """Enhanced Selenium scraper for Amazon product details with better error handling."""
+    """Enhanced Selenium scraper for Amazon product details."""
     print(f"--- Starting enhanced Amazon scraper for: {url} ---")
     options = FirefoxOptions()
     options.add_argument("--headless")
@@ -52,295 +57,188 @@ def enhanced_amazon_scraper(url: str) -> dict:
         "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:89.0) Gecko/20100101 Firefox/89.0")
     
     driver = None
-    product_details = {
-        'product_name': "Not found",
-        'price': "Not found", 
-        'rating': "Not found",
-        'description': "Not found",
-        'images': []
-    }
+    product_details = { 'product_name': "Not found", 'price': "Not found", 'rating': "Not found" }
     
     try:
         driver = webdriver.Firefox(options=options)
         driver.get(url)
         wait = WebDriverWait(driver, 20)
-        
-        # Wait for critical elements with multiple fallbacks
-        try:
-            wait.until(EC.presence_of_element_located((By.ID, "productTitle")))
-        except:
-            wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, "h1.a-size-large")))
-        
+        wait.until(EC.presence_of_element_located((By.ID, "productTitle")))
         soup = BeautifulSoup(driver.page_source, 'html.parser')
         
-        # Product Name with multiple selectors
-        name_selectors = [
-            {'id': 'productTitle'},
-            {'class': 'a-size-large'},
-            {'class': 'product-title'}
-        ]
-        for selector in name_selectors:
-            element = soup.find('span', selector) if 'id' in selector else soup.find('h1', selector)
-            if element:
-                product_details['product_name'] = element.get_text(strip=True)
-                break
+        # Product Name
+        name_element = soup.find('span', {'id': 'productTitle'})
+        if name_element:
+            product_details['product_name'] = name_element.get_text(strip=True)
         
-        # Price with multiple selectors
-        price_selectors = [
-            'span.a-price-whole',
-            '.a-price[data-a-size="xl"] span',
-            '.a-price .a-offscreen',
-            '.a-text-price'
-        ]
-        for selector in price_selectors:
-            element = soup.select_one(selector)
-            if element:
-                price_text = element.get_text(strip=True)
-                # Clean price text
-                if '₹' in price_text:
-                    product_details['price'] = price_text.replace('₹', '').replace(',', '').strip()
-                else:
-                    product_details['price'] = price_text
-                break
+        # Price
+        price_element = soup.select_one('span.a-price-whole')
+        if price_element:
+            product_details['price'] = price_element.get_text(strip=True).replace(',', '')
         
         # Rating
         rating_element = soup.find('span', {'class': 'a-icon-alt'})
         if rating_element:
-            rating_text = rating_element.get_text(strip=True)
-            if 'out of' in rating_text:
-                product_details['rating'] = rating_text
-        
-        # Description/Highlights
-        desc_selectors = [
-            {'id': 'feature-bullets'},
-            {'id': 'productDescription'},
-            {'class': 'product-description'}
-        ]
-        for selector in desc_selectors:
-            element = soup.find('div', selector)
-            if element:
-                product_details['description'] = element.get_text(separator=' ', strip=True)
-                break
-        
-        # Try to get product images
-        image_elements = soup.find_all('img', {'class': 'a-dynamic-image'})
-        for img in image_elements[:3]:  # Get first 3 images
-            src = img.get('src') or img.get('data-src')
-            if src and 'http' in src:
-                product_details['images'].append(src)
-        
+            product_details['rating'] = rating_element.get_text(strip=True)
+            
         print(f"✅ Successfully scraped product: {product_details['product_name']}")
-        
     except Exception as e:
         print(f"❌ Enhanced scraper failed: {e}")
     finally:
         if driver:
             driver.quit()
-            
     return product_details
 
 def enhanced_apify_review_scraper(url: str, api_token: str) -> list:
-    """Enhanced Apify scraper with better error handling and data extraction."""
+    """Enhanced Apify scraper for reviews."""
     print(f"--- Starting enhanced Apify scraper for: {url} ---")
     client = ApifyClient(api_token)
-    
-    # Enhanced input configuration
-    run_input = {
-        "productUrls": [{"url": url}],
-        "maxReviews": 50,  # Increased for better analysis
-        "includeGdprSensitive": False,
-        "sort": "helpful",
-        "filterByRatings": ["allStars"],
-        "reviewsUseProductVariantFilter": False,
-        "scrapeProductDetails": False,
-        "reviewsAlwaysSaveCategoryData": False,
-        "deduplicateRedirectedAsins": True,
-    }
-    
+    run_input = { "productUrls": [{"url": url}], "maxReviews": 50, "sort": "helpful" }
     try:
         run = client.actor("R8WeJwLuzLZ6g4Bkk").call(run_input=run_input)
-        
-        # Wait for completion and get all items
         reviews_data = []
         for item in client.dataset(run["defaultDatasetId"]).iterate_items():
-            # Extract both title and description for richer analysis
-            review_text = ""
-            if item.get('reviewTitle'):
-                review_text += item['reviewTitle'] + ". "
-            if item.get('reviewDescription'):
-                review_text += item['reviewDescription']
-            
-            if review_text.strip():
-                reviews_data.append({
-                    'text': review_text.strip(),
-                    'rating': item.get('ratingScore', 0),
-                    'date': item.get('date', ''),
-                    'verified': item.get('isVerified', False),
-                    'helpful': item.get('reviewReaction', '')
-                })
-        
+            review_text = f"{item.get('reviewTitle', '')}. {item.get('reviewDescription', '')}".strip()
+            if review_text and review_text != ".":
+                reviews_data.append({'text': review_text, 'rating': item.get('ratingScore', 0)})
         print(f"✅ Successfully scraped {len(reviews_data)} reviews using Apify.")
         return reviews_data
-        
     except Exception as e:
         print(f"❌ Enhanced Apify scraper failed: {e}")
         return []
 
-def combine_scraped_data(product_details: dict, reviews: list) -> dict:
-    """Combine data from both scrapers and enhance with metadata."""
-    combined_data = {**product_details}
-    
-    # Extract just review texts for analysis
-    review_texts = [review['text'] for review in reviews if review['text']]
-    combined_data['reviews'] = review_texts
-    
-    # Add review metadata for display
-    combined_data['review_metadata'] = {
-        'total_reviews': len(reviews),
-        'average_rating': sum([r['rating'] for r in reviews if r['rating']]) / len(reviews) if reviews else 0,
-        'verified_reviews': sum([1 for r in reviews if r.get('verified', False)]),
-        'recent_reviews': [r for r in reviews if '2025' in r.get('date', '')][:5]  # Recent reviews
-    }
-    
-    return combined_data
+# --- Context-Aware Keyword Extraction ---
 
-def extract_top_keywords_tfidf(texts: list, num_keywords: int = 5) -> list:
-    """Enhanced keyword extraction with better preprocessing."""
-    if not texts or len(texts) < 2:
-        return []
+PRODUCT_KEYWORDS = {
+    "Smartphone": ["camera", "battery", "performance", "display", "screen", "charging", "design", "build", "value"],
+    "Laptop": ["performance", "battery", "display", "keyboard", "trackpad", "build", "portability", "speed", "screen"],
+    "Headphones": ["sound quality", "noise cancellation", "battery", "comfort", "build", "connectivity", "mic"],
+    "Generic": ["quality", "value", "performance", "design", "price", "easy to use"]
+}
+
+def categorize_product(product_name: str) -> str:
+    """Simple product categorization based on title."""
+    name = product_name.lower()
+    if any(k in name for k in ["phone", "mobile", "smartphone"]): return "Smartphone"
+    if any(k in name for k in ["laptop", "notebook", "macbook"]): return "Laptop"
+    if any(k in name for k in ["headphone", "earbuds", "headset"]): return "Headphones"
+    return "Generic"
+
+def extract_focused_keywords(texts: list, product_name: str, num_keywords: int = 4) -> list:
+    """
+    Extracts keywords, prioritizes relevant ones, and pads with top statistical
+    keywords to ensure the desired count is met.
+    """
+    if not texts: return []
+    
+    category = categorize_product(product_name)
+    relevant_keywords = PRODUCT_KEYWORDS.get(category, PRODUCT_KEYWORDS["Generic"])
     
     try:
-        vectorizer = TfidfVectorizer(
-            stop_words='english', 
-            ngram_range=(1, 2),
-            max_df=0.85,
-            min_df=1,  # Reduced for smaller datasets
-            max_features=1000
-        )
+        vectorizer = TfidfVectorizer(stop_words='english', ngram_range=(1, 2), max_df=0.9, min_df=1)
         tfidf_matrix = vectorizer.fit_transform(texts)
         sum_tfidf = tfidf_matrix.sum(axis=0)
         words = vectorizer.get_feature_names_out()
-        tfidf_scores = list(sum_tfidf.tolist()[0])
+        df = pd.DataFrame({'term': words, 'score': list(sum_tfidf.tolist()[0])})
         
-        df = pd.DataFrame({'term': words, 'score': tfidf_scores})
-        keywords = df.sort_values(by='score', ascending=False).head(num_keywords)['term'].tolist()
+        if df.empty:
+            return []
+
+        # Get top 20 statistical keywords to work with
+        top_statistical_keywords = df.sort_values(by='score', ascending=False).head(20)['term'].tolist()
         
-        # Filter out generic terms
-        generic_terms = ['phone', 'product', 'item', 'buy', 'purchase']
-        return [kw for kw in keywords if kw not in generic_terms]
+        # 1. Prioritize keywords that match our context list
+        focused_keywords = [kw for kw in top_statistical_keywords if any(focus in kw for focus in relevant_keywords)]
         
+        # Create a combined list, ensuring no duplicates and preserving order
+        combined_keywords = []
+        for kw in focused_keywords:
+            if kw not in combined_keywords:
+                combined_keywords.append(kw)
+        
+        # 2. Pad the list with the top statistical keywords if we don't have enough
+        for kw in top_statistical_keywords:
+            if len(combined_keywords) >= num_keywords:
+                break
+            if kw not in combined_keywords:
+                combined_keywords.append(kw)
+        
+        return combined_keywords[:num_keywords]
+
     except Exception as e:
         print(f"TF-IDF failed: {e}")
         return []
 
 def generate_comprehensive_analysis(product_data: dict) -> dict:
-    """Generate comprehensive analysis with enhanced features."""
+    """Generate comprehensive analysis using the new rating model and focused keywords."""
     reviews = product_data.get('reviews', [])
-    if not reviews:
-        return {"error": "No reviews to analyze."}
+    if not reviews: return {"error": "No reviews to analyze."}
 
-    # Sentiment Analysis
-    sentiments = [result['label'] for result in sentiment_classifier(reviews, truncation=True, max_length=512, padding=True)]
-    sentiment_counts = Counter(sentiments)
+    review_texts = [r['text'] for r in reviews]
+    
+    # --- UPDATED: Use the new rating classifier ---
+    predictions = rating_classifier(review_texts, truncation=True, max_length=512, padding=True)
+    
+    # --- FIX: Correctly parse the star rating from labels like "5 stars" ---
+    star_ratings = [int(p['label'].split()[0]) for p in predictions]
+
+    positive_count = sum(1 for star in star_ratings if star >= 4)
+    negative_count = sum(1 for star in star_ratings if star <= 2)
     total = len(reviews)
-    positive_percent = round((sentiment_counts.get('POSITIVE', 0) / total) * 100) if total > 0 else 0
-    negative_percent = round((sentiment_counts.get('NEGATIVE', 0) / total) * 100) if total > 0 else 0
-    neutral_percent = 100 - positive_percent - negative_percent
     
-    # Enhanced keyword extraction with sentiment context
-    positive_reviews = [r for r, s in zip(reviews, sentiments) if s == 'POSITIVE']
-    negative_reviews = [r for r, s in zip(reviews, sentiments) if s == 'NEGATIVE']
-    
-    top_pros_keywords = extract_top_keywords_tfidf(positive_reviews, num_keywords=6)
-    top_cons_keywords = extract_top_keywords_tfidf(negative_reviews, num_keywords=6)
+    positive_percent = round((positive_count / total) * 100) if total > 0 else 0
+    negative_percent = round((negative_count / total) * 100) if total > 0 else 0
 
-    # Enhanced summaries
-    summary_text = " ".join(reviews)
-    truncated_text = summary_text[:4000]  # Safe limit for summarization
+    positive_reviews = [text for text, star in zip(review_texts, star_ratings) if star >= 4]
+    negative_reviews = [text for text, star in zip(review_texts, star_ratings) if star <= 2]
     
-    overall_summary = summarizer(
-    truncated_text, 
-    max_length=80, 
-    min_length=30, 
-    do_sample=False,
-    truncation=True
-    )[0]['summary_text'] if len(truncated_text) > 100 else "Not enough reviews for detailed summary."
- 
+    # --- UPDATED: Use the new focused keyword extraction ---
+    product_name = product_data.get('product_name', '')
+    top_pros = extract_focused_keywords(positive_reviews, product_name)
+    top_cons = extract_focused_keywords(negative_reviews, product_name)
 
-    quick_summary = summarizer(
-    truncated_text, 
-    max_length=40, 
-    min_length=15, 
-    do_sample=False,
-    truncation=True
-    )[0]['summary_text'] if len(truncated_text) > 50 else "Insufficient review data."
+    summary = summarizer(" ".join(review_texts), max_length=50, min_length=15, do_sample=False)[0]['summary_text']
 
     return {
         "public_opinion": {
             "positive_percent": positive_percent,
             "negative_percent": negative_percent,
-            "neutral_percent": neutral_percent,
+            "neutral_percent": 100 - positive_percent - negative_percent,
             "total_reviews_analyzed": total,
-            "quick_summary": quick_summary,
-            "average_rating": product_data.get('review_metadata', {}).get('average_rating', 0)
+            "quick_summary": summary,
+            "average_rating": sum(star_ratings) / total if total > 0 else 0
         },
-        "pros_cons_panel": { 
-            "pros": top_pros_keywords[:4],  # Top 4 pros
-            "cons": top_cons_keywords[:4]   # Top 4 cons
-        },
-        "review_summary_generator": overall_summary,
-        "review_insights": {
-            "verified_reviews_count": product_data.get('review_metadata', {}).get('verified_reviews', 0),
-            "recent_review_count": len([r for r in product_data.get('review_metadata', {}).get('recent_reviews', [])])
-        }
+        "pros_cons_panel": {"pros": top_pros, "cons": top_cons}
     }
 
-# --- 5. Main API Endpoint with Dual Scraping ---
+# --- 5. Main API Endpoint ---
 @app.post("/analyze/")
 async def analyze_url(input_data: URLInput):
-    """Orchestrates dual scraping strategy and analysis."""
     APIFY_API_TOKEN = os.getenv("APIFY")
     if not APIFY_API_TOKEN:
         raise HTTPException(status_code=500, detail="APIFY API token is not configured.")
 
     try:
         loop = asyncio.get_event_loop()
-        
-        # Run both scrapers in parallel
         product_task = loop.run_in_executor(None, enhanced_amazon_scraper, input_data.url)
         reviews_task = loop.run_in_executor(None, enhanced_apify_review_scraper, input_data.url, APIFY_API_TOKEN)
         
         product_details = await product_task
         review_data = await reviews_task
 
-        # Check if we have minimum required data
         if not product_details or product_details.get('product_name') == "Not found":
-            raise HTTPException(status_code=404, detail="Could not scrape product details. URL may be invalid.")
-        
+            raise HTTPException(status_code=404, detail="Could not scrape product details.")
         if not review_data:
-            raise HTTPException(status_code=404, detail="Could not scrape reviews. Product may have no reviews or URL structure has changed.")
+            raise HTTPException(status_code=404, detail="Could not scrape reviews.")
 
-        # Combine data from both sources
-        combined_data = combine_scraped_data(product_details, review_data)
-        
-        # Generate analysis
-        analytics_task = loop.run_in_executor(None, generate_comprehensive_analysis, combined_data)
-        analysis_results = await analytics_task
+        combined_data = {**product_details, "reviews": review_data}
+        analysis_results = await loop.run_in_executor(None, generate_comprehensive_analysis, combined_data)
 
-        # Combine all data for response
-        final_response = {
-            **product_details,
-            **analysis_results
-        }
-        
-        # Remove raw reviews to reduce response size
+        final_response = {**product_details, **analysis_results}
         if 'reviews' in final_response:
             del final_response['reviews']
             
         return final_response
-
-    except HTTPException:
-        raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Analysis failed: {str(e)}")
 
