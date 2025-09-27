@@ -1,0 +1,47 @@
+{% extends 'users/base.html' %}
+
+{% block title %}User Dashboard{% endblock %}
+
+{% block content %}
+<div class="bg-white shadow-lg rounded-xl overflow-hidden">
+    <div class="p-8">
+        <div class="flex items-center space-x-5">
+            <div class="flex-shrink-0">
+                <div class="relative">
+                    <div class="w-16 h-16 rounded-full bg-gray-200 flex items-center justify-center">
+                        <svg class="h-10 w-10 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                        </svg>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <h1 class="text-3xl font-bold text-gray-900">{{ profile.full_name }}</h1>
+                <p class="text-sm font-medium text-gray-500">@{{ user.username }}</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="border-t border-gray-200 px-8 py-6">
+        <h3 class="text-lg font-semibold text-gray-800 mb-4">Your Profile Details</h3>
+        <dl class="grid grid-cols-1 gap-x-4 gap-y-8 sm:grid-cols-2">
+            <div class="sm:col-span-1">
+                <dt class="text-sm font-medium text-gray-500">Email address</dt>
+                <dd class="mt-1 text-sm text-gray-900">{{ profile.email }}</dd>
+            </div>
+            <div class="sm:col-span-1">
+                <dt class="text-sm font-medium text-gray-500">Phone number</dt>
+                <dd class="mt-1 text-sm text-gray-900">{{ profile.phone }}</dd>
+            </div>
+            <div class="sm:col-span-1">
+                <dt class="text-sm font-medium text-gray-500">Date of Birth</dt>
+                <dd class="mt-1 text-sm text-gray-900">{{ profile.dob|date:"F d, Y" }}</dd>
+            </div>
+            <div class="sm:col-span-1">
+                <dt class="text-sm font-medium text-gray-500">Address</dt>
+                <dd class="mt-1 text-sm text-gray-900">{{ profile.address }}</dd>
+            </div>
+        </dl>
+    </div>
+</div>
+{% endblock %}

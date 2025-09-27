@@ -1,0 +1,64 @@
+{% load widget_tweaks %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Frutiger Aero Sign-Up | Step 1</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Poppins', sans-serif; }
+        .frutiger-aero-glass { background: rgba(255, 255, 255, 0.3); backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.15);}
+        .form-input { background: rgba(255, 255, 255, 0.4); border: 1px solid rgba(255,255,255,0.2); transition: all 0.3s ease;}
+        .form-input:focus { background: rgba(255,255,255,0.6); border-color: rgba(2,239,239,0.5); box-shadow: 0 0 0 3px rgba(0,191,255,0.3);}
+    </style>
+</head>
+<body class="bg-gradient-to-br from-cyan-200 via-green-200 to-lime-300 min-h-screen flex items-center justify-center">
+    <div class="w-full max-w-md">
+        <div class="frutiger-aero-glass rounded-2xl shadow-2xl p-8">
+            <h1 class="text-3xl font-bold text-gray-800 text-center">Create Account</h1>
+            <p class="text-gray-600 text-center mt-2">Step 1 of 2: Set your credentials.</p>
+
+            {% if messages %}
+                <ul class="mt-4">
+                    {% for message in messages %}
+                        <li class="text-red-500 text-sm">{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+
+            <form method="post" class="space-y-4 mt-6">
+                {% csrf_token %}
+
+                <!-- Username field -->
+                <div>
+                    <label for="{{ form.username.id_for_label }}" class="block text-sm font-medium text-gray-700">Username</label>
+                    {{ form.username|add_class:"form-input w-full mt-1 px-4 py-2 rounded-lg" }}
+                </div>
+
+                <!-- Password field -->
+                <div>
+                    <label for="{{ form.password1.id_for_label }}" class="block text-sm font-medium text-gray-700">Password</label>
+                    {{ form.password1|add_class:"form-input w-full mt-1 px-4 py-2 rounded-lg" }}
+                </div>
+
+                <!-- Confirm password -->
+                <div>
+                    <label for="{{ form.password2.id_for_label }}" class="block text-sm font-medium text-gray-700">Confirm Password</label>
+                    {{ form.password2|add_class:"form-input w-full mt-1 px-4 py-2 rounded-lg" }}
+                </div>
+
+                <button type="submit" class="w-full bg-gradient-to-r from-cyan-400 to-green-400 text-white font-bold py-3 px-4 rounded-lg shadow-lg hover:from-cyan-500 hover:to-green-500 transition-all duration-300 transform hover:scale-105">
+                    Next: Add Details
+                </button>
+            </form>
+
+            <p class="text-center text-sm text-gray-600 mt-6">
+                Already have an account? 
+                <a href="{% url 'user_login' %}" class="font-medium text-cyan-600 hover:text-cyan-800">Log in</a>
+            </p>
+        </div>
+    </div>
+</body>
+</html>

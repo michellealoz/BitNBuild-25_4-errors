@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}My Application{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body class="bg-gray-100">
+    <nav class="bg-white shadow-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center">
+                    <a href="/" class="text-2xl font-bold text-indigo-600">MyApp</a>
+                </div>
+                <div class="flex items-center">
+                    {% if user.is_authenticated %}
+                        <a href="{% url 'user_dashboard' %}" class="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-200">Dashboard</a>
+                        <form action="/logout/" method="post" class="inline">
+                            {% csrf_token %}
+                            <button type="submit" class="ml-4 px-3 py-2 rounded-md text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700">
+                                Logout
+                            </button>
+                        </form>
+                    {% else %}
+                        <a href="{% url 'user_login' %}" class="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-200">Login</a>
+                        <a href="{% url 'user_signup' %}" class="ml-4 px-3 py-2 rounded-md text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700">Sign Up</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+            {% if messages %}
+                <div class="mb-4 px-4 sm:px-0">
+                    {% for message in messages %}
+                        <div class="p-4 rounded-md {% if message.tags == 'success' %}bg-green-100 text-green-800{% else %}bg-red-100 text-red-800{% endif %}" role="alert">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+            
+            {% block content %}
+            {% endblock %}
+        </div>
+    </main>
+
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

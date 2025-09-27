@@ -1,0 +1,36 @@
+{% load widget_tweaks %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Complete Profile</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gradient-to-br from-cyan-200 via-green-200 to-lime-300 min-h-screen flex items-center justify-center">
+    <div class="w-full max-w-md">
+        <div class="bg-white bg-opacity-30 backdrop-blur-lg p-8 rounded-2xl shadow-2xl">
+            <h1 class="text-2xl font-bold text-center mb-4">Step 2: Complete Your Profile</h1>
+
+            {% if messages %}
+                <ul class="mb-4">
+                    {% for message in messages %}
+                        <li class="text-red-500 text-sm">{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+
+            <form method="post" class="space-y-4">
+                {% csrf_token %}
+                <input type="text" name="full_name" placeholder="Full Name" class="w-full p-2 rounded-lg form-input" required>
+                <input type="email" name="email" placeholder="Email" class="w-full p-2 rounded-lg form-input" required>
+                <input type="text" name="phone" placeholder="Phone Number" class="w-full p-2 rounded-lg form-input" required>
+                <input type="date" name="dob" class="w-full p-2 rounded-lg form-input" required>
+                <input type="text" name="address" placeholder="Address" class="w-full p-2 rounded-lg form-input" required>
+
+                <button type="submit" class="w-full bg-green-500 text-white font-bold py-2 rounded-lg hover:bg-green-600 transition">Next: Finish</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

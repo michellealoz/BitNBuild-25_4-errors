@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Innovate Solutions - Your Partner for Success</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#0D47A1',   // Corporate Blue
+                        secondary: '#1E88E5', // Lighter Blue
+                        accent: '#10B981',    // Vibrant Green
+                        light: '#F5F7FA',     // Off-White
+                        dark: '#1A202C',      // Dark Gray/Blue
+                    },
+                    fontFamily: {
+                        poppins: ['Poppins', 'sans-serif'],
+                        serif: ['Playfair Display', 'serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet">
+    <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            color: #333;
+        }
+        
+        .hero-bg {
+            background-image: linear-gradient(rgba(26, 32, 44, 0.7), rgba(26, 32, 44, 0.7)), url('https://images.unsplash.com/photo-1521737604893-d14cc237f11d?q=80&w=1484&auto=format&fit=crop&ixlib=rb-4.0.3');
+            background-size: cover;
+            background-position: center;
+        }
+        
+        .pricing-card-popular {
+            transform: scale(1.05);
+            border: 2px solid #10B981;
+        }
+
+        /* Google Translate minimal theming */
+        .goog-te-banner-frame, #goog-gt-tt { display: none !important; }
+        html { margin-top: 0 !important; }
+        body { top: 0 !important; }
+        #google_translate_element { display: none; }
+        .language-select {
+            background-color: transparent;
+            border: none;
+            color: #4A5568;
+            padding: 0.5rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: color .2s;
+        }
+        .language-select:hover { color: #0D47A1; }
+    </style>
+</head>
+<body class="bg-light">
+
+    <header class="fixed w-full bg-white/80 backdrop-blur-sm shadow-sm z-50">
+        <div class="container mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <a href="/" class="text-2xl font-bold text-primary">
+                    Innovate<span class="text-secondary">Solutions</span>
+                </a>
+                
+                <nav class="hidden md:flex items-center space-x-8">
+                    <a href="#features" class="text-gray-600 hover:text-primary font-medium transition-colors">Features</a>
+                    <a href="#pricing" class="text-gray-600 hover:text-primary font-medium transition-colors">Pricing</a>
+                    <a href="#contact" class="text-gray-600 hover:text-primary font-medium transition-colors">Contact</a>
+                    <select id="custom_language_select" class="language-select">
+                        <option value="en">EN</option>
+                        <option value="es">ES</option>
+                        <option value="fr">FR</option>
+                        <option value="de">DE</option>
+                    </select>
+                    <div id="google_translate_element"></div>
+                </nav>
+
+                <div class="flex items-center space-x-4">
+                    <a href="/user/login" class="px-5 py-2 text-primary font-semibold hover:text-secondary transition-colors">Log In</a>
+                    <a href="/user/signup" class="px-5 py-2 bg-primary text-white hover:bg-dark rounded-lg shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5">Sign Up</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <section class="relative h-screen flex items-center justify-center text-center text-white hero-bg">
+        <div class="container mx-auto px-6 z-10" data-aos="fade-up">
+            <h1 class="text-4xl md:text-6xl font-extrabold leading-tight mb-4">
+                Build Your Future, Faster.
+            </h1>
+            <p class="text-lg md:text-xl max-w-3xl mx-auto text-gray-200 mb-8">
+                Our innovative platform provides the tools you need to scale your business, streamline your workflow, and achieve unprecedented growth.
+            </p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <a href="#pricing" class="px-8 py-4 bg-accent text-white font-bold rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300">
+                    Get Started for Free
+                </a>
+                <a href="#features" class="px-8 py-4 bg-white text-dark font-bold rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300">
+                    Explore Features
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <section id="features" class="py-24">
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-16" data-aos="fade-up">
+                <h2 class="text-4xl font-bold text-dark mb-4">Everything You Need to Succeed</h2>
+                <p class="text-gray-600 max-w-2xl mx-auto text-lg">A powerful suite of features designed for performance and scalability.</p>
+            </div>
+            
+            <div class="flex flex-col md:flex-row items-center gap-12 mb-20" data-aos="fade-right">
+                <div class="md:w-1/2">
+                    <span class="font-semibold text-primary">CUSTOMIZABLE</span>
+                    <h3 class="text-3xl font-bold text-dark my-3">Adaptable to Your Workflow</h3>
+                    <p class="text-gray-600 leading-relaxed mb-4">Don't change your process for a tool. Our platform features customizable modules and a flexible interface that adapts to your unique business needs, ensuring a seamless integration.</p>
+                    <a href="#" class="font-semibold text-primary hover:text-secondary">Learn More &rarr;</a>
+                </div>
+                <div class="md:w-1/2">
+                    <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=1470&auto=format&fit=crop&ixlib=rb-4.0.3" alt="Analytics Dashboard" class="rounded-lg shadow-xl">
+                </div>
+            </div>
+
+            <div class="flex flex-col md:flex-row-reverse items-center gap-12 mb-20" data-aos="fade-left">
+                <div class="md:w-1/2">
+                    <span class="font-semibold text-primary">INTEGRATION-READY</span>
+                    <h3 class="text-3xl font-bold text-dark my-3">Connect Your Favorite Tools</h3>
+                    <p class="text-gray-600 leading-relaxed mb-4">Our robust API allows for seamless integration with hundreds of third-party services. Connect your CRM, marketing automation, and other essential platforms in just a few clicks.</p>
+                    <a href="#" class="font-semibold text-primary hover:text-secondary">View Integrations &rarr;</a>
+                </div>
+                <div class="md:w-1/2">
+                    <img src="https://images.unsplash.com/photo-1556740758-90de374c12ad?q=80&w=1470&auto=format&fit=crop&ixlib=rb-4.0.3" alt="Team Collaboration" class="rounded-lg shadow-xl">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="pricing" class="py-24 bg-white">
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-16" data-aos="fade-up">
+                <h2 class="text-4xl font-bold text-dark mb-4">Simple, Transparent Pricing</h2>
+                <p class="text-gray-600 max-w-2xl mx-auto text-lg">Choose the plan that's right for you. No hidden fees, ever.</p>
+            </div>
+
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8 justify-center items-center">
+                <div class="bg-light rounded-xl shadow-lg p-8 text-center transition-transform transform hover:-translate-y-2" data-aos="fade-up" data-aos-delay="100">
+                    <h3 class="text-2xl font-bold text-dark mb-2">Individual</h3>
+                    <p class="text-gray-500 mb-6">For freelancers and solo-preneurs.</p>
+                    <div class="my-6">
+                        <span class="text-5xl font-extrabold text-dark">$29</span>
+                        <span class="text-gray-500">/ month</span>
+                    </div>
+                    <ul class="space-y-4 text-left my-8">
+                        <li class="flex items-center"><i class="fas fa-check-circle text-accent mr-3"></i> 5 Projects</li>
+                        <li class="flex items-center"><i class="fas fa-check-circle text-accent mr-3"></i> 10GB Storage</li>
+                        <li class="flex items-center"><i class="fas fa-check-circle text-accent mr-3"></i> Basic Analytics</li>
+                        <li class="flex items-center"><i class="fas fa-check-circle text-accent mr-3"></i> Community Support</li>
+                    </ul>
+                    <a href="/signup/individual" class="w-full block px-6 py-3 bg-white border-2 border-primary text-primary font-semibold rounded-lg hover:bg-primary hover:text-white transition-colors">Choose Plan</a>
+                </div>
+
+                <div class="bg-white rounded-xl shadow-2xl p-8 text-center relative pricing-card-popular" data-aos="fade-up">
+                     <span class="absolute top-0 -translate-y-1/2 left-1/2 -translate-x-1/2 bg-accent text-white text-xs font-bold px-3 py-1 rounded-full uppercase">Most Popular</span>
+                    <h3 class="text-2xl font-bold text-primary mb-2">Teams</h3>
+                    <p class="text-gray-500 mb-6">For growing businesses and teams.</p>
+                    <div class="my-6">
+                        <span class="text-5xl font-extrabold text-dark">$79</span>
+                        <span class="text-gray-500">/ month</span>
+                    </div>
+                    <ul class="space-y-4 text-left my-8">
+                        <li class="flex items-center"><i class="fas fa-check-circle text-accent mr-3"></i> Unlimited Projects</li>
+                        <li class="flex items-center"><i class="fas fa-check-circle text-accent mr-3"></i> 100GB Storage</li>
+                        <li class="flex items-center"><i class="fas fa-check-circle text-accent mr-3"></i> Advanced Analytics</li>
+                        <li class="flex items-center"><i class="fas fa-check-circle text-accent mr-3"></i> Priority Email Support</li>
+                        <li class="flex items-center"><i class="fas fa-check-circle text-accent mr-3"></i> Team Collaboration Tools</li>
+                    </ul>
+                    <a href="/signup/team" class="w-full block px-6 py-3 bg-accent text-white font-semibold rounded-lg hover:opacity-90 transition-opacity">Choose Plan</a>
+                </div>
+
+                <div class="bg-light rounded-xl shadow-lg p-8 text-center transition-transform transform hover:-translate-y-2" data-aos="fade-up" data-aos-delay="200">
+                    <h3 class="text-2xl font-bold text-dark mb-2">Enterprise</h3>
+                    <p class="text-gray-500 mb-6">For large-scale organizations.</p>
+                    <div class="my-6">
+                        <span class="text-4xl font-extrabold text-dark">Let's Talk</span>
+                    </div>
+                    <ul class="space-y-4 text-left my-8">
+                        <li class="flex items-center"><i class="fas fa-check-circle text-accent mr-3"></i> Everything in Teams</li>
+                        <li class="flex items-center"><i class="fas fa-check-circle text-accent mr-3"></i> Unlimited Storage</li>
+                        <li class="flex items-center"><i class="fas fa-check-circle text-accent mr-3"></i> Dedicated Account Manager</li>
+                        <li class="flex items-center"><i class="fas fa-check-circle text-accent mr-3"></i> 24/7 Phone Support</li>
+                    </ul>
+                    <a href="/contact-sales" class="w-full block px-6 py-3 bg-white border-2 border-primary text-primary font-semibold rounded-lg hover:bg-primary hover:text-white transition-colors">Contact Sales</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer id="contact" class="bg-dark text-white pt-20 pb-6">
+        <div class="container mx-auto px-6">
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-12 mb-16">
+                <div class="md:col-span-5 space-y-4">
+                    <h3 class="text-2xl font-bold">InnovateSolutions</h3>
+                    <p class="text-gray-400 leading-relaxed pr-8">
+                        Empowering businesses with the tools to innovate, automate, and grow. Join thousands of satisfied customers today.
+                    </p>
+                    <div class="flex space-x-4 pt-2">
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors"><i class="fab fa-twitter fa-lg"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors"><i class="fab fa-instagram fa-lg"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors"><i class="fab fa-linkedin-in fa-lg"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors"><i class="fab fa-github fa-lg"></i></a>
+                    </div>
+                </div>
+
+                <div class="md:col-span-4 grid grid-cols-2 gap-8">
+                    <div>
+                        <h4 class="text-lg font-semibold text-white mb-4">Product</h4>
+                        <ul class="space-y-3">
+                            <li><a href="#features" class="text-gray-400 hover:text-white transition-colors">Features</a></li>
+                            <li><a href="#pricing" class="text-gray-400 hover:text-white transition-colors">Pricing</a></li>
+                            <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Integrations</a></li>
+                            <li><a href="#" class="text-gray-400 hover:text-white transition-colors">API Docs</a></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 class="text-lg font-semibold text-white mb-4">Company</h4>
+                        <ul class="space-y-3">
+                            <li><a href="#" class="text-gray-400 hover:text-white transition-colors">About Us</a></li>
+                            <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Careers</a></li>
+                            <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Contact</a></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="md:col-span-3 space-y-4">
+                    <h4 class="text-lg font-semibold text-white">Get in Touch</h4>
+                    <ul class="space-y-3">
+                        <li class="flex items-center text-gray-400"><i class="fas fa-envelope w-5 mr-2"></i> info@innovate.com</li>
+                        <li class="flex items-center text-gray-400"><i class="fas fa-phone w-5 mr-2"></i> +1 (555) 123-4567</li>
+                        <li class="flex items-start text-gray-400"><i class="fas fa-map-marker-alt w-5 mr-2 mt-1"></i> 123 Innovation Dr, USA</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="pt-8 border-t border-gray-800 text-center text-gray-500 text-sm">
+                <p>&copy; 2025 InnovateSolutions. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        AOS.init({
+            duration: 800,
+            once: true,
+            offset: 50
+        });
+    </script>
+
+    <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+    <script type="text/javascript">
+        function googleTranslateElementInit() {
+            new google.translate.TranslateElement({ pageLanguage: 'en', includedLanguages: 'en,es,fr,de', autoDisplay: false }, 'google_translate_element');
+            const customSelect = document.getElementById('custom_language_select');
+            customSelect.addEventListener('change', function() {
+                const gtCombo = document.querySelector('.goog-te-combo');
+                if (gtCombo) {
+                    gtCombo.value = this.value;
+                    gtCombo.dispatchEvent(new Event('change'));
+                }
+            });
+        }
+    </script>
+</body>
+</html>

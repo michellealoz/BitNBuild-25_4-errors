@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Frutiger Aero Login</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        .frutiger-aero-glass {
+            background: rgba(255, 255, 255, 0.3);
+            -webkit-backdrop-filter: blur(15px);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        .form-input {
+            background: rgba(255, 255, 255, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+        
+        .form-input:focus {
+            background: rgba(255, 255, 255, 0.6);
+            border-color: rgba(2, 239, 239, 0.5);
+            box-shadow: 0 0 0 3px rgba(0, 191, 255, 0.3);
+        }
+
+        .bubble {
+            position: absolute;
+            border-radius: 50%;
+            opacity: 0.2;
+            animation: rise 15s infinite ease-in;
+            z-index: -1;
+        }
+        
+        @keyframes rise {
+            0% {
+                transform: translateY(0) scale(1);
+            }
+            100% {
+                transform: translateY(-120vh) scale(1.5);
+            }
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-cyan-200 via-green-200 to-lime-300 min-h-screen overflow-hidden">
+    <!-- Bubble background container -->
+    <div id="bubble-container" class="absolute inset-0 w-full h-full z-0"></div>
+    
+    <!-- Main Content Container -->
+    <div class="relative min-h-screen flex items-center justify-center p-4 z-10">
+
+        <!-- Login View -->
+        <div id="login-view" class="w-full max-w-md">
+            <div class="frutiger-aero-glass rounded-2xl shadow-2xl p-8 space-y-6">
+                <div class="text-center">
+                    <h1 class="text-3xl font-bold text-gray-800">Welcome Back</h1>
+                    <p class="text-gray-600 mt-2">Log in to continue your journey.</p>
+                </div>
+                <form method="post" class="space-y-4">
+    {% csrf_token %}
+    {% if form.non_field_errors %}
+        <ul>
+            {% for error in form.non_field_errors %}
+                <li class="text-red-500 text-sm">{{ error }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+    <div>
+        <label for="id_username" class="block text-sm font-medium text-gray-700">Username</label>
+        <input type="text" name="username" id="id_username" class="form-input w-full mt-1 px-4 py-2 rounded-lg" placeholder="Your username" required>
+    </div>
+    <div>
+        <label for="id_password" class="block text-sm font-medium text-gray-700">Password</label>
+        <input type="password" name="password" id="id_password" class="form-input w-full mt-1 px-4 py-2 rounded-lg" placeholder="••••••••" required>
+    </div>
+    <button type="submit" class="w-full bg-gradient-to-r from-cyan-400 to-green-400 text-white font-bold py-3 px-4 rounded-lg shadow-lg hover:from-cyan-500 hover:to-green-500 transition-all duration-300 transform hover:scale-105">
+        Log In
+    </button>
+</form>
+
+                <p class="text-center text-sm text-gray-600">
+                    Don't have an account? 
+                    <a href="/user/signup" class="font-medium text-cyan-600 hover:text-cyan-800">Sign up</a>
+                </p>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- Aesthetic Background Bubbles ---
+            const bubbleContainer = document.getElementById('bubble-container');
+            const bubbleColors = [
+                'bg-cyan-300', 'bg-green-300', 'bg-lime-300', 'bg-teal-300'
+            ];
+
+            function createBubble() {
+                const bubble = document.createElement('div');
+                const size = Math.random() * 150 + 50; // 50px to 200px
+                const color = bubbleColors[Math.floor(Math.random() * bubbleColors.length)];
+                
+                bubble.classList.add('bubble', color);
+                bubble.style.width = `${size}px`;
+                bubble.style.height = `${size}px`;
+                bubble.style.left = `${Math.random() * 100}%`;
+                bubble.style.bottom = `-${size}px`; // Start from below the screen
+                bubble.style.animationDuration = `${Math.random() * 10 + 10}s`; // 10s to 20s
+                bubble.style.animationDelay = `${Math.random() * 5}s`;
+
+                bubbleContainer.appendChild(bubble);
+
+                // Remove bubble after animation ends to prevent DOM clutter
+                setTimeout(() => {
+                    bubble.remove();
+                }, 25000);
+            }
+
+            // Create a set number of bubbles initially and then periodically
+            for(let i = 0; i < 20; i++) {
+                createBubble();
+            }
+            setInterval(createBubble, 1500); // Add a new bubble every 1.5 seconds
+        });
+    </script>
+</body>
+</html>
