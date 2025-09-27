@@ -3,19 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}User Portal{% endblock %}</title>
-    <link href="https://fonts.googleapis.com/css?family=Roboto:400,700&display=swap" rel="stylesheet">
+    <title>{% block title %}Review Radar - User Portal{% endblock %}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         :root {
             --sidebar-collapsed: 72px;
             --sidebar-expanded: 240px;
-            --sidebar-bg-start: #0b7b5d;
-            --sidebar-bg-end: #0a5e46;
-            --sidebar-accent: #34D399;
-            --sidebar-text: #ffffff;
+            --neon-green: #9ae49a;
+            --neon-blue: #4A90E2;
+            --neon-yellow: #f8c050;
+            --neon-green-shadow: 0 0 15px rgba(154, 228, 154, 0.5);
+            --neon-blue-shadow: 0 0 15px rgba(74, 144, 226, 0.5);
         }
+        
         * {
             margin: 0;
             padding: 0;
@@ -23,9 +25,10 @@
         }
         
         body {
-            background: #ffffff;
-            font-family: 'Roboto', sans-serif;
-            color: #111827;
+            font-family: 'Inter', sans-serif;
+            background: #000000;
+            color: #E0F7FA;
+            min-height: 100vh;
         }
         
         .main-container {
@@ -33,18 +36,18 @@
             min-height: 100vh;
         }
         
-        /* Sidebar */
+        /* Sidebar - Dark Theme */
         .sidebar {
             width: var(--sidebar-collapsed);
-            background: #ECF4E5;
-            color: #16341c;
+            background: #050505;
+            color: #E0F7FA;
             position: fixed;
             height: 100vh;
             overflow: hidden;
             transition: width 250ms ease, box-shadow 250ms ease;
             z-index: 1000;
-            box-shadow: 4px 0 24px rgba(0, 0, 0, 0.12);
-            border-right: 1px solid rgba(255,255,255,0.08);
+            box-shadow: 4px 0 24px rgba(0, 0, 0, 0.8);
+            border-right: 1px solid #1A1A1A;
         }
 
         .sidebar:hover,
@@ -54,8 +57,8 @@
         
         .sidebar-header {
             padding: 1.25rem 1rem;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.06);
-            background: #E1e9e5;
+            border-bottom: 1px solid #1A1A1A;
+            background: #0A0A0A;
             display: flex;
             align-items: center;
             gap: 0.75rem;
@@ -63,16 +66,14 @@
         }
         
         .sidebar-header h2 {
-            color: #16621f;
+            color: var(--neon-green);
             font-size: 1.25rem;
-            font-weight: 600;
+            font-weight: 800;
             margin: 0;
             opacity: 0;
             transform: translateX(-8px);
             transition: opacity 220ms ease, transform 220ms ease;
         }
-        
-        .sidebar-header p { display: none; }
         
         .sidebar-nav {
             padding: 0.75rem 0.5rem;
@@ -82,51 +83,42 @@
             display: flex;
             align-items: center;
             padding: 0.75rem 0.75rem;
-            color: #2b8228;
+            color: #E0F7FA;
             text-decoration: none;
-            transition: background-color 200ms ease, color 200ms ease;
+            transition: all 0.2s ease-in-out;
             border-radius: 12px;
             font-weight: 500;
             position: relative;
             gap: 0.75rem;
             white-space: nowrap;
             margin-bottom: 0.25rem;
+            border-left: 4px solid transparent;
         }
         
         .nav-item:hover {
-            color: #111827;
-            background: rgba(6, 95, 70, 0.08);
+            background-color: #1A1A1A;
+            color: var(--neon-green);
+            border-left-color: var(--neon-green);
+            text-shadow: 0 0 5px rgba(154, 228, 154, 0.3);
         }
         
         .nav-item.active {
-            color: #EAF7EE;
-            background: #065F46;
-            box-shadow: inset 0 0 0 1px rgba(0,0,0,0.06);
-        }
-        .nav-item.active .nav-label { color: #EAF7EE; }
-        
-        .nav-emoji {
-            font-size: 1.2rem;
-            width: 28px;
-            height: 28px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            background: rgba(6,95,70,0.08);
-            border-radius: 10px;
-            box-shadow: inset 0 1px 0 rgba(0,0,0,0.04);
-        }
-
-        .nav-item.active .nav-emoji {
-            background: rgba(255,255,255,0.18);
+            background-color: rgba(74, 144, 226, 0.2);
+            color: var(--neon-blue);
+            border-left-color: var(--neon-blue);
+            font-weight: 700;
+            box-shadow: inset 0 0 10px rgba(74, 144, 226, 0.2);
         }
 
         .nav-label {
             opacity: 0;
             transform: translateX(-6px);
             transition: opacity 220ms ease, transform 220ms ease;
-            color: #1e5327;
+            color: #E0F7FA;
             letter-spacing: 0.2px;
+            display: inline-block;
+            max-width: 0;
+            overflow: hidden;
         }
 
         .sidebar:hover .nav-label,
@@ -135,59 +127,63 @@
         .sidebar.expanded .sidebar-header h2 {
             opacity: 1;
             transform: translateX(0);
+            max-width: 200px;
         }
-
-        /* Reveal labels without layout shift by reserving space */
-        .sidebar .nav-label { display: inline-block; max-width: 0; }
-        .sidebar:hover .nav-label,
-        .sidebar.expanded .nav-label { max-width: 200px; }
         
         .sidebar-footer {
             position: absolute;
             bottom: 0;
             width: 100%;
             padding: 0.75rem;
-            border-top: 1px solid rgba(0,0,0,0.06);
+            border-top: 1px solid #1A1A1A;
         }
         
         .logout-btn {
-            background: #d90429;
-            color: white;
+            background: transparent;
+            color: #E0F7FA;
             border: none;
             padding: 0.5rem 1rem;
             border-radius: 8px;
             cursor: pointer;
             width: 100%;
-            font-weight: bold;
-            transition: background-color 0.3s ease;
+            font-weight: 500;
+            transition: all 0.2s ease-in-out;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 0.5rem;
+            text-decoration: none;
+            border-left: 4px solid transparent;
         }
         
         .logout-btn:hover {
-            background: #b71c1c;
+            background-color: #1A1A1A;
+            color: #FF6B6B;
+            border-left-color: #FF6B6B;
+            text-shadow: 0 0 5px rgba(255, 107, 107, 0.5);
         }
+        
         .logout-text {
             opacity: 0;
             transition: opacity 220ms ease;
             max-width: 0;
             display: inline-block;
             white-space: nowrap;
+            overflow: hidden;
         }
+        
         .sidebar:hover .logout-text,
         .sidebar.expanded .logout-text {
             opacity: 1;
             max-width: 100px;
         }
         
-        /* Main Content */
+        /* Main Content - Dark Theme */
         .main-content {
             flex: 1;
             margin-left: var(--sidebar-collapsed);
             padding: 2rem;
-            background: #F9FAFB;
+            background: #000000;
             min-height: 100vh;
             transition: margin-left 250ms ease;
         }
@@ -198,34 +194,135 @@
         }
         
         .content-header {
-            background: white;
+            background: #0A0A0A;
             padding: 2rem;
             border-radius: 16px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
             margin-bottom: 2rem;
-            border: 1px solid rgba(229, 231, 235, 1);
+            border: 1px solid #1A1A1A;
         }
         
         .content-header h1 {
-            color: #059669;
+            color: var(--neon-blue);
             margin-bottom: 0.75rem;
             font-size: 1.875rem;
-            font-weight: 600;
+            font-weight: 700;
             line-height: 2.25rem;
         }
         
         .content-header p {
-            color: #4B5563;
+            color: #9CA3AF;
             font-size: 1.125rem;
             line-height: 1.75rem;
         }
         
         .content-body {
-            background: white;
+            background: #0A0A0A;
             padding: 2rem;
             border-radius: 16px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            border: 1px solid rgba(229, 231, 235, 1);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+            border: 1px solid #1A1A1A;
+        }
+        
+        /* Card with subtle border and glow */
+        .app-card {
+            background: #0A0A0A;
+            border: 1px solid #1A1A1A;
+            border-radius: 20px;
+            box-shadow: 0 0 5px rgba(255, 255, 255, 0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .app-card:hover {
+            box-shadow: var(--neon-green-shadow);
+        }
+        
+        /* Input Fields */
+        .form-input {
+            background: #000000;
+            border: 1px solid #333333;
+            color: white;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            padding: 0.8rem;
+            width: 100%;
+        }
+        
+        /* Input Focus: Neon Green Border and Shadow */
+        .form-input:focus {
+            outline: none;
+            border-color: var(--neon-green);
+            box-shadow: 0 0 0 2px rgba(154, 228, 154, 0.3);
+        }
+        
+        /* Primary Button: Neon Green Background and Glow */
+        .btn-primary {
+            background: var(--neon-green);
+            color: #000000;
+            border-radius: 12px;
+            font-weight: 700;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            box-shadow: 0 4px 15px rgba(154, 228, 154, 0.4);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+        
+        /* Stronger glow and scale on hover */
+        .btn-primary:hover {
+            transform: scale(1.02);
+            box-shadow: 0 0 25px rgba(154, 228, 154, 0.8);
+            color: #000000;
+        }
+        
+        /* Alert Styles */
+        .alert {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            border-width: 1px;
+            border-style: solid;
+        }
+        
+        .alert-success {
+            background-color: rgba(154, 228, 154, 0.1);
+            color: var(--neon-green);
+            border-color: var(--neon-green);
+        }
+        
+        .alert-error {
+            background-color: rgba(255, 107, 107, 0.1);
+            color: #FF6B6B;
+            border-color: #FF6B6B;
+        }
+        
+        /* Table Styles */
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+            color: #E0F7FA;
+        }
+        
+        .table th, .table td {
+            padding: 0.8rem;
+            text-align: left;
+            border-bottom: 1px solid #1A1A1A;
+        }
+        
+        .table th {
+            background: #050505;
+            font-weight: bold;
+            color: var(--neon-green);
+        }
+        
+        .table tbody tr:hover {
+            background: #1A1A1A;
         }
         
         /* Mobile Responsive */
@@ -235,14 +332,14 @@
             top: 1rem;
             left: 1rem;
             z-index: 1001;
-            background: #065F46;
+            background: var(--neon-blue);
             color: white;
             border: none;
             width: 40px;
             height: 40px;
             border-radius: 8px;
             cursor: pointer;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
         }
         
         @media (max-width: 768px) {
@@ -258,20 +355,10 @@
             .sidebar, .main-content, .nav-label, .logout-text { transition: none !important; }
         }
         
-        /* Form, Button, Alert, Table Styles (can be kept as they are well-defined) */
-        .form-group { margin-bottom: 1.5rem; }
-        .form-group label { display: block; margin-bottom: 0.5rem; font-weight: bold; color: #2d6a4f; }
-        .form-control { width: 100%; padding: 0.8rem; border: 2px solid #e9ecef; border-radius: 8px; font-size: 1rem; transition: border-color 0.3s ease; }
-        .form-control:focus { outline: none; border-color: #2d6a4f; }
-        .btn { background: #059669; color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 8px; cursor: pointer; font-size: 0.875rem; font-weight: 600; transition: all 0.2s ease; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; }
-        .btn:hover { background: #047857; transform: translateY(-1px); box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); }
-        .alert { padding: 1rem; border-radius: 8px; margin-bottom: 1rem; border-width: 1px; border-style: solid; }
-        .alert-success { background-color: #d1fae5; color: #065f46; border-color: #6ee7b7; }
-        .alert-error { background-color: #fee2e2; color: #991b1b; border-color: #fca5a5; }
-        .table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
-        .table th, .table td { padding: 0.8rem; text-align: left; border-bottom: 1px solid #e9ecef; }
-        .table th { background: #f8f9fa; font-weight: bold; color: #2d6a4f; }
-        .table tbody tr:hover { background: #f8f9fa; }
+        /* Utility classes */
+        .text-neon-green { color: var(--neon-green); }
+        .text-neon-blue { color: var(--neon-blue); }
+        .text-neon-yellow { color: var(--neon-yellow); }
     </style>
     {% block extra_css %}{% endblock %}
 </head>
@@ -283,34 +370,33 @@
     <div class="main-container">
         <nav class="sidebar" id="sidebar">
             <div class="sidebar-header">
-                <!-- <span class="nav-emoji" aria-hidden="true">🌿</span> -->
-                <h2>CheckCheck</h2>
+                <h2><span class="text-neon-green">Review</span> <span class="text-neon-blue">Radar</span></h2>
             </div>
             
             <div class="sidebar-nav">
                 <a href="{% url 'user_dashboard' %}" class="nav-item {% if request.resolver_match.url_name == 'user_dashboard' %}active{% endif %}">
-                    <!-- <span class="nav-emoji" aria-hidden="true">🏠</span> -->
+                    <i class="fas fa-tachometer-alt"></i>
                     <span class="nav-label">Dashboard</span>
                 </a>
-                <a href="{% url 'analyzer' %}" class="nav-item {% if request.resolver_match.url_name == 'appointments' %}active{% endif %}">
-                    <!-- <span class="nav-emoji" aria-hidden="true">📅</span> -->
+                <a href="{% url 'analyzer' %}" class="nav-item {% if request.resolver_match.url_name == 'analyzer' %}active{% endif %}">
+                    <i class="fas fa-search-dollar"></i>
                     <span class="nav-label">Analyzer</span>
                 </a>
-                <a href="#" class="nav-item {% if request.resolver_match.url_name == 'health_records' %}active{% endif %}">
-                    <!-- <span class="nav-emoji" aria-hidden="true">❤️‍🩹</span> -->
+                <a href="#" class="nav-item {% if request.resolver_match.url_name == 'records' %}active{% endif %}">
+                    <i class="fas fa-save"></i>
                     <span class="nav-label">Records</span>
                 </a>
-                <a href="{% url 'compare' %}" class="nav-item {% if request.resolver_match.url_name == 'prescriptions' %}active{% endif %}">
-                    <!-- <span class="nav-emoji" aria-hidden="true">💊</span> -->
+                <a href="{% url 'compare' %}" class="nav-item {% if request.resolver_match.url_name == 'compare' %}active{% endif %}">
+                    <i class="fas fa-balance-scale"></i>
                     <span class="nav-label">Compare</span>
                 </a>
-                <a href="#" class="nav-item {% if request.resolver_match.url_name == 'find_doctor' %}active{% endif %}">
-                    <!-- <span class="nav-emoji" aria-hidden="true">👩‍⚕️</span> -->
-                    <span class="nav-label">Settings</span>
-                </a>
-                 <a href="#" class="nav-item {% if request.resolver_match.url_name == 'user_profile' %}active{% endif %}">
-                    <!-- <span class="nav-emoji" aria-hidden="true">👤</span> -->
+                <a href="#" class="nav-item {% if request.resolver_match.url_name == 'my_profile' %}active{% endif %}">
+                    <i class="fas fa-user-circle"></i>
                     <span class="nav-label">My Profile</span>
+                </a>
+                <a href="#" class="nav-item {% if request.resolver_match.url_name == 'settings' %}active{% endif %}">
+                    <i class="fas fa-cog"></i>
+                    <span class="nav-label">Settings</span>
                 </a>
             </div>
             
@@ -329,6 +415,7 @@
             {% block content_header %}
             <div class="content-header">
                 <h1>{% block page_title %}Dashboard{% endblock %}</h1>
+                <p>{% block page_subtitle %}Welcome back! Here's a summary of your activity.{% endblock %}</p>
             </div>
             {% endblock %}
             
