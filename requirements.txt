@@ -1,0 +1,6 @@
+django
+
+python-dotenv
+
+# For rendering form fields in templates
+django-widget-tweaks
