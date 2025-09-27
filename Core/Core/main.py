@@ -1,10 +1,7 @@
-# main.py - Your FastAPI Analysis Server
-
+import time
+import asyncio
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
-import time
-
-# --- All your scraping and analysis imports and functions go here ---
 from selenium import webdriver
 from selenium.webdriver.firefox.options import Options as FirefoxOptions
 from selenium.webdriver.common.by import By
@@ -15,108 +12,149 @@ from apify_client import ApifyClient
 from transformers import pipeline
 from collections import Counter
 import os
+import logging
+
+logger = logging.getLogger(__name__)
 
 # --- 1. Initialize AI Models (Global - loaded once on startup) ---
 print("Loading AI models...")
+# Model for the main pie chart (Positive/Negative)
 sentiment_classifier = pipeline("sentiment-analysis", model="distilbert-base-uncased-finetuned-sst-2-english", framework="pt")
+# Model for the TL;DR Summary
 summarizer = pipeline("summarization", model="sshleifer/distilbart-cnn-12-6", framework="pt")
 print("Models loaded successfully.")
 
-# --- 2. Define Request Body Model ---
+
+# --- 2. Define Pydantic Models for API data structure ---
 class URLInput(BaseModel):
     url: str
 
 # --- 3. Create FastAPI App Instance ---
 app = FastAPI()
 
-# --- 4. Helper Functions (Scraping and Analysis Logic) ---
-def local_product_scraper(url: str) -> dict:
-    # (This is your Selenium scraper for product details)
-    # ... [Paste your corrected local_product_scraper function here] ...
-    # For brevity, a mock version is used below.
-    print("--- (Mock) Starting local scraper for product details... ---")
-    time.sleep(1) # Simulate work
-    return {
-        'product_name': "Mock Product Name",
-        'price': "19,999",
-        'rating': "4.5 out of 5 stars",
-        'description': "A great product with many features."
-    }
+# --- 4. Helper Functions (Scraping and Analysis) ---
 
-def apify_review_scraper(url: str, api_token: str) -> list:
-    # (This is your Apify scraper for reviews)
-    # ... [Paste your apify_review_scraper function here] ...
-    # For brevity, a mock version is used below.
-    print("--- (Mock) Starting Apify scraper for reviews... ---")
-    time.sleep(2) # Simulate work
-    return [
-        "The battery is incredible, lasts two days easily. Performance is super smooth.",
-        "I love the camera and the screen quality is top-notch. Best phone for the price.",
-        "Gaming performance is great but it tends to overheat after an hour.",
-        "The screen is beautiful but the camera is a huge disappointment.",
-        "Heats up way too much. The performance suffers because of it. Had to return it."
-    ]
+def local_product_scraper_sync(url: str) -> dict:
+    """The synchronous (blocking) Selenium scraper for product details."""
+    print("--- Starting local scraper for product details... ---")
+    options = FirefoxOptions()
+    options.headless = True
+    options.set_preference("general.useragent.override", "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:89.0) Gecko/20100101 Firefox/89.0")
+    
+    driver = webdriver.Firefox(options=options)
+    product_details = {}
+    
+    try:
+        driver.get(url)
+        wait = WebDriverWait(driver, 10)
+        wait.until(EC.presence_of_element_located((By.ID, "productTitle")))
+        
+        soup = BeautifulSoup(driver.page_source, 'html.parser')
+        
+        product_details['product_name'] = soup.find('span', {'id': 'productTitle'}).get_text(strip=True) if soup.find('span', {'id': 'productTitle'}) else "Not found"
+        product_details['price'] = soup.find('span', {'class': 'a-price-whole'}).get_text(strip=True) if soup.find('span', {'class': 'a-price-whole'}) else "Not found"
+        product_details['rating'] = soup.find('span', {'class': 'a-icon-alt'}).get_text(strip=True) if soup.find('span', {'class': 'a-icon-alt'}) else "Not found"
+        product_details['description'] = soup.find('div', {'id': 'feature-bullets'}).get_text(separator=' ', strip=True) if soup.find('div', {'id': 'feature-bullets'}) else "Not found"
+        
+        print("Successfully scraped product details locally.")
+    except Exception as e:
+        print(f"Local scraper failed: {e}")
+    finally:
+        driver.quit()
+        
+    return product_details
+
+def apify_review_scraper_sync(url: str, api_token: str) -> list:
+    """The synchronous (blocking) Apify scraper for reviews."""
+    print("--- Starting Apify scraper for reviews... ---")
+    client = ApifyClient(api_token)
+    run_input = {
+        "productUrls": [{"url": url}],
+        "maxReviews": 10, 
+        "scrapeProductDetails": False,
+    }
+    try:
+        run = client.actor("R8WeJwLuzLZ6g4Bkk").call(run_input=run_input)
+        
+        reviews = []
+        for item in client.dataset(run["defaultDatasetId"]).iterate_items():
+            if item.get('text'):
+                reviews.append(item.get('text'))
+        
+        print(f"Successfully scraped {len(reviews)} reviews using Apify.")
+        return reviews
+    except Exception as e:
+        print(f"Apify scraper failed: {e}")
+        return []
 
 def generate_dashboard_data(product_data: dict) -> dict:
-    # (This is the main analytics function from our previous discussion)
-    # ... [Paste your generate_dashboard_data function here] ...
-    # For brevity, a mock version is used below.
-    print("--- (Mock) Generating dashboard data... ---")
+    """Takes combined scraped data and generates the full analytics report."""
     reviews = product_data.get('reviews', [])
-    if not reviews: return {}
-    
+    if not reviews:
+        return {"error": "No reviews to analyze."}
+
+    # Public Opinion Summary
     sentiments = [result['label'] for result in sentiment_classifier(reviews, truncation=True)]
     sentiment_counts = Counter(sentiments)
     total = len(reviews)
     positive_percent = round((sentiment_counts.get('POSITIVE', 0) / total) * 100)
+    negative_percent = round((sentiment_counts.get('NEGATIVE', 0) / total) * 100)
     
+    # Simple Pros/Cons heuristic
+    pros, cons = [], []
+    positive_reviews = [r for r, s in zip(reviews, sentiments) if s == 'POSITIVE']
+    negative_reviews = [r for r, s in zip(reviews, sentiments) if s == 'NEGATIVE']
+    
+    if positive_reviews:
+        pros_summary = summarizer( ". ".join(positive_reviews), max_length=30, min_length=5, do_sample=False)[0]['summary_text']
+        pros = [p.strip() for p in pros_summary.split(',')]
+    if negative_reviews:
+        cons_summary = summarizer( ". ".join(negative_reviews), max_length=30, min_length=5, do_sample=False)[0]['summary_text']
+        cons = [c.strip() for c in cons_summary.split(',')]
+
+    # Overall Summary
+    overall_summary = summarizer(" ".join(reviews), max_length=60, min_length=20, do_sample=False)[0]['summary_text']
+
     return {
         "public_opinion": {
             "positive_percent": positive_percent,
-            "negative_percent": 100 - positive_percent,
-            "total_reviews_analyzed": total
+            "negative_percent": negative_percent,
+            "neutral_percent": 100 - positive_percent - negative_percent,
+            "total_reviews_analyzed": total,
+            "quick_summary": f"Most users are satisfied ({positive_percent}%), especially with features like {pros[0] if pros else 'performance'}, but {negative_percent}% mention issues like {cons[0] if cons else 'bugs'}."
         },
-        "pros_cons_panel": {
-            "pros": ["Great Battery", "Smooth Performance"],
-            "cons": ["Overheats", "Bad Camera"]
-        },
-        "review_summary_generator": "This product is praised for its battery and performance, but some users report overheating and a disappointing camera."
+        "pros_cons_panel": { "pros": pros[:4], "cons": cons[:4] },
+        "review_summary_generator": overall_summary
     }
-
 
 # --- 5. Define the Main API Endpoint ---
 @app.post("/analyze/")
 async def analyze_url(input_data: URLInput):
-    """
-    Receives a product URL, orchestrates scraping and analysis,
-    and returns the final dashboard JSON.
-    """
-    # It's good practice to get API keys from environment variables
-    # APIFY_API_TOKEN = os.getenv("APIFY_API_TOKEN")
-    APIFY_API_TOKEN = "YOUR_APIFY_API_TOKEN" # Replace for testing
-
-    if not APIFY_API_TOKEN or APIFY_API_TOKEN == "YOUR_APIFY_API_TOKEN":
-        raise HTTPException(status_code=500, detail="Apify API token is not configured on the server.")
+    """Orchestrates scraping and analysis."""
+    APIFY_API_TOKEN = os.getenv("APIFY") # Fallback for local 
+    if not APIFY_API_TOKEN:
+            logger.error("APIFY not set in environment")
+            return None
 
     try:
-        # Step 1: Run both scrapers
-        product_details = local_product_scraper(input_data.url)
-        review_list = apify_review_scraper(input_data.url, APIFY_API_TOKEN)
+        # Run synchronous code in threads to avoid blocking the server
+        loop = asyncio.get_event_loop()
+        local_task = loop.run_in_executor(None, local_product_scraper_sync, input_data.url)
+        apify_task = loop.run_in_executor(None, apify_review_scraper_sync, input_data.url, APIFY_API_TOKEN)
+        
+        product_details = await local_task
+        review_list = await apify_task
 
         if not product_details or not review_list:
             raise HTTPException(status_code=404, detail="Could not scrape all necessary data.")
 
-        # Step 2: Combine the data
         product_details['reviews'] = review_list
+        
+        analytics_task = loop.run_in_executor(None, generate_dashboard_data, product_details)
+        dashboard_json = await analytics_task
 
-        # Step 3: Run the full analysis
-        dashboard_json = generate_dashboard_data(product_details)
-
-        # Step 4: Return the final result
         return dashboard_json
-
     except Exception as e:
-        # Catch any other errors and return a generic server error
         raise HTTPException(status_code=500, detail=f"An internal error occurred: {str(e)}")
 
-# --- To run this server: uvicorn main:app --reload --port 8001 ---
+# To run: uvicorn main:app --reload --port 8001

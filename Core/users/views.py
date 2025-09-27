@@ -5,7 +5,7 @@ from django.contrib.auth import authenticate, login
 from django.contrib import messages
 from django import forms
 from users.models import UserProfile
-
+import requests
 
 # Step 1: Signup
 def user_signup(request):
@@ -86,3 +86,30 @@ def user_login_view(request):
         else:
             messages.error(request, 'Invalid username or password.')
     return render(request, 'users/login.html')
+
+@login_required(login_url='/user/login/')
+def analysis_view(request):
+    FASTAPI_ANALYSIS_URL = "http://127.0.0.1:8001/analyze/"
+    context = {}
+    if request.method == "POST":
+        product_url = request.POST.get("product_url")
+        if product_url:
+            try:
+                # Set a generous timeout as scraping can be slow
+                response = requests.post(FASTAPI_ANALYSIS_URL, json={"url": product_url}, timeout=90)
+                response.raise_for_status()
+                
+                context['data'] = response.json()
+                context['product_url'] = product_url
+
+            except requests.exceptions.Timeout:
+                context['error'] = "The analysis took too long to complete. Please try again."
+            except requests.exceptions.RequestException as e:
+                # Try to get the error detail from FastAPI's response
+                try:
+                    error_detail = e.response.json().get('detail', str(e))
+                except:
+                    error_detail = str(e)
+                context['error'] = f"An error occurred: {error_detail}"
+
+    return render(request, "analysis_template.html", context)

@@ -159,6 +159,7 @@ LOGGING = {
 }
 
 REVIEW_SCRAPE_KEY = os.getenv('REVIEW_SCRAPE_KEY')
+APIFY = os.getenv('APIFY')
 
 LOGIN_URL = '/user/login/'
 LOGIN_REDIRECT_URL = '/user/dashboard/'
