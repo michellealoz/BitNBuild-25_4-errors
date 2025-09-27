@@ -1,6 +1,7 @@
 import time
 import asyncio
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from selenium import webdriver
 from selenium.webdriver.firefox.options import Options as FirefoxOptions
@@ -33,6 +34,13 @@ class URLInput(BaseModel):
 # --- 3. FastAPI App ---
 app = FastAPI()
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Allows all origins
+    allow_credentials=True,
+    allow_methods=["*"],  # Allows all methods (including POST and OPTIONS)
+    allow_headers=["*"],  # Allows all headers
+)
 # --- 4. Enhanced Scraping Functions ---
 
 def enhanced_amazon_scraper(url: str) -> dict:

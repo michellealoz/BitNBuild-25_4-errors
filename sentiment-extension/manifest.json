@@ -1,0 +1,31 @@
+{
+  "manifest_version": 3,
+  "name": "Product Sentiment Analyzer",
+  "version": "1.0",
+  "description": "Analyzes the sentiment of the current Amazon product page using a local AI service.",
+  "permissions": [
+    "activeTab"
+  ],
+  "host_permissions": [
+    "http://127.0.0.1:8001/*"
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "images/icon16.png",
+      "48": "images/icon48.png",
+      "128": "images/icon128.png"
+    }
+  },
+  "icons": {
+    "16": "images/icon16.png",
+    "48": "images/icon48.png",
+    "128": "images/icon128.png"
+  },
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "sentiment-analyzer@example.com"
+    }
+  }
+}
+

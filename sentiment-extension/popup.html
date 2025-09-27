@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Product Analyzer</title>
+    <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Sentiment Analysis</h1>
+        <button id="analyze-btn">Analyze this Product</button>
+        
+        <div id="loader" class="hidden">
+            <div class="spinner"></div>
+            <p>Analyzing... this may take a moment.</p>
+        </div>
+
+        <div id="error" class="hidden"></div>
+
+        <div id="results" class="hidden">
+            <h2 id="product-name"></h2>
+            <div class="score-card">
+                <h3>Overall Score</h3>
+                <p id="overall-score">_</p>
+            </div>
+            <div class="sentiment-breakdown">
+                <h4>Sentiment</h4>
+                <div class="bar-container">
+                    <div class="bar positive" id="positive-bar"></div>
+                </div>
+                <p id="sentiment-text"></p>
+            </div>
+            <h4>Summary</h4>
+            <p id="summary-text"></p>
+            <h4>Pros & Cons</h4>
+            <div class="pros-cons">
+                <div id="pros-list"></div>
+                <div id="cons-list"></div>
+            </div>
+        </div>
+    </div>
+    <script src="popup.js"></script>
+</body>
+</html>
