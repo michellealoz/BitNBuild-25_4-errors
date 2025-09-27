@@ -8,6 +8,8 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from bs4 import BeautifulSoup
+from sklearn.feature_extraction.text import TfidfVectorizer
+import pandas as pd
 from apify_client import ApifyClient
 from transformers import pipeline
 from collections import Counter
@@ -87,6 +89,42 @@ def apify_review_scraper_sync(url: str, api_token: str) -> list:
         print(f"Apify scraper failed: {e}")
         return []
 
+def extract_top_keywords_tfidf(texts: list, num_keywords: int = 5) -> list:
+    """
+    Extracts the most significant keywords from a list of texts using TF-IDF.
+    It focuses on single words and two-word phrases.
+    """
+    if not texts:
+        return []
+
+    try:
+        # Initialize the TF-IDF Vectorizer to look for single words and pairs of words (n-grams)
+        vectorizer = TfidfVectorizer(
+            stop_words='english', 
+            ngram_range=(1, 2), # considers words like "battery" and "battery life"
+            max_df=0.85, # ignore terms that appear in more than 85% of documents
+            min_df=2 # ignore terms that appear in only one document
+        )
+        
+        tfidf_matrix = vectorizer.fit_transform(texts)
+        
+        # Sum the TF-IDF scores for each term across all reviews
+        sum_tfidf = tfidf_matrix.sum(axis=0)
+        
+        # Get the words (features) and their corresponding summed scores
+        words = vectorizer.get_feature_names_out()
+        tfidf_scores = list(sum_tfidf.tolist()[0])
+        
+        # Create a DataFrame for easy sorting
+        df = pd.DataFrame({'term': words, 'score': tfidf_scores})
+        
+        # Return the top N keywords
+        return df.sort_values(by='score', ascending=False).head(num_keywords)['term'].tolist()
+
+    except Exception as e:
+        print(f"TF-IDF failed: {e}")
+        return []
+
 def generate_dashboard_data(product_data: dict) -> dict:
     """Takes combined scraped data and generates the full analytics report."""
     reviews = product_data.get('reviews', [])
@@ -100,20 +138,17 @@ def generate_dashboard_data(product_data: dict) -> dict:
     positive_percent = round((sentiment_counts.get('POSITIVE', 0) / total) * 100)
     negative_percent = round((sentiment_counts.get('NEGATIVE', 0) / total) * 100)
     
-    # Simple Pros/Cons heuristic
-    pros, cons = [], []
+    # Separate reviews for keyword extraction
     positive_reviews = [r for r, s in zip(reviews, sentiments) if s == 'POSITIVE']
     negative_reviews = [r for r, s in zip(reviews, sentiments) if s == 'NEGATIVE']
     
-    if positive_reviews:
-        pros_summary = summarizer( ". ".join(positive_reviews), max_length=30, min_length=5, do_sample=False)[0]['summary_text']
-        pros = [p.strip() for p in pros_summary.split(',')]
-    if negative_reviews:
-        cons_summary = summarizer( ". ".join(negative_reviews), max_length=30, min_length=5, do_sample=False)[0]['summary_text']
-        cons = [c.strip() for c in cons_summary.split(',')]
+    # Use the new TF-IDF function to get pros and cons
+    top_pros_keywords = extract_top_keywords_tfidf(positive_reviews, num_keywords=4)
+    top_cons_keywords = extract_top_keywords_tfidf(negative_reviews, num_keywords=4)
 
     # Overall Summary
     overall_summary = summarizer(" ".join(reviews), max_length=60, min_length=20, do_sample=False)[0]['summary_text']
+    quick_summary = summarizer(" ".join(reviews[:10]), max_length=40, min_length=15, do_sample=False)[0]['summary_text']
 
     return {
         "public_opinion": {
@@ -121,9 +156,13 @@ def generate_dashboard_data(product_data: dict) -> dict:
             "negative_percent": negative_percent,
             "neutral_percent": 100 - positive_percent - negative_percent,
             "total_reviews_analyzed": total,
-            "quick_summary": f"Most users are satisfied ({positive_percent}%), especially with features like {pros[0] if pros else 'performance'}, but {negative_percent}% mention issues like {cons[0] if cons else 'bugs'}."
+            "quick_summary": quick_summary
         },
-        "pros_cons_panel": { "pros": pros[:4], "cons": cons[:4] },
+        # The pros_cons_panel is now populated by the TF-IDF results
+        "pros_cons_panel": { 
+            "pros": top_pros_keywords, 
+            "cons": top_cons_keywords 
+        },
         "review_summary_generator": overall_summary
     }
 

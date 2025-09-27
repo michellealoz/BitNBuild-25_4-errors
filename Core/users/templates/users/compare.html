@@ -10,53 +10,71 @@
 {% endblock %}
 
 {% block content %}
-<div class="card mb-4">
-    <div class="card-body">
-        <div class="row g-3 align-items-center">
-            <div class="col-lg-5">
-                <input type="url" class="form-control" placeholder="Product URL 1...">
+<!-- The form now has a method, action, and CSRF token -->
+<form method="post">
+    {% csrf_token %}
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="row g-3 align-items-center">
+                <div class="col-lg-5">
+                    <!-- Inputs now have 'name' attributes and 'value' to remember old input -->
+                    <input type="url" name="product_url_1" class="form-control" placeholder="Product URL 1..." value="{{ product_url_1|default:'' }}" required>
+                </div>
+                <div class="col-lg-2 text-center">
+                    <span class="fw-bold h5 text-muted">VS</span>
+                </div>
+                <div class="col-lg-5">
+                    <input type="url" name="product_url_2" class="form-control" placeholder="Product URL 2..." value="{{ product_url_2|default:'' }}" required>
+                </div>
             </div>
-            <div class="col-lg-2 text-center">
-                <span class="fw-bold h5 text-muted">VS</span>
+            <div class="text-center mt-3">
+                <!-- Button is now type="submit" -->
+                <button class="btn btn-success fw-bold px-5" type="submit">
+                    <i class="fas fa-balance-scale me-2"></i>Compare
+                </button>
             </div>
-            <div class="col-lg-5">
-                <input type="url" class="form-control" placeholder="Product URL 2...">
-            </div>
-        </div>
-        <div class="text-center mt-3">
-            <button class="btn btn-success fw-bold px-5" type="button">
-                <i class="fas fa-balance-scale me-2"></i>Compare
-            </button>
         </div>
     </div>
-</div>
+</form>
 
+<!-- Display error messages if any -->
+{% if error %}
+<div class="alert alert-danger" role="alert">
+    <strong>Error:</strong> {{ error }}
+</div>
+{% endif %}
+
+<!-- Display the comparison results only if both data sets are available -->
+{% if data1 and data2 %}
 <div class="row">
+    <!-- Product 1 Card -->
     <div class="col-md-6 mb-4">
         <div class="card h-100 border-primary border-2">
-            <div class="card-header bg-primary text-white fw-bold h5">Product A: ProTech Gadget</div>
+            <div class="card-header bg-primary text-white fw-bold h5">
+                Product A: {{ data1.product_name|truncatechars:30 }}
+            </div>
             <div class="table-responsive">
                 <table class="table table-striped table-hover mb-0">
                     <tbody>
                         <tr>
                             <th scope="row">Overall Score</th>
-                            <td class="fw-bold text-primary">8.5 / 10</td>
+                            <td class="fw-bold text-primary">{{ data1.overall_score }} / 10</td>
                         </tr>
                         <tr>
                             <th scope="row">Price</th>
-                            <td>$299.99</td>
+                            <td>₹{{ data1.price }}</td>
                         </tr>
                         <tr>
                             <th scope="row">Positive Reviews</th>
-                            <td>81%</td>
+                            <td>{{ data1.public_opinion.positive_percent }}%</td>
                         </tr>
                         <tr>
-                            <th scope="row">Key Feature</th>
-                            <td>Long Battery Life</td>
+                            <th scope="row">Top Pro</th>
+                            <td>{{ data1.pros_cons_panel.pros.0|default:'N/A' }}</td>
                         </tr>
                         <tr>
-                            <th scope="row">Top Complaint</th>
-                            <td>Bulky Design</td>
+                            <th scope="row">Top Con</th>
+                            <td>{{ data1.pros_cons_panel.cons.0|default:'N/A' }}</td>
                         </tr>
                     </tbody>
                 </table>
@@ -64,31 +82,34 @@
         </div>
     </div>
 
+    <!-- Product 2 Card -->
     <div class="col-md-6 mb-4">
         <div class="card h-100 border-success border-2">
-            <div class="card-header bg-success text-white fw-bold h5">Product B: Nova Speaker</div>
+            <div class="card-header bg-success text-white fw-bold h5">
+                Product B: {{ data2.product_name|truncatechars:30 }}
+            </div>
             <div class="table-responsive">
                 <table class="table table-striped table-hover mb-0">
                     <tbody>
                         <tr>
                             <th scope="row">Overall Score</th>
-                            <td class="fw-bold text-success">8.2 / 10</td>
+                            <td class="fw-bold text-success">{{ data2.overall_score }} / 10</td>
                         </tr>
                         <tr>
                             <th scope="row">Price</th>
-                            <td>$249.99</td>
+                            <td>₹{{ data2.price }}</td>
                         </tr>
                         <tr>
                             <th scope="row">Positive Reviews</th>
-                            <td>78%</td>
+                            <td>{{ data2.public_opinion.positive_percent }}%</td>
                         </tr>
                         <tr>
-                            <th scope="row">Key Feature</th>
-                            <td>Superior Sound Quality</td>
+                            <th scope="row">Top Pro</th>
+                            <td>{{ data2.pros_cons_panel.pros.0|default:'N/A' }}</td>
                         </tr>
                         <tr>
-                            <th scope="row">Top Complaint</th>
-                            <td>Connectivity Issues</td>
+                            <th scope="row">Top Con</th>
+                            <td>{{ data2.pros_cons_panel.cons.0|default:'N/A' }}</td>
                         </tr>
                     </tbody>
                 </table>
@@ -96,4 +117,5 @@
         </div>
     </div>
 </div>
+{% endif %}
 {% endblock %}
