@@ -5,28 +5,47 @@
     <title>Review Radar - About & Privacy</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <style>
+        :root {
+    --neon-green: #42ea24; /* Neon Green */
+    --neon-blue: #00F0FF;  /* Electric Cyan */
+    --neon-pink: #FF4DFF;  /* Neon Pink */
+    --dark-bg: #000000;    /* True Black */
+    --text-light: #EAEAEA; /* Soft white for readability */
+}
     body {
         font-family: 'Segoe UI', Arial, sans-serif;
-        background: #f7f9fc;
-        color: #222;
+        background: var(--dark-bg);
+        color: var(--text-light);
         margin: 0;
         padding: 0;
     }
 
     header {
-        background: #2e4aad;
-        color: #fff;
+        background:  var(--neon-green);
+        
+        color:  var(--text-light);
         padding: 2rem 1rem 1rem 1rem;
         text-align: center;
     }
+    .header-flex {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    max-width: 700px;
+    margin: 0 auto;
+}
+    
 
     main {
         max-width: 700px;
         margin: 2rem auto;
-        background: #fff;
+        background:  var(--dark-bg);
         border-radius: 10px;
-        box-shadow: 0 2px 12px rgba(46, 74, 173, 0.07);
-        padding: 2rem 2rem 1.5rem 2rem;
+        box-shadow:
+        0 0 40px 10px var(--neon-green),
+        0 10px 24px 0 rgba(0, 240, 255, 0.3),
+        0 8px 32px 0 rgba(0,0,0,0.7);
+    padding: 2rem 2rem 1.5rem 2rem;
     }
 
     section {
@@ -39,7 +58,7 @@
     }
 
     h2 {
-        color: #2e4aad;
+        color:  var(--text-light);
         margin-bottom: 0.75rem;
     }
 
@@ -54,16 +73,16 @@
     }
 
     a {
-        color: #2e4aad;
+        color:  var(--dark-bg);
         text-decoration: underline;
     }
 
     a:hover {
-        color: #20387a;
+        color:  var(--dark-bg);
     }
     button {
-    background-color: var(--secondary-color);
-    color: var(--background-color);
+    background-color: var(--neon-green);
+    color: var(--text-light);
     padding: 10px 20px;
     border-radius: 5px;
     transition: background-color 0.3s ease;
@@ -75,17 +94,17 @@
     gap: 20px;
 }
 button:hover {
-    background-color: var(--base-color);
-    color: var(--secondary-color);
+    background-color: var(--neon-pink);
+    color: var(--text-light);
 }
 
     footer {
         text-align: center;
         font-size: 0.95rem;
-        color: #666;
-        background: #e5eaf5;
+        color:  var(--dark-bg);
+        background:  var(--neon-green);
         padding: 1rem 0;
-        border-top: 1px solid #d8dbe8;
+        border-top: 1px solid  var(--dark-bg);
         margin-top: 3rem;
     }
 
@@ -100,11 +119,13 @@ button:hover {
 </head>
 <body>
     <header>
+    <div class="header-flex">
         <h1>About Review Radar</h1>
-           <!--button-->
-           <a href ="http://127.0.0.1:5500/Core/main/templates/main/landing.html" style="text-decoration: none;">
-        <button id="backButton" > Home</button></a>
-    </header>
+        <a href="http://127.0.0.1:5500/Core/main/templates/main/landing.html" style="text-decoration: none;">
+            <button id="backButton">Home</button>
+        </a>
+    </div>
+</header>
 
     <main>
         <section class="about-section">

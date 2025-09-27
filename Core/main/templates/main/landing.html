@@ -29,37 +29,61 @@
     <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet">
     <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
     <style>
-        body {
-            font-family: 'Poppins', sans-serif;
-            color: #333;
-        }
-        
-        .hero-bg {
-            background-image: linear-gradient(rgba(26, 32, 44, 0.7), rgba(26, 32, 44, 0.7)), url('https://images.unsplash.com/photo-1521737604893-d14cc237f11d?q=80&w=1484&auto=format&fit=crop&ixlib=rb-4.0.3');
-            background-size: cover;
-            background-position: center;
-        }
-        
-        .pricing-card-popular {
-            transform: scale(1.05);
-            border: 2px solid #10B981;
-        }
+        :root {
+    --neon-green: #39FF14; /* Neon Green */
+    --neon-blue: #00F0FF;  /* Electric Cyan */
+    --neon-pink: #FF4DFF;  /* Neon Pink */
+    --dark-bg: #000000;    /* True Black */
+    --text-light: #EAEAEA; /* Soft white for readability */
+}
 
-        /* Google Translate minimal theming */
-        .goog-te-banner-frame, #goog-gt-tt { display: none !important; }
-        html { margin-top: 0 !important; }
-        body { top: 0 !important; }
-        #google_translate_element { display: none; }
-        .language-select {
-            background-color: transparent;
-            border: none;
-            color: #4A5568;
-            padding: 0.5rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: color .2s;
-        }
-        .language-select:hover { color: #0D47A1; }
+/* Body */
+body {
+    font-family: 'Poppins', sans-serif;
+    color: var(--text-light);
+    background: var(--dark-bg);
+}
+
+/* Hero Background with neon overlay */
+.hero-bg {
+    background-image: linear-gradient(rgba(0, 240, 255, 0.2), rgba(57, 255, 20, 0.2)),
+        url('https://images.unsplash.com/photo-1521737604893-d14cc237f11d?q=80&w=1484&auto=format&fit=crop&ixlib=rb-4.0.3');
+    background-size: cover;
+    background-position: center;
+    box-shadow: 0 0 30px rgba(0, 240, 255, 0.4); /* neon cyan glow */
+}
+
+/* Pricing Card (popular plan) */
+.pricing-card-popular {
+    transform: scale(1.05);
+    border: 2px solid var(--neon-green);
+    box-shadow: 0 0 20px rgba(57, 255, 20, 0.6);
+    border-radius: 12px;
+}
+
+/* Google Translate minimal theming */
+.goog-te-banner-frame,
+#goog-gt-tt { display: none !important; }
+html { margin-top: 0 !important; }
+body { top: 0 !important; }
+#google_translate_element { display: none; }
+
+/* Language Selector (neon hover) */
+.language-select {
+    background-color: transparent;
+    border: none;
+    color: var(--neon-blue);
+    padding: 0.5rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all .3s ease;
+}
+
+.language-select:hover {
+    color: var(--neon-green);
+    text-shadow: 0 0 8px var(--neon-green);
+}
+
     </style>
 </head>
 <body class="bg-light">
@@ -76,10 +100,11 @@
                     <a href="#pricing" class="text-gray-600 hover:text-primary font-medium transition-colors">Pricing</a>
                     <a href="#contact" class="text-gray-600 hover:text-primary font-medium transition-colors">Contact</a>
                     <select id="custom_language_select" class="language-select">
+                         <option value="de">IN</option>
                         <option value="en">EN</option>
                         <option value="es">ES</option>
                         <option value="fr">FR</option>
-                        <option value="de">DE</option>
+                        
                     </select>
                     <div id="google_translate_element"></div>
                 </nav>
@@ -171,7 +196,7 @@
                     <h3 class="text-2xl font-bold text-dark mb-2">Individual</h3>
                     <p class="text-gray-500 mb-6">For freelancers and solo-preneurs.</p>
                     <div class="my-6">
-                        <span class="text-5xl font-extrabold text-dark">$29</span>
+                        <span class="text-5xl font-extrabold text-dark">₹899</span>
                         <span class="text-gray-500">/ month</span>
                     </div>
                     <ul class="space-y-4 text-left my-8">
@@ -188,7 +213,7 @@
                     <h3 class="text-2xl font-bold text-primary mb-2">Teams</h3>
                     <p class="text-gray-500 mb-6">For growing businesses and teams.</p>
                     <div class="my-6">
-                        <span class="text-5xl font-extrabold text-dark">$79</span>
+                        <span class="text-5xl font-extrabold text-dark">₹1899</span>
                         <span class="text-gray-500">/ month</span>
                     </div>
                     <ul class="space-y-4 text-left my-8">
