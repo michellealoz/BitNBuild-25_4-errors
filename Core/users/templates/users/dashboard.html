@@ -1,118 +1,142 @@
 {% extends 'users/base.html' %}
+{% load static %}
 
 {% block title %}User Dashboard - Review Radar{% endblock %}
 
-{% block page_title %}<span style="color: #4A90E2;">User</span> Dashboard{% endblock %}
-{% block page_subtitle %}Welcome back! Here's a summary of your activity.{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+{% block page_subtitle %}Welcome back, {{ user.first_name|default:user.username }}! Here's your activity snapshot.{% endblock %}
 
 {% block content %}
-<!-- User Profile Card -->
-<div class="app-card mb-8" style="box-shadow: 0 0 15px rgba(74, 144, 226, 0.2);">
-    <div class="p-6">
-        <div style="display: flex; align-items: center;">
-            <div style="flex-shrink: 0; margin-right: 1rem;">
-                <img src="https://placehold.co/80x80/101010/4A90E2?text={{ profile.full_name.0|default:user.username.0|upper }}" 
-                     alt="User Avatar" style="border-radius: 50%; border: 2px solid #4A90E2;">
+<div class="dashboard-grid">
+    <!-- Left Column -->
+    <div class="left-column">
+        <!-- Stats Cards -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon" style="background-color: rgba(154, 228, 154, 0.1); color: #9ae49a;">
+                    <i class="fas fa-search-dollar"></i>
+                </div>
+                <div class="stat-info">
+                    <p class="stat-number">{{ analyses_count }}</p>
+                    <p class="stat-label">Analyses Performed</p>
+                </div>
             </div>
-            <div>
-                <h2 style="font-size: 1.5rem; font-weight: 800; color: #4A90E2; margin-bottom: 0;">
-                    {{ profile.full_name }}
-                </h2>
-                <p style="color: #6B7280; margin-bottom: 0;">@{{ user.username }}</p>
+            <div class="stat-card">
+                <div class="stat-icon" style="background-color: rgba(248, 192, 80, 0.1); color: #f8c050;">
+                    <i class="fas fa-balance-scale"></i>
+                </div>
+                <div class="stat-info">
+                    <p class="stat-number">{{ comparisons_count }}</p>
+                    <p class="stat-label">Comparisons Made</p>
+                </div>
             </div>
-        </div>
-    </div>
-    
-    <div class="p-6" style="border-top: 1px solid rgba(255, 255, 255, 0.1);">
-        <h3 style="font-size: 1.25rem; color: white; font-weight: 600; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid rgba(154, 228, 154, 0.3);">
-            Your Profile <span style="color: #9ae49a;">Details</span>
-        </h3>
-        <div style="display: grid; grid-template-columns: 1fr; gap: 1rem;">
-            <div style="border-bottom: 1px solid #1A1A1A; padding-bottom: 0.5rem; margin-bottom: 1rem;">
-                <small style="color: #6B7280; display: block;">Email address</small>
-                <span style="font-weight: 500; color: white;">{{ profile.email }}</span>
-            </div>
-            
-            <div style="border-bottom: 1px solid #1A1A1A; padding-bottom: 0.5rem; margin-bottom: 1rem;">
-                <small style="color: #6B7280; display: block;">Phone number</small>
-                <span style="font-weight: 500; color: white;">
-                    {% if profile.phone %}
-                        {{ profile.phone }}
-                    {% else %}
-                        Not provided
-                    {% endif %}
-                </span>
-            </div>
-            
-            <div style="border-bottom: 1px solid #1A1A1A; padding-bottom: 0.5rem; margin-bottom: 1rem;">
-                <small style="color: #6B7280; display: block;">Date of Birth</small>
-                <span style="font-weight: 500; color: white;">
-                    {% if profile.dob %}
-                        {{ profile.dob }}
-                    {% else %}
-                        Not provided
-                    {% endif %}
-                </span>
-            </div>
-            
-            <div style="padding-bottom: 0.5rem;">
-                <small style="color: #6B7280; display: block;">Address</small>
-                <span style="font-weight: 500; color: white;">
-                    {% if profile.address %}
-                        {{ profile.address }}
-                    {% else %}
-                        Not provided
-                    {% endif %}
-                </span>
+            <div class="stat-card full-span">
+                <div class="stat-icon" style="background-color: rgba(74, 144, 226, 0.1); color: #4A90E2;">
+                    <i class="fas fa-save"></i>
+                </div>
+                <div class="stat-info">
+                    <p class="stat-number">{{ saved_records_count }}</p>
+                    <p class="stat-label">Total Saved Records</p>
+                </div>
             </div>
         </div>
-    </div>
-</div>
 
-<!-- Stats Cards -->
-<div style="display: grid; grid-template-columns: 1fr; gap: 1.5rem;">
-    <div class="app-card text-center" style="padding: 1.5rem; height: 100%;">
-        <div style="padding: 1rem;">
-            <i class="fas fa-search-dollar fa-3x" style="color: #9ae49a; margin-bottom: 0.75rem; text-shadow: 0 0 10px #9ae49a;"></i>
-            <h5 style="font-size: 1.125rem; font-weight: 600; color: white; margin-bottom: 0.5rem;">Analyses Performed</h5>
-            <p style="font-size: 3rem; font-weight: 800; color: #9ae49a;">{{ analyses_count }}</p>
+        <!-- Quick Actions -->
+        <div class="app-card">
+            <div class="p-6">
+                <h5 class="card-header">Quick Actions</h5>
+                <div class="action-buttons">
+                    <a href="{% url 'analyzer' %}" class="action-btn analyze-btn">
+                        <i class="fas fa-plus-circle me-2"></i> New Analysis
+                    </a>
+                    <a href="{% url 'compare' %}" class="action-btn compare-btn">
+                        <i class="fas fa-exchange-alt me-2"></i> New Comparison
+                    </a>
+                </div>
+            </div>
         </div>
     </div>
-    
-    <div class="app-card text-center" style="padding: 1.5rem; height: 100%;">
-        <div style="padding: 1rem;">
-            <i class="fas fa-save fa-3x" style="color: #4A90E2; margin-bottom: 0.75rem; text-shadow: 0 0 10px #4A90E2;"></i>
-            <h5 style="font-size: 1.125rem; font-weight: 600; color: white; margin-bottom: 0.5rem;">Saved Records</h5>
-            <p style="font-size: 3rem; font-weight: 800; color: #4A90E2;">{{ saved_records_count }}</p>
-        </div>
-    </div>
-    
-    <div class="app-card text-center" style="padding: 1.5rem; height: 100%;">
-        <div style="padding: 1rem;">
-            <i class="fas fa-balance-scale fa-3x" style="color: #f8c050; margin-bottom: 0.75rem; text-shadow: 0 0 10px #f8c050;"></i>
-            <h5 style="font-size: 1.125rem; font-weight: 600; color: white; margin-bottom: 0.5rem;">Comparisons Made</h5>
-            <p style="font-size: 3rem; font-weight: 800; color: #f8c050;">{{ comparisons_count }}</p>
+
+    <!-- Right Column -->
+    <div class="right-column">
+        <div class="app-card">
+            <div class="p-6">
+                <h5 class="card-header">Recent Activity</h5>
+                {% if recent_records %}
+                <ul class="activity-list">
+                    {% for record in recent_records %}
+                    <li class="activity-item">
+                        {% if record.record_type == 'analysis' %}
+                        <div class="activity-icon-wrapper" style="background-color: rgba(154, 228, 154, 0.1);">
+                            <i class="fas fa-search activity-icon" style="color: #9ae49a;"></i>
+                        </div>
+                        <div class="activity-content">
+                            <p class="activity-title">Analyzed: <strong>{{ record.product_name|truncatechars:45 }}</strong></p>
+                            <p class="activity-date">{{ record.created_at|date:"F j, Y, P" }}</p>
+                        </div>
+                        {% elif record.record_type == 'comparison' %}
+                        <div class="activity-icon-wrapper" style="background-color: rgba(248, 192, 80, 0.1);">
+                            <i class="fas fa-balance-scale activity-icon" style="color: #f8c050;"></i>
+                        </div>
+                        <div class="activity-content">
+                            <p class="activity-title">Compared: <strong>{{ record.product_name_1|truncatechars:20 }}</strong> vs <strong>{{ record.product_name_2|truncatechars:20 }}</strong></p>
+                            <p class="activity-date">{{ record.created_at|date:"F j, Y, P" }}</p>
+                        </div>
+                        {% endif %}
+                    </li>
+                    {% endfor %}
+                </ul>
+                <div style="text-align: center; margin-top: 2.5rem;">
+                    <a href="{% url 'records' %}" class="view-all-link">View All Records <i class="fas fa-arrow-right ms-1"></i></a>
+                </div>
+                {% else %}
+                <div class="text-center p-4">
+                    <i class="fas fa-history fa-2x" style="color: #4A5568; margin-bottom: 1rem;"></i>
+                    <p style="color: #A0AEC0;">No activity yet. Perform an analysis or comparison to get started!</p>
+                </div>
+                {% endif %}
+            </div>
         </div>
     </div>
 </div>
 
 <style>
-    @media (min-width: 768px) {
-        div[style*="grid-template-columns: 1fr;"] {
-            grid-template-columns: 1fr 1fr 1fr !important;
-        }
-    }
+    .dashboard-grid { display: grid; grid-template-columns: 1fr; gap: 3rem; }
+    .left-column, .right-column { display: flex; flex-direction: column; gap: 3rem; }
+
+    /* Stats Grid */
+    .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2.5rem; }
+    .stat-card { background-color: #1A202C; border-radius: 16px; padding: 2.5rem; display: flex; align-items: center; gap: 2rem; border: 1px solid #2D3748; }
+    .stat-card.full-span { grid-column: 1 / -1; }
+    .stat-icon { font-size: 2rem; width: 65px; height: 65px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .stat-number { font-size: 3rem; font-weight: 700; color: white; margin: 0; line-height: 1; }
+    .stat-label { font-size: 1rem; color: #A0AEC0; margin: 0.5rem 0 0 0; }
     
-    .app-card {
-        background: #0A0A0A;
-        border: 1px solid #1A1A1A;
-        border-radius: 20px;
-        box-shadow: 0 0 5px rgba(255, 255, 255, 0.1);
-        transition: transform 0.3s, box-shadow 0.3s;
-    }
+    /* Quick Actions & Recent Activity Cards */
+    .app-card .p-6 { padding: 2.5rem; }
+    .card-header { color: white; font-size: 1.25rem; margin-bottom: 2rem; }
     
-    .app-card:hover {
-        box-shadow: 0 0 15px rgba(154, 228, 154, 0.5);
+    .action-buttons { display: flex; flex-direction: column; gap: 1.25rem; }
+    .action-btn { text-decoration: none; color: white; padding: 1rem 1.5rem; border-radius: 10px; text-align: center; font-weight: 600; transition: all 0.2s ease; font-size: 1rem; }
+    .analyze-btn { background-color: #9ae49a; color: #1A202C; }
+    .analyze-btn:hover { background-color: white; transform: translateY(-2px); }
+    .compare-btn { background-color: #f8c050; color: #1A202C; }
+    .compare-btn:hover { background-color: white; transform: translateY(-2px); }
+
+    /* Recent Activity List */
+    .activity-list { list-style: none; padding: 0; margin: 0; }
+    .activity-item { display: flex; align-items: center; gap: 1.75rem; }
+    .activity-item:not(:last-child) { border-bottom: 1px solid #2D3748; padding-bottom: 1.75rem; margin-bottom: 1.75rem; }
+    .activity-icon-wrapper { flex-shrink: 0; width: 55px; height: 55px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+    .activity-icon { font-size: 1.5rem; }
+    .activity-title { color: #E5E7EB; margin: 0; line-height: 1.5; }
+    .activity-date { font-size: 0.85rem; color: #718096; margin: 0.35rem 0 0 0; }
+    .view-all-link { color: #9ae49a; text-decoration: none; font-weight: 500; font-size: 1rem; }
+    .view-all-link:hover { text-decoration: underline; }
+
+    @media (min-width: 992px) {
+        .dashboard-grid { grid-template-columns: 1fr 1.7fr; }
     }
 </style>
 {% endblock %}
+

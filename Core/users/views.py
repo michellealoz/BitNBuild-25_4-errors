@@ -68,23 +68,35 @@ def user_profile_complete(request):
     return redirect('user_dashboard')
 
 
-# Dashboard
 @login_required(login_url='/user/login/')
 def user_dashboard(request):
-    # Get user profile
-    profile = UserProfile.objects.filter(user=request.user).first()
-    if not profile:
-        return redirect('user_profile_setup')
+    """
+    Displays a dynamic dashboard with user stats and recent activity.
+    """
+    # Assuming you have a Profile model linked to your User with a one-to-one field
+    # profile = get_object_or_404(Profile, user=request.user)
+
+    analyses_count = ProductAnalysis.objects.filter(user=request.user).count()
+    comparisons_count = ProductComparison.objects.filter(user=request.user).count()
     
-    # For now, use placeholder values for stats
+    # Fetch recent records
+    user_analyses = ProductAnalysis.objects.filter(user=request.user)
+    user_comparisons = ProductComparison.objects.filter(user=request.user)
+    
+    recent_records = sorted(
+        chain(user_analyses, user_comparisons),
+        key=attrgetter('created_at'),
+        reverse=True
+    )[:3] # Get the 3 most recent records
+
     context = {
-        'profile': profile,
-        'analyses_count': 18,
-        'saved_records_count': 5,
-        'comparisons_count': 9,
+        # 'profile': profile, # Uncomment this if you have a Profile model
+        'analyses_count': analyses_count,
+        'comparisons_count': comparisons_count,
+        'saved_records_count': analyses_count + comparisons_count,
+        'recent_records': recent_records
     }
-    
-    return render(request, 'users/dashboard.html', context)
+    return render(request, "users/dashboard.html", context)
 
 
 def user_login_view(request):
