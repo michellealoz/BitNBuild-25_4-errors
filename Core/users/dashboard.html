@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Review Radar- dashboard</title>
-    <script src="app.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 </head> 
 <style>
 :root
@@ -48,6 +49,21 @@ main {
     padding: 20px;
     text-align: center;
 }
+/* ...existing code... */
+.dashboard-sections {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    align-items: flex-start;
+    flex-wrap: wrap; /* Allows wrapping on smaller screens */
+}
+
+.dashboard-sections > section {
+    flex: 1 1 350px; /* Grow, shrink, min width */
+    min-width: 400px;
+    max-width: 900px;
+}
+/* ...existing code... */
 
 /* Sections */
 section {
@@ -73,6 +89,7 @@ section h2 {
     display: inline-block;
     padding-bottom: 5px;
 }
+
 
 /* Footer */
 footer {
@@ -105,8 +122,7 @@ a:hover {
         <button id="backButton">Go Back</button>
     </header>
     <main>
-        <p></p>
-    </main>
+        <div class="dashboard-sections">
 
 <!-- dashboard -->
 <section>
@@ -132,9 +148,8 @@ a:hover {
      
     <!-- Section main 2 -->
     <section>
-        <h2>Pros vs Cons</h2>
-
-         <p>This is the main section content.</p>
+        <h2>Visual panel</h2>
+<canvas id="sentimentPieChart" width="300" height="300" style="width:300px; height:300px; display:block; margin:auto;"></canvas>
 
 </section>
 
@@ -144,12 +159,10 @@ a:hover {
     <section>
     <h3>Sentiment analysis</h3>
     <p>Classifying your reviews as Positive, Neutral, or Negative..</p>
+    <canvas id="myBarChart" width="400" height="200"></canvas>
+
   </section>
 
-  <section>
-    <h3>Subsection 2 Title</h3>
-    <p>Content for subsection 2.</p>
-    </section>
     </section>
 
     <!--main section 4-->
@@ -165,9 +178,57 @@ a:hover {
     <!--Show percentage or count per star rating using a horizontal bar chart.-->
     </section>
     </section>
+    </div>
+     </main>
 
     <footer>
         <p>&copy; 2025 Review Radar</p>
     </footer>
+    <script>
+        // pie chart
+const pieCtx = document.getElementById('sentimentPieChart').getContext('2d');
+new Chart(pieCtx, {
+    type: 'pie',
+    data: {
+        labels: ['Positive', 'Neutral', 'Negative'],
+        datasets: [{
+            data: [60, 25, 15],
+            backgroundColor: ['#10B981', '#F5F7FA', '#1A202C'],
+        }]
+    }
+});
+
+// Bar Chart
+const ctx = document.getElementById('myBarChart').getContext('2d');
+const myBarChart = new Chart(ctx, {
+    type: 'bar', // bar chart
+    data: {
+        labels: ['January', 'February', 'March', 'April'], // x-axis labels
+        datasets: [{
+            label: 'Sales',
+            data: [12, 19, 3, 5], // data for each bar
+            backgroundColor: [
+                'rgba(75, 192, 192, 0.2)',
+                'rgba(54, 162, 235, 0.2)',
+                'rgba(255, 206, 86, 0.2)',
+                'rgba(255, 99, 132, 0.2)'
+            ],
+            borderColor: [
+                'rgba(75, 192, 192, 1)',
+                'rgba(54, 162, 235, 1)',
+                'rgba(255, 206, 86, 1)',
+                'rgba(255, 99, 132, 1)'
+            ],
+            borderWidth: 1
+        }]
+    },
+    options: {
+        scales: {
+            y: { beginAtZero: true }
+        }
+    }
+});
+</script>
+
 </body>
 </html>
