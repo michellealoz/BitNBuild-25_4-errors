@@ -1,40 +1,46 @@
 {% extends 'users/base.html' %}
 
+{% block title %}Product Analyzer - Review Radar{% endblock %}
+
+{% block page_title %}Product Analyzer{% endblock %}
+{% block page_subtitle %}Enter an Amazon product URL to analyze customer reviews and sentiment{% endblock %}
+
 {% block content %}
 <!-- Analysis Form -->
-<div class="card mb-4">
-    <div class="card-body">
-        <form method="post" id="analysis-form">
-            {% csrf_token %}
-            <div class="input-group">
-                <span class="input-group-text"><i class="fas fa-link"></i></span>
-                <input type="url" name="product_url" class="form-control form-control-lg" 
+<div class="app-card mb-6 p-6">
+    <form method="post" id="analysis-form">
+        {% csrf_token %}
+        <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem;">
+            <div style="flex: 1; display: flex; align-items: center;">
+                <span style="background: #1A1A1A; padding: 0.8rem; border-radius: 12px 0 0 12px; border: 1px solid #333333; border-right: none;">
+                    <i class="fas fa-link" style="color: #9ae49a;"></i>
+                </span>
+                <input type="url" name="product_url" class="form-input" 
                        placeholder="https://www.amazon.com/dp/PRODUCT_ID or https://www.amazon.in/dp/PRODUCT_ID" 
-                       value="{{ product_url|default:'' }}" required>
-                <button class="btn btn-success fw-bold px-4" type="submit" id="analyze-btn">
-                    <i class="fas fa-cogs me-2"></i>Analyze
-                </button>
+                       value="{{ product_url|default:'' }}" required
+                       style="border-radius: 0 12px 12px 0; margin-left: -1px;">
             </div>
-            <small class="form-text text-muted mt-2">
-                Supported: Amazon.com, Amazon.in, Amazon.co.uk. Use direct product links for best results.
-            </small>
-        </form>
-        {% if error %}
-            <div class="alert alert-danger mt-3" role="alert">
-                <i class="fas fa-exclamation-triangle me-2"></i>{{ error }}
-            </div>
-        {% endif %}
-    </div>
+            <button class="btn-primary px-6" type="submit" id="analyze-btn">
+                <i class="fas fa-cogs me-2"></i>Analyze
+            </button>
+        </div>
+    </form>
+    
+    {% if error %}
+        <div class="alert alert-error" role="alert" style="margin-top: 1rem;">
+            <i class="fas fa-exclamation-triangle me-2"></i>{{ error }}
+        </div>
+    {% endif %}
 </div>
 
 <!-- Loading Spinner -->
-<div id="loading-spinner" class="text-center mb-4" style="display: none;">
-    <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
+<div id="loading-spinner" class="text-center mb-6" style="display: none;">
+    <div class="spinner-border" style="width: 3rem; height: 3rem; color: #9ae49a;" role="status">
         <span class="visually-hidden">Loading...</span>
     </div>
-    <p class="mt-3">Scraping product details and reviews... This may take 1-2 minutes.</p>
-    <div class="progress mt-2" style="height: 6px;">
-        <div class="progress-bar progress-bar-striped progress-bar-animated" style="width: 100%"></div>
+    <p class="mt-3" style="color: #9CA3AF;">Scraping product details and reviews... This may take 1-2 minutes.</p>
+    <div class="mt-2" style="width: 100%; background: #374151; border-radius: 9999px; height: 6px;">
+        <div style="background: #9ae49a; height: 6px; border-radius: 9999px; width: 100%; animation: pulse 2s infinite;"></div>
     </div>
 </div>
 
@@ -42,228 +48,227 @@
 {% if data %}
 <div id="results-section">
     <!-- Product Header -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h3>Analysis Results for "{{ data.product_name }}"</h3>
-        <span class="badge bg-info fs-6">
+    <div style="display: flex; justify-content: between; align-items: center; margin-bottom: 2rem;">
+        <h3 style="color: white; margin: 0;">Analysis Results for "{{ data.product_name }}"</h3>
+        <span style="background: #4A90E2; color: white; padding: 0.5rem 1rem; border-radius: 8px; font-size: 0.875rem;">
             <i class="fas fa-database me-1"></i>
             {{ data.public_opinion.total_reviews_analyzed }} Reviews Analyzed
         </span>
     </div>
     
     <!-- Product Basic Info Card -->
-    <div class="card mb-4">
-        <div class="card-body">
-            <div class="row align-items-center">
-                <div class="col-md-8">
-                    <h5 class="card-title mb-2">{{ data.product_name }}</h5>
-                    <div class="row text-muted">
-                        {% if data.rating and data.rating != "Not found" %}
-                        <div class="col-auto">
-                            <strong>Rating:</strong> {{ data.rating }}
-                        </div>
-                        {% endif %}
-                        {% if data.price and data.price != "Not found" %}
-                        <div class="col-auto">
-                            <strong>Price:</strong> ₹{{ data.price }}
-                        </div>
-                        {% endif %}
-                        {% if data.review_insights.verified_reviews_count %}
-                        <div class="col-auto">
-                            <strong>Verified:</strong> {{ data.review_insights.verified_reviews_count }} reviews
-                        </div>
-                        {% endif %}
+    <div class="app-card mb-6 p-6">
+        <div style="display: flex; align-items: center; justify-content: between;">
+            <div style="flex: 1;">
+                <h5 style="color: white; margin-bottom: 0.5rem; font-size: 1.25rem;">{{ data.product_name }}</h5>
+                <div style="display: flex; gap: 2rem; color: #9CA3AF;">
+                    {% if data.rating and data.rating != "Not found" %}
+                    <div>
+                        <strong>Rating:</strong> {{ data.rating }}
                     </div>
+                    {% endif %}
+                    {% if data.price and data.price != "Not found" %}
+                    <div>
+                        <strong>Price:</strong> ₹{{ data.price }}
+                    </div>
+                    {% endif %}
+                    {% if data.review_insights.verified_reviews_count %}
+                    <div>
+                        <strong>Verified:</strong> {{ data.review_insights.verified_reviews_count }} reviews
+                    </div>
+                    {% endif %}
                 </div>
-                <div class="col-md-4 text-end">
-                    <a href="{{ product_url }}" target="_blank" class="btn btn-outline-primary btn-sm">
-                        <i class="fas fa-external-link-alt me-2"></i>View on Amazon
-                    </a>
-                </div>
+            </div>
+            <div>
+                <a href="{{ product_url }}" target="_blank" style="background: transparent; border: 1px solid #4A90E2; color: #4A90E2; padding: 0.5rem 1rem; border-radius: 8px; text-decoration: none; display: inline-flex; align-items: center;">
+                    <i class="fas fa-external-link-alt me-2"></i>View on Amazon
+                </a>
             </div>
         </div>
     </div>
 
     <!-- Sentiment Overview Row -->
-    <div class="row">
+    <div style="display: grid; grid-template-columns: 1fr; gap: 1.5rem; margin-bottom: 2rem;">
         <!-- Overall Sentiment Score -->
-        <div class="col-lg-4 mb-4">
-            <div class="card h-100">
-                <div class="card-header fw-bold d-flex justify-content-between align-items-center">
-                    <span>Overall Sentiment Score</span>
-                    {% with score=data.public_opinion.positive_percent %}
-                    <span class="badge {% if score >= 70 %}bg-success{% elif score >= 50 %}bg-warning{% else %}bg-danger{% endif %}">
-                        {% if score >= 70 %}Excellent{% elif score >= 50 %}Average{% else %}Poor{% endif %}
-                    </span>
-                    {% endwith %}
-                </div>
-                <div class="card-body text-center">
-                    {% with positive_percent=data.public_opinion.positive_percent %}
-                    <h1 class="display-3 fw-bolder 
-                        {% if positive_percent >= 70 %}text-success
-                        {% elif positive_percent >= 50 %}text-warning
-                        {% else %}text-danger{% endif %}">
-                        {{ positive_percent }}<small class="text-muted">/100</small>
-                    </h1>
-                    <div class="progress mb-3" style="height: 12px;">
-                        <div class="progress-bar 
-                            {% if positive_percent >= 70 %}bg-success
-                            {% elif positive_percent >= 50 %}bg-warning
-                            {% else %}bg-danger{% endif %}" 
-                            style="width: {{ positive_percent }}%">
-                        </div>
-                    </div>
-                    <p class="text-muted mb-2">{{ data.public_opinion.total_reviews_analyzed }} reviews analyzed</p>
-                    {% if data.public_opinion.average_rating %}
-                    <p class="mb-0">
-                        <i class="fas fa-star text-warning me-1"></i>
-                        Average Rating: <strong>{{ data.public_opinion.average_rating|floatformat:1 }}/5</strong>
-                    </p>
-                    {% endif %}
-                    {% endwith %}
-                </div>
+        <div class="app-card p-6">
+            <div style="display: flex; justify-content: between; align-items: center; margin-bottom: 1rem;">
+                <span style="font-weight: bold; color: white;">Overall Sentiment Score</span>
+                {% with score=data.public_opinion.positive_percent %}
+                <span style="background: {% if score >= 70 %}#9ae49a{% elif score >= 50 %}#f8c050{% else %}#FF6B6B{% endif %}; 
+                      color: {% if score >= 70 or score >= 50 %}#000000{% else %}#ffffff{% endif %}; 
+                      padding: 0.25rem 0.5rem; border-radius: 0.25rem; font-size: 0.875rem;">
+                    {% if score >= 70 %}Excellent{% elif score >= 50 %}Average{% else %}Poor{% endif %}
+                </span>
+                {% endwith %}
             </div>
-        </div>
-
-        <!-- Sentiment Chart -->
-        <div class="col-lg-8 mb-4">
-            <div class="card h-100">
-                <div class="card-header fw-bold">Sentiment Distribution</div>
-                <div class="card-body d-flex align-items-center justify-content-center">
-                    <canvas id="sentimentChart" width="400" height="250"></canvas>
+            <div style="text-align: center;">
+                {% with positive_percent=data.public_opinion.positive_percent %}
+                <h1 style="font-size: 3rem; font-weight: 800; 
+                    color: {% if positive_percent >= 70 %}#9ae49a{% elif positive_percent >= 50 %}#f8c050{% else %}#FF6B6B{% endif %};
+                    margin-bottom: 0.5rem;">
+                    {{ positive_percent }}<small style="color: #9CA3AF; font-size: 1.5rem;">/100</small>
+                </h1>
+                <div style="width: 100%; background: #374151; border-radius: 9999px; height: 12px; margin-bottom: 1rem;">
+                    <div style="background: {% if positive_percent >= 70 %}#9ae49a{% elif positive_percent >= 50 %}#f8c050{% else %}#FF6B6B{% endif %}; 
+                         height: 12px; border-radius: 9999px; width: {{ positive_percent }}%;">
+                    </div>
                 </div>
+                <p style="color: #9CA3AF; margin-bottom: 0.5rem;">{{ data.public_opinion.total_reviews_analyzed }} reviews analyzed</p>
+                {% if data.public_opinion.average_rating %}
+                <p style="margin: 0;">
+                    <i class="fas fa-star" style="color: #f8c050; margin-right: 0.25rem;"></i>
+                    Average Rating: <strong style="color: white;">{{ data.public_opinion.average_rating|floatformat:1 }}/5</strong>
+                </p>
+                {% endif %}
+                {% endwith %}
             </div>
         </div>
     </div>
 
     <!-- Quick Summary -->
     {% if data.public_opinion.quick_summary and data.public_opinion.quick_summary != "Insufficient review data." %}
-    <div class="card mb-4">
-        <div class="card-header fw-bold">
-            <i class="fas fa-bolt me-2"></i>Quick Summary
+    <div class="app-card mb-6 p-6">
+        <div style="font-weight: bold; color: white; margin-bottom: 1rem;">
+            <i class="fas fa-bolt me-2" style="color: #9ae49a;"></i>Quick Summary
         </div>
-        <div class="card-body">
-            <p class="lead mb-0">{{ data.public_opinion.quick_summary }}</p>
+        <div>
+            <p style="color: white; font-size: 1.125rem; margin: 0;">{{ data.public_opinion.quick_summary }}</p>
         </div>
     </div>
     {% endif %}
 
     <!-- Pros and Cons -->
-    <div class="row">
-        <div class="col-md-6 mb-4">
-            <div class="card h-100">
-                <div class="card-header fw-bold text-success d-flex align-items-center">
-                    <i class="fas fa-thumbs-up me-2"></i>Key Strengths
-                    <span class="badge bg-success ms-2">{{ data.pros_cons_panel.pros|length }}</span>
-                </div>
-                <div class="card-body p-0">
-                    <ul class="list-group list-group-flush">
-                        {% if data.pros_cons_panel.pros %}
-                            {% for pro in data.pros_cons_panel.pros %}
-                                <li class="list-group-item d-flex align-items-center">
-                                    <i class="fas fa-check text-success me-2"></i>
-                                    {{ pro|title }}
-                                </li>
-                            {% endfor %}
-                        {% else %}
-                            <li class="list-group-item text-muted text-center py-4">
-                                <i class="fas fa-info-circle me-2"></i>
-                                No significant strengths identified in reviews
+    <div style="display: grid; grid-template-columns: 1fr; gap: 1.5rem; margin-bottom: 2rem;">
+        <div class="app-card p-6">
+            <div style="font-weight: bold; color: #9ae49a; display: flex; align-items: center; margin-bottom: 1rem;">
+                <i class="fas fa-thumbs-up me-2"></i>Key Strengths
+                <span style="background: #9ae49a; color: #000000; padding: 0.25rem 0.5rem; border-radius: 0.25rem; font-size: 0.875rem; margin-left: 0.5rem;">
+                    {{ data.pros_cons_panel.pros|length }}
+                </span>
+            </div>
+            <div>
+                <ul style="list-style: none; padding: 0; margin: 0;">
+                    {% if data.pros_cons_panel.pros %}
+                        {% for pro in data.pros_cons_panel.pros %}
+                            <li style="display: flex; align-items: center; margin-bottom: 0.75rem;">
+                                <i class="fas fa-check me-3" style="color: #9ae49a;"></i>
+                                <span style="color: white;">{{ pro|title }}</span>
                             </li>
-                        {% endif %}
-                    </ul>
-                </div>
+                        {% endfor %}
+                    {% else %}
+                        <li style="color: #9CA3AF; text-align: center; padding: 2rem;">
+                            <i class="fas fa-info-circle me-2"></i>
+                            No significant strengths identified in reviews
+                        </li>
+                    {% endif %}
+                </ul>
             </div>
         </div>
-        <div class="col-md-6 mb-4">
-            <div class="card h-100">
-                <div class="card-header fw-bold text-danger d-flex align-items-center">
-                    <i class="fas fa-thumbs-down me-2"></i>Key Concerns
-                    <span class="badge bg-danger ms-2">{{ data.pros_cons_panel.cons|length }}</span>
-                </div>
-                <div class="card-body p-0">
-                    <ul class="list-group list-group-flush">
-                        {% if data.pros_cons_panel.cons %}
-                            {% for con in data.pros_cons_panel.cons %}
-                                <li class="list-group-item d-flex align-items-center">
-                                    <i class="fas fa-times text-danger me-2"></i>
-                                    {{ con|title }}
-                                </li>
-                            {% endfor %}
-                        {% else %}
-                            <li class="list-group-item text-muted text-center py-4">
-                                <i class="fas fa-info-circle me-2"></i>
-                                No significant concerns identified in reviews
+        
+        <div class="app-card p-6">
+            <div style="font-weight: bold; color: #FF6B6B; display: flex; align-items: center; margin-bottom: 1rem;">
+                <i class="fas fa-thumbs-down me-2"></i>Key Concerns
+                <span style="background: #FF6B6B; color: #ffffff; padding: 0.25rem 0.5rem; border-radius: 0.25rem; font-size: 0.875rem; margin-left: 0.5rem;">
+                    {{ data.pros_cons_panel.cons|length }}
+                </span>
+            </div>
+            <div>
+                <ul style="list-style: none; padding: 0; margin: 0;">
+                    {% if data.pros_cons_panel.cons %}
+                        {% for con in data.pros_cons_panel.cons %}
+                            <li style="display: flex; align-items: center; margin-bottom: 0.75rem;">
+                                <i class="fas fa-times me-3" style="color: #FF6B6B;"></i>
+                                <span style="color: white;">{{ con|title }}</span>
                             </li>
-                        {% endif %}
-                    </ul>
-                </div>
+                        {% endfor %}
+                    {% else %}
+                        <li style="color: #9CA3AF; text-align: center; padding: 2rem;">
+                            <i class="fas fa-info-circle me-2"></i>
+                            No significant concerns identified in reviews
+                        </li>
+                    {% endif %}
+                </ul>
             </div>
         </div>
     </div>
 
     <!-- Detailed Analysis -->
     {% if data.review_summary_generator and data.review_summary_generator != "Not enough reviews for detailed summary." %}
-    <div class="card mb-4">
-        <div class="card-header fw-bold d-flex align-items-center">
-            <i class="fas fa-file-alt me-2"></i>Detailed Analysis
-            <span class="badge bg-primary ms-2">AI Generated</span>
+    <div class="app-card mb-6 p-6">
+        <div style="font-weight: bold; color: white; display: flex; align-items: center; margin-bottom: 1rem;">
+            <i class="fas fa-file-alt me-2" style="color: #4A90E2;"></i>Detailed Analysis
+            <span style="background: #4A90E2; color: #ffffff; padding: 0.25rem 0.5rem; border-radius: 0.25rem; font-size: 0.875rem; margin-left: 0.5rem;">
+                AI Generated
+            </span>
         </div>
-        <div class="card-body">
-            <p class="mb-0">{{ data.review_summary_generator }}</p>
+        <div>
+            <p style="color: white; margin: 0; line-height: 1.6;">{{ data.review_summary_generator }}</p>
         </div>
     </div>
     {% endif %}
 
     <!-- Product Description -->
     {% if data.description and data.description != "Not found" %}
-    <div class="card mb-4">
-        <div class="card-header fw-bold">
-            <i class="fas fa-info-circle me-2"></i>Product Highlights
+    <div class="app-card mb-6 p-6">
+        <div style="font-weight: bold; color: white; margin-bottom: 1rem;">
+            <i class="fas fa-info-circle me-2" style="color: #9ae49a;"></i>Product Highlights
         </div>
-        <div class="card-body">
-            <p>{{ data.description|truncatewords:150 }}</p>
+        <div>
+            <p style="color: white; margin: 0; line-height: 1.6;">{{ data.description|truncatewords:150 }}</p>
         </div>
     </div>
     {% endif %}
 
     <!-- Analysis Metadata -->
-    <div class="card">
-        <div class="card-body text-center text-muted">
-            <small>
-                <i class="fas fa-clock me-1"></i>
-                Analysis generated on {% now "F j, Y, g:i a" %} | 
-                <i class="fas fa-microchip me-1"></i>
-                Powered by AI sentiment analysis
-            </small>
-        </div>
+    <div class="app-card p-6 text-center">
+        <small style="color: #9CA3AF;">
+            <i class="fas fa-clock me-1"></i>
+            Analysis generated on {% now "F j, Y, g:i a" %} | 
+            <i class="fas fa-microchip me-1"></i>
+            Powered by AI sentiment analysis
+        </small>
     </div>
 </div>
 {% else %}
 <!-- Placeholder when no data -->
-<div id="no-results" class="text-center py-5">
-    <i class="fas fa-search fa-3x text-muted mb-3"></i>
-    <h4 class="text-muted">Enter an Amazon product URL to analyze reviews</h4>
-    <p class="text-muted">We'll analyze customer sentiment, extract key pros/cons, and generate AI-powered summaries.</p>
-    <div class="mt-4">
-        <div class="row justify-content-center">
-            <div class="col-md-8">
-                <div class="alert alert-info">
-                    <h6><i class="fas fa-lightbulb me-2"></i>Tips for best results:</h6>
-                    <ul class="mb-0">
-                        <li>Use direct Amazon product links (containing '/dp/')</li>
-                        <li>Ensure the product has customer reviews</li>
-                        <li>Supported regions: Amazon.com, Amazon.in, Amazon.co.uk</li>
-                    </ul>
-                </div>
-            </div>
+<div id="no-results" class="text-center" style="padding: 3rem 0;">
+    <i class="fas fa-search fa-3x" style="color: #9CA3AF; margin-bottom: 1rem;"></i>
+    <h4 style="color: #9CA3AF; margin-bottom: 0.5rem;">Enter an Amazon product URL to analyze reviews</h4>
+    <p style="color: #9CA3AF;">We'll analyze customer sentiment, extract key pros/cons, and generate AI-powered summaries.</p>
+    <div style="margin-top: 2rem;">
+        <div class="app-card p-6" style="max-width: 600px; margin: 0 auto;">
+            <h6 style="color: #4A90E2; margin-bottom: 1rem;"><i class="fas fa-lightbulb me-2"></i>Tips for best results:</h6>
+            <ul style="color: #9CA3AF; text-align: left; margin: 0;">
+                <li>Use direct Amazon product links (containing '/dp/')</li>
+                <li>Ensure the product has customer reviews</li>
+                <li>Supported regions: Amazon.com, Amazon.in, Amazon.co.uk</li>
+            </ul>
         </div>
     </div>
 </div>
 {% endif %}
+
+<style>
+    @keyframes pulse {
+        0% { opacity: 1; }
+        50% { opacity: 0.5; }
+        100% { opacity: 1; }
+    }
+    
+    /* Responsive grid for larger screens */
+    @media (min-width: 768px) {
+        div[style*="grid-template-columns: 1fr;"] {
+            grid-template-columns: 1fr 1fr !important;
+        }
+        
+        div[style*="grid-template-columns: 1fr;"]:first-child {
+            grid-template-columns: 1fr 2fr !important;
+        }
+    }
+</style>
 {% endblock %}
 
 {% block extra_js %}
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
     // Enhanced form submission handler
     document.getElementById('analysis-form')?.addEventListener('submit', function(e) {
@@ -283,69 +288,5 @@
             if (noResults) noResults.style.display = 'none';
         }
     });
-
-    // Enhanced chart initialization
-    {% if data %}
-    document.addEventListener('DOMContentLoaded', function() {
-        const ctx = document.getElementById('sentimentChart');
-        if (ctx) {
-            const sentimentData = {
-                positive: {{ data.public_opinion.positive_percent }},
-                negative: {{ data.public_opinion.negative_percent }},
-                neutral: {{ data.public_opinion.neutral_percent }}
-            };
-            
-            new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels: ['Positive', 'Negative', 'Neutral'],
-                    datasets: [{
-                        data: [sentimentData.positive, sentimentData.negative, sentimentData.neutral],
-                        backgroundColor: [
-                            'rgba(25, 135, 84, 0.8)',
-                            'rgba(220, 53, 69, 0.8)',
-                            'rgba(108, 117, 125, 0.8)'
-                        ],
-                        borderColor: [
-                            'rgba(25, 135, 84, 1)',
-                            'rgba(220, 53, 69, 1)',
-                            'rgba(108, 117, 125, 1)'
-                        ],
-                        borderWidth: 2,
-                        hoverOffset: 15
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    cutout: '65%',
-                    plugins: {
-                        legend: {
-                            position: 'bottom',
-                            labels: {
-                                padding: 20,
-                                usePointStyle: true,
-                                font: {
-                                    size: 12
-                                }
-                            }
-                        },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    return `${context.label}: ${context.raw}% (${Math.round(context.raw * {{ data.public_opinion.total_reviews_analyzed }} / 100)} reviews)`;
-                                }
-                            }
-                        }
-                    },
-                    animation: {
-                        animateScale: true,
-                        animateRotate: true
-                    }
-                }
-            });
-        }
-    });
-    {% endif %}
 </script>
 {% endblock %}
