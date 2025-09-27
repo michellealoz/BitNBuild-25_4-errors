@@ -1,6 +1,5 @@
 {% extends 'users/base.html' %}
 
-<<<<<<< HEAD
 {% block title %}User Dashboard{% endblock %}
 
 {% block content_header %}
@@ -41,59 +40,11 @@
             <div class="col-md-6">
                 <small class="text-muted d-block">Address</small>
                 <span class="fw-medium">123 Innovation Drive, Tech City</span>
-=======
-{% block title %}User Dashboard - Review Radar{% endblock %}
-
-{% block page_title %}<span class="text-neon-blue">User</span> Dashboard{% endblock %}
-{% block page_subtitle %}Welcome back! Here's a summary of your activity.{% endblock %}
-
-{% block content %}
-<!-- User Profile Card -->
-<div class="app-card mb-8" style="box-shadow: 0 0 15px rgba(74, 144, 226, 0.2);">
-    <!-- Card Body: User Avatar and Name -->
-    <div class="p-6">
-        <div style="display: flex; align-items: center;">
-            <div style="flex-shrink: 0; margin-right: 1rem;">
-                <img src="https://placehold.co/80x80/101010/4A90E2?text=JD" alt="User Avatar" style="border-radius: 50%; border: 2px solid #4A90E2;">
-            </div>
-            <div>
-                <h2 style="font-size: 1.5rem; font-weight: 800; color: #4A90E2; margin-bottom: 0;">Jane Doe</h2>
-                <p style="color: #6B7280; margin-bottom: 0;">@janedoe</p>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Card Footer: Profile Details -->
-    <div class="p-6" style="border-top: 1px solid rgba(255, 255, 255, 0.1);">
-        <h3 style="font-size: 1.25rem; color: white; font-weight: 600; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid rgba(154, 228, 154, 0.3);">
-            Your Profile <span style="color: #9ae49a;">Details</span>
-        </h3>
-        <div style="display: grid; grid-template-columns: 1fr; gap: 1rem;">
-            <div style="border-bottom: 1px solid #1A1A1A; padding-bottom: 0.5rem; margin-bottom: 1rem;">
-                <small style="color: #6B7280; display: block;">Email address</small>
-                <span style="font-weight: 500; color: white;">jane.doe@example.com</span>
-            </div>
-            
-            <div style="border-bottom: 1px solid #1A1A1A; padding-bottom: 0.5rem; margin-bottom: 1rem;">
-                <small style="color: #6B7280; display: block;">Phone number</small>
-                <span style="font-weight: 500; color: white;">+1 (555) 123-4567</span>
-            </div>
-            
-            <div style="border-bottom: 1px solid #1A1A1A; padding-bottom: 0.5rem; margin-bottom: 1rem;">
-                <small style="color: #6B7280; display: block;">Date of Birth</small>
-                <span style="font-weight: 500; color: white;">October 26, 1995</span>
-            </div>
-            
-            <div style="padding-bottom: 0.5rem;">
-                <small style="color: #6B7280; display: block;">Address</small>
-                <span style="font-weight: 500; color: white;">123 Innovation Drive, Tech City</span>
->>>>>>> b8726b1cc54de43c417419f0093bb4147ae7a16f
             </div>
         </div>
     </div>
 </div>
 
-<<<<<<< HEAD
 <div class="row">
     <div class="col-md-4 mb-4">
         <div class="card text-center h-100">
@@ -123,56 +74,4 @@
         </div>
     </div>
 </div>
-=======
-<!-- Stats Cards -->
-<div style="display: grid; grid-template-columns: 1fr; gap: 1.5rem;">
-    <!-- Analyses Performed -->
-    <div class="app-card text-center" style="padding: 1.5rem; height: 100%;">
-        <div style="padding: 1rem;">
-            <i class="fas fa-search-dollar fa-3x" style="color: #9ae49a; margin-bottom: 0.75rem; text-shadow: 0 0 10px #9ae49a;"></i>
-            <h5 style="font-size: 1.125rem; font-weight: 600; color: white; margin-bottom: 0.5rem;">Analyses Performed</h5>
-            <p style="font-size: 3rem; font-weight: 800; color: #9ae49a;">18</p>
-        </div>
-    </div>
-    
-    <!-- Saved Records -->
-    <div class="app-card text-center" style="padding: 1.5rem; height: 100%;">
-        <div style="padding: 1rem;">
-            <i class="fas fa-save fa-3x" style="color: #4A90E2; margin-bottom: 0.75rem; text-shadow: 0 0 10px #4A90E2;"></i>
-            <h5 style="font-size: 1.125rem; font-weight: 600; color: white; margin-bottom: 0.5rem;">Saved Records</h5>
-            <p style="font-size: 3rem; font-weight: 800; color: #4A90E2;">5</p>
-        </div>
-    </div>
-    
-    <!-- Comparisons Made -->
-    <div class="app-card text-center" style="padding: 1.5rem; height: 100%;">
-        <div style="padding: 1rem;">
-            <i class="fas fa-balance-scale fa-3x" style="color: #f8c050; margin-bottom: 0.75rem; text-shadow: 0 0 10px #f8c050;"></i>
-            <h5 style="font-size: 1.125rem; font-weight: 600; color: white; margin-bottom: 0.5rem;">Comparisons Made</h5>
-            <p style="font-size: 3rem; font-weight: 800; color: #f8c050;">9</p>
-        </div>
-    </div>
-</div>
-
-<style>
-    /* Add responsive grid for larger screens */
-    @media (min-width: 768px) {
-        div[style*="grid-template-columns: 1fr;"] {
-            grid-template-columns: 1fr 1fr 1fr !important;
-        }
-    }
-    
-    .app-card {
-        background: #0A0A0A;
-        border: 1px solid #1A1A1A;
-        border-radius: 20px;
-        box-shadow: 0 0 5px rgba(255, 255, 255, 0.1);
-        transition: transform 0.3s, box-shadow 0.3s;
-    }
-    
-    .app-card:hover {
-        box-shadow: 0 0 15px rgba(154, 228, 154, 0.5);
-    }
-</style>
->>>>>>> b8726b1cc54de43c417419f0093bb4147ae7a16f
 {% endblock %}
