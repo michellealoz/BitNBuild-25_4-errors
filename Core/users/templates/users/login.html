@@ -1,134 +1,178 @@
+{% load widget_tweaks %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
+    <title>Login - Review Radar</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- We are using 'Inter' for consistency across all Review Radar pages -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
+        /* Base Dark Theme (Consistent with Canvas files) */
         body {
-            font-family: 'Poppins', sans-serif;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
+            font-family: 'Inter', sans-serif;
+            background: #000000; /* Deep Black Background */
+            color: #E0F7FA; /* Light Text */
+            min-height: 100vh;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
-
-        .frutiger-aero-glass {
-            background: rgba(255, 255, 255, 0.3);
-            -webkit-backdrop-filter: blur(15px);
-            backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 255, 255, 0.15);
+        /* Dashboard Card - Deep Dark with subtle border */
+        .app-card {
+            background: #0A0A0A; /* Very dark gray */
+            border: 1px solid #1A1A1A;
+            border-radius: 20px;
+            /* Optional subtle internal glow from the neon color */
+            box-shadow: 0 0 20px rgba(154, 228, 154, 0.15); 
         }
-
+        /* Input Fields - Black interior, subtle glow on focus */
         .form-input {
-            background: rgba(255, 255, 255, 0.4);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: #000000;
+            border: 1px solid #333333;
+            color: white;
+            border-radius: 12px;
             transition: all 0.3s ease;
+            padding: 12px 16px; 
         }
-        
+        /* Neon Green Focus */
         .form-input:focus {
-            background: rgba(255, 255, 255, 0.6);
-            border-color: rgba(2, 239, 239, 0.5);
-            box-shadow: 0 0 0 3px rgba(0, 191, 255, 0.3);
+            outline: none;
+            border-color: #9ae49a; /* Neon Green */
+            box-shadow: 0 0 0 2px rgba(154, 228, 154, 0.3);
         }
-
-        .bubble {
-            position: absolute;
-            border-radius: 50%;
-            opacity: 0.2;
-            animation: rise 15s infinite ease-in;
-            z-index: -1;
+        /* Primary Button - Inverse look (Black text on Neon Green) */
+        .btn-primary {
+            background: #9ae49a;
+            color: #000000;
+            border-radius: 12px;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .btn-primary:hover {
+            transform: scale(1.01);
+            box-shadow: 0 0 20px rgba(154, 228, 154, 0.7); /* Stronger glow on hover */
         }
         
-        @keyframes rise {
-            0% {
-                transform: translateY(0) scale(1);
-            }
-            100% {
-                transform: translateY(-120vh) scale(1.5);
-            }
+        /* --- Digital Starfield Animation Styles (Replacing Bubbles) --- */
+        .starfield-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+        .star {
+            position: absolute;
+            background: rgba(154, 228, 154, 0.5); /* Faded Neon Green */
+            box-shadow: 0 0 5px rgba(154, 228, 154, 0.8);
+            border-radius: 50%;
+            animation: twinkle linear infinite;
+        }
+        @keyframes twinkle {
+            0%, 100% { opacity: 0; transform: scale(0.5); }
+            50% { opacity: 1; transform: scale(1); }
         }
     </style>
 </head>
-<body class="bg-gradient-to-br from-cyan-200 via-green-200 to-lime-300 min-h-screen overflow-hidden">
-    <!-- Bubble background container -->
-    <div id="bubble-container" class="absolute inset-0 w-full h-full z-0"></div>
+<body class="p-4">
     
-    <!-- Main Content Container -->
-    <div class="relative min-h-screen flex items-center justify-center p-4 z-10">
+    <!-- Digital Starfield Background Container -->
+    <div id="starfield-container" class="starfield-container"></div>
+    
+    <!-- Main Content Container (z-10 to float above stars) -->
+    <div class="relative w-full max-w-md z-10">
 
-        <!-- Login View -->
-        <div id="login-view" class="w-full max-w-md">
-            <div class="frutiger-aero-glass rounded-2xl shadow-2xl p-8 space-y-6">
-                <div class="text-center">
-                    <h1 class="text-3xl font-bold text-gray-800">Welcome Back</h1>
-                    <p class="text-gray-600 mt-2">Log in to continue your journey.</p>
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <div class="flex items-center justify-center gap-3 mb-4">
+                <!-- App Icon - Using consistent neon green color -->
+                <div class="w-12 h-12 bg-[#9ae49a] rounded-2xl flex items-center justify-center shadow-lg shadow-[#9ae49a]/30">
+                    <svg class="w-6 h-6 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                    </svg>
                 </div>
-                <form method="post" class="space-y-4">
-    {% csrf_token %}
-    {% if form.non_field_errors %}
-        <ul>
-            {% for error in form.non_field_errors %}
-                <li class="text-red-500 text-sm">{{ error }}</li>
-            {% endfor %}
-        </ul>
-    {% endif %}
-    <div>
-        <label for="id_username" class="block text-sm font-medium text-gray-700">Username</label>
-        <input type="text" name="username" id="id_username" class="form-input w-full mt-1 px-4 py-2 rounded-lg" placeholder="Your username" required>
-    </div>
-    <div>
-        <label for="id_password" class="block text-sm font-medium text-gray-700">Password</label>
-        <input type="password" name="password" id="id_password" class="form-input w-full mt-1 px-4 py-2 rounded-lg" placeholder="••••••••" required>
-    </div>
-    <button type="submit" class="w-full bg-gradient-to-r from-cyan-400 to-green-400 text-white font-bold py-3 px-4 rounded-lg shadow-lg hover:from-cyan-500 hover:to-green-500 transition-all duration-300 transform hover:scale-105">
-        Log In
-    </button>
-</form>
-
-                <p class="text-center text-sm text-gray-600">
-                    Don't have an account? 
-                    <a href="/user/signup" class="font-medium text-cyan-600 hover:text-cyan-800">Sign up</a>
-                </p>
+                <h1 class="text-3xl font-extrabold text-white">Review <span class="text-[#9ae49a]">Radar</span></h1>
             </div>
+            <p class="text-gray-400">Advanced Product Analysis Terminal</p>
         </div>
+        
+        <!-- Login Card - Uses the app-card style -->
+        <div id="login-view" class="app-card p-8 space-y-6">
+            <div class="text-center">
+                <h2 class="text-2xl font-bold text-white">Access Protocol</h2>
+                <p class="text-gray-500 mt-2">Enter credentials for secure gateway access.</p>
+            </div>
+            
+            <form method="post" class="space-y-4">
+                {% csrf_token %}
+                
+                {% if form.non_field_errors %}
+                    <div class="p-3 rounded-lg bg-red-500/10 border border-red-500/20">
+                        {% for error in form.non_field_errors %}
+                            <p class="text-red-400 text-sm">{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                
+                <div>
+                    <label for="id_username" class="block text-sm font-medium text-gray-300 mb-2">Username</label>
+                    <!-- Using direct input since we don't have the Django form object here, mimicking the styling. -->
+                    <!-- If using widget_tweaks, this would ideally be: {{ form.username|add_class:"form-input w-full" }} -->
+                    <input type="text" name="username" id="id_username" class="form-input w-full" placeholder="User ID or Email" required>
+                </div>
+                
+                <div>
+                    <label for="id_password" class="block text-sm font-medium text-gray-300 mb-2">Password</label>
+                    <!-- If using widget_tweaks, this would ideally be: {{ form.password|add_class:"form-input w-full" }} -->
+                    <input type="password" name="password" id="id_password" class="form-input w-full" placeholder="••••••••" required>
+                </div>
+                
+                <button type="submit" class="btn-primary w-full py-4 px-4 shadow-lg shadow-[#9ae49a]/30">
+                    ACCESS RADAR
+                </button>
+            </form>
 
+            <p class="text-center text-sm text-gray-500 pt-2">
+                Need to initialize a new profile? 
+                <a href="/user/signup" class="font-medium text-[#9ae49a] hover:text-white transition duration-200">Initiate Sign-up</a>
+            </p>
+        </div>
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // --- Aesthetic Background Bubbles ---
-            const bubbleContainer = document.getElementById('bubble-container');
-            const bubbleColors = [
-                'bg-cyan-300', 'bg-green-300', 'bg-lime-300', 'bg-teal-300'
-            ];
+            // --- Digital Starfield Particle Generator ---
+            const starfieldContainer = document.getElementById('starfield-container');
+            const numStars = 100;
 
-            function createBubble() {
-                const bubble = document.createElement('div');
-                const size = Math.random() * 150 + 50; // 50px to 200px
-                const color = bubbleColors[Math.floor(Math.random() * bubbleColors.length)];
+            function createStar() {
+                const star = document.createElement('div');
+                const size = Math.random() * 3 + 1; // 1px to 4px
                 
-                bubble.classList.add('bubble', color);
-                bubble.style.width = `${size}px`;
-                bubble.style.height = `${size}px`;
-                bubble.style.left = `${Math.random() * 100}%`;
-                bubble.style.bottom = `-${size}px`; // Start from below the screen
-                bubble.style.animationDuration = `${Math.random() * 10 + 10}s`; // 10s to 20s
-                bubble.style.animationDelay = `${Math.random() * 5}s`;
+                star.classList.add('star');
+                star.style.width = `${size}px`;
+                star.style.height = `${size}px`;
+                star.style.left = `${Math.random() * 100}%`;
+                star.style.top = `${Math.random() * 100}%`;
+                
+                // Randomize animation properties for an organic look
+                star.style.animationDuration = `${Math.random() * 3 + 2}s`; // 2s to 5s
+                star.style.animationDelay = `${Math.random() * 5}s`;
 
-                bubbleContainer.appendChild(bubble);
-
-                // Remove bubble after animation ends to prevent DOM clutter
-                setTimeout(() => {
-                    bubble.remove();
-                }, 25000);
+                starfieldContainer.appendChild(star);
             }
 
-            // Create a set number of bubbles initially and then periodically
-            for(let i = 0; i < 20; i++) {
-                createBubble();
+            // Generate initial stars
+            for(let i = 0; i < numStars; i++) {
+                createStar();
             }
-            setInterval(createBubble, 1500); // Add a new bubble every 1.5 seconds
         });
     </script>
 </body>
