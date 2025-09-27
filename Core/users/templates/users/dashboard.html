@@ -1,265 +1,103 @@
-{% load widget_tweaks %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User Dashboard - Review Radar</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Include Font Awesome for icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <style>
-        /* Define the Neon Green color for easy reference in CSS */
-        :root {
-            --neon-green: #9ae49a;
-            --neon-blue: #4A90E2; /* For contrast/primary highlights */
-            --neon-green-shadow: 0 0 15px rgba(154, 228, 154, 0.5);
-            --neon-blue-shadow: 0 0 15px rgba(74, 144, 226, 0.5);
-            --neon-yellow: #f8c050; /* For comparison/warning */
-        }
+{% extends 'users/base.html' %}
 
-        body {
-            font-family: 'Inter', sans-serif;
-            background: #000000;
-            color: #E0F7FA;
-            min-height: 100vh;
-            margin: 0;
-        }
+{% block title %}User Dashboard - Review Radar{% endblock %}
 
-        /* Full page layout container */
-        .app-layout {
-            display: flex;
-            min-height: 100vh;
-            width: 100%;
-        }
+{% block page_title %}<span class="text-neon-blue">User</span> Dashboard{% endblock %}
+{% block page_subtitle %}Welcome back! Here's a summary of your activity.{% endblock %}
 
-        /* Sidebar Styling */
-        .sidebar {
-            width: 280px; /* Fixed width */
-            background: #050505;
-            border-right: 1px solid #1A1A1A;
-            box-shadow: 2px 0 15px rgba(0, 0, 0, 0.5);
-            display: flex;
-            flex-direction: column;
-            padding: 1.5rem 0;
-            position: sticky; /* Sticky for appearance, but this layout is self-contained */
-            top: 0;
-        }
-
-        .sidebar-link {
-            display: flex;
-            align-items: center;
-            padding: 0.75rem 1.5rem;
-            color: #E0F7FA;
-            font-weight: 500;
-            transition: all 0.2s ease-in-out;
-            border-left: 4px solid transparent;
-        }
-
-        .sidebar-link:hover {
-            background-color: #1A1A1A;
-            color: var(--neon-green);
-            border-left-color: var(--neon-green);
-            text-shadow: 0 0 5px rgba(154, 228, 154, 0.3);
-        }
-        
-        /* Active Link */
-        .sidebar-link.active {
-            background-color: rgba(74, 144, 226, 0.2);
-            color: var(--neon-blue);
-            border-left-color: var(--neon-blue);
-            font-weight: 700;
-            box-shadow: inset 0 0 10px rgba(74, 144, 226, 0.2);
-        }
-        
-        /* Logout Button Style */
-        .logout-link {
-            margin-top: auto; /* Push to the bottom */
-            border-top: 1px solid #1A1A1A;
-            background-color: #101010;
-        }
-        .logout-link:hover {
-            color: #FF6B6B; /* Neon Red */
-            border-left-color: #FF6B6B;
-            text-shadow: 0 0 5px rgba(255, 107, 107, 0.5);
-        }
-
-        /* Main Content Area */
-        .main-content {
-            flex-grow: 1;
-            padding: 2rem 3rem;
-        }
-
-        /* Card with subtle border and glow */
-        .app-card {
-            background: #0A0A0A;
-            border: 1px solid #1A1A1A;
-            border-radius: 20px;
-            box-shadow: 0 0 5px rgba(255, 255, 255, 0.1);
-            transition: transform 0.3s, box-shadow 0.3s;
-        }
-        .app-card:hover {
-            box-shadow: var(--neon-green-shadow);
-        }
-        .app-card-blue {
-            box-shadow: var(--neon-blue-shadow);
-        }
-
-        /* Utility classes for text colors */
-        .text-neon-green { color: var(--neon-green); }
-        .text-neon-blue { color: var(--neon-blue); }
-        .text-neon-yellow { color: var(--neon-yellow); }
-        
-        /* Custom styles for dashboard info block */
-        .info-detail {
-            border-bottom: 1px solid #1A1A1A;
-            padding-bottom: 0.5rem;
-            margin-bottom: 1rem;
-        }
-        .info-detail:last-child {
-            border-bottom: none;
-            margin-bottom: 0;
-        }
-    </style>
-</head>
-<body>
-    <!-- Layout Wrapper: Mimicking Base Template Structure -->
-    <div class="app-layout">
-        
-        <!-- Sidebar -->
-        <nav class="sidebar">
-            <h1 class="text-xl font-extrabold text-center mb-6 px-4">
-                <span class="text-neon-green">Review</span> <span class="text-neon-blue">Radar</span>
-            </h1>
-
-            <a href="#" class="sidebar-link active">
-                <i class="fas fa-tachometer-alt me-3 w-5"></i>
-                Dashboard
-            </a>
-            <a href="/user/analyzer/" class="sidebar-link">
-            <i class="fas fa-search-dollar me-3 w-5"></i>
-             Analyzer
-             </a>
-            <a href="/user/compare/" class="sidebar-link">
-             <i class="fas fa-balance-scale me-3 w-5"></i>
-               Compare
-             </a>
-            <a href="#" class="sidebar-link">
-                <i class="fas fa-save me-3 w-5"></i>
-                Records
-            </a>
-
-            <a href="#" class="sidebar-link">
-                <i class="fas fa-user-circle me-3 w-5"></i>
-                My Profile
-            </a>
-            <a href="#" class="sidebar-link">
-                <i class="fas fa-cog me-3 w-5"></i>
-                Settings
-            </a>
-            
-            <a href="#" class="sidebar-link logout-link">
-                <i class="fas fa-sign-out-alt me-3 w-5"></i>
-                Logout
-            </a>
-        </nav>
-
-        <!-- Main Content Area -->
-        <main class="main-content">
-            <div class="w-full mx-auto">
-                <!-- Start of original Dashboard content -->
-                
-                <!-- Content Header -->
-                <div class="content-header text-center mb-10">
-                    <h1 class="text-3xl font-extrabold text-white"><span class="text-neon-blue">User</span> Dashboard</h1>
-                    <p class="text-gray-400 mt-2">Welcome back! Here's a summary of your activity.</p>
-                </div>
-
-                <!-- User Profile Card -->
-                <div class="app-card mb-8 shadow-xl shadow-[#4A90E2]/20">
-                    <!-- Card Body: User Avatar and Name -->
-                    <div class="p-6">
-                        <div class="flex items-center">
-                            <div class="flex-shrink-0 me-4">
-                                <img src="https://placehold.co/80x80/101010/4A90E2?text=JD" alt="User Avatar" class="rounded-full border-2 border-neon-blue">
-                            </div>
-                            <div>
-                                <h2 class="text-2xl font-extrabold text-neon-blue mb-0">Jane Doe</h2>
-                                <p class="text-gray-500 mb-0">@janedoe</p>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Card Footer: Profile Details -->
-                    <div class="p-6 border-t border-white/10">
-                        <h3 class="text-xl text-white font-semibold mb-4 border-b border-neon-green/30 pb-2">Your Profile <span class="text-neon-green">Details</span></h3>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            
-                            <div class="info-detail">
-                                <small class="text-gray-500 block">Email address</small>
-                                <span class="font-medium text-white">jane.doe@example.com</span>
-                            </div>
-                            
-                            <div class="info-detail">
-                                <small class="text-gray-500 block">Phone number</small>
-                                <span class="font-medium text-white">+1 (555) 123-4567</span>
-                            </div>
-                            
-                            <div class="info-detail">
-                                <small class="text-gray-500 block">Date of Birth</small>
-                                <span class="font-medium text-white">October 26, 1995</span>
-                            </div>
-                            
-                            <div class="info-detail">
-                                <small class="text-gray-500 block">Address</small>
-                                <span class="font-medium text-white">123 Innovation Drive, Tech City</span>
-                            </div>
-                            
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Stats Cards -->
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    
-                    <!-- Analyses Performed -->
-                    <div class="mb-4">
-                        <div class="app-card text-center h-full p-6 hover:shadow-[#9ae49a]/40">
-                            <div class="p-4">
-                                <i class="fas fa-search-dollar fa-3x text-neon-green mb-3 glow-icon" style="text-shadow: 0 0 10px var(--neon-green);"></i>
-                                <h5 class="text-lg font-semibold text-white mb-2">Analyses Performed</h5>
-                                <p class="text-5xl font-extrabold text-neon-green">18</p>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Saved Records -->
-                    <div class="mb-4">
-                        <div class="app-card text-center h-full p-6 hover:shadow-[#4A90E2]/40">
-                            <div class="p-4">
-                                <i class="fas fa-save fa-3x text-neon-blue mb-3 glow-icon" style="text-shadow: 0 0 10px var(--neon-blue);"></i>
-                                <h5 class="text-lg font-semibold text-white mb-2">Saved Records</h5>
-                                <p class="text-5xl font-extrabold text-neon-blue">5</p>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Comparisons Made -->
-                    <div class="mb-4">
-                        <div class="app-card text-center h-full p-6 hover:shadow-[#f8c050]/40">
-                            <div class="p-4">
-                                <i class="fas fa-balance-scale fa-3x text-neon-yellow mb-3 glow-icon" style="text-shadow: 0 0 10px var(--neon-yellow);"></i>
-                                <h5 class="text-lg font-semibold text-white mb-2">Comparisons Made</h5>
-                                <p class="text-5xl font-extrabold text-neon-yellow">9</p>
-                            </div>
-                        </div>
-                    </div>
-                    
-                </div>
-                <!-- End of original Dashboard content -->
+{% block content %}
+<!-- User Profile Card -->
+<div class="app-card mb-8" style="box-shadow: 0 0 15px rgba(74, 144, 226, 0.2);">
+    <!-- Card Body: User Avatar and Name -->
+    <div class="p-6">
+        <div style="display: flex; align-items: center;">
+            <div style="flex-shrink: 0; margin-right: 1rem;">
+                <img src="https://placehold.co/80x80/101010/4A90E2?text=JD" alt="User Avatar" style="border-radius: 50%; border: 2px solid #4A90E2;">
             </div>
-        </main>
+            <div>
+                <h2 style="font-size: 1.5rem; font-weight: 800; color: #4A90E2; margin-bottom: 0;">Jane Doe</h2>
+                <p style="color: #6B7280; margin-bottom: 0;">@janedoe</p>
+            </div>
+        </div>
     </div>
-</body>
-</html>
+    
+    <!-- Card Footer: Profile Details -->
+    <div class="p-6" style="border-top: 1px solid rgba(255, 255, 255, 0.1);">
+        <h3 style="font-size: 1.25rem; color: white; font-weight: 600; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid rgba(154, 228, 154, 0.3);">
+            Your Profile <span style="color: #9ae49a;">Details</span>
+        </h3>
+        <div style="display: grid; grid-template-columns: 1fr; gap: 1rem;">
+            <div style="border-bottom: 1px solid #1A1A1A; padding-bottom: 0.5rem; margin-bottom: 1rem;">
+                <small style="color: #6B7280; display: block;">Email address</small>
+                <span style="font-weight: 500; color: white;">jane.doe@example.com</span>
+            </div>
+            
+            <div style="border-bottom: 1px solid #1A1A1A; padding-bottom: 0.5rem; margin-bottom: 1rem;">
+                <small style="color: #6B7280; display: block;">Phone number</small>
+                <span style="font-weight: 500; color: white;">+1 (555) 123-4567</span>
+            </div>
+            
+            <div style="border-bottom: 1px solid #1A1A1A; padding-bottom: 0.5rem; margin-bottom: 1rem;">
+                <small style="color: #6B7280; display: block;">Date of Birth</small>
+                <span style="font-weight: 500; color: white;">October 26, 1995</span>
+            </div>
+            
+            <div style="padding-bottom: 0.5rem;">
+                <small style="color: #6B7280; display: block;">Address</small>
+                <span style="font-weight: 500; color: white;">123 Innovation Drive, Tech City</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Stats Cards -->
+<div style="display: grid; grid-template-columns: 1fr; gap: 1.5rem;">
+    <!-- Analyses Performed -->
+    <div class="app-card text-center" style="padding: 1.5rem; height: 100%;">
+        <div style="padding: 1rem;">
+            <i class="fas fa-search-dollar fa-3x" style="color: #9ae49a; margin-bottom: 0.75rem; text-shadow: 0 0 10px #9ae49a;"></i>
+            <h5 style="font-size: 1.125rem; font-weight: 600; color: white; margin-bottom: 0.5rem;">Analyses Performed</h5>
+            <p style="font-size: 3rem; font-weight: 800; color: #9ae49a;">18</p>
+        </div>
+    </div>
+    
+    <!-- Saved Records -->
+    <div class="app-card text-center" style="padding: 1.5rem; height: 100%;">
+        <div style="padding: 1rem;">
+            <i class="fas fa-save fa-3x" style="color: #4A90E2; margin-bottom: 0.75rem; text-shadow: 0 0 10px #4A90E2;"></i>
+            <h5 style="font-size: 1.125rem; font-weight: 600; color: white; margin-bottom: 0.5rem;">Saved Records</h5>
+            <p style="font-size: 3rem; font-weight: 800; color: #4A90E2;">5</p>
+        </div>
+    </div>
+    
+    <!-- Comparisons Made -->
+    <div class="app-card text-center" style="padding: 1.5rem; height: 100%;">
+        <div style="padding: 1rem;">
+            <i class="fas fa-balance-scale fa-3x" style="color: #f8c050; margin-bottom: 0.75rem; text-shadow: 0 0 10px #f8c050;"></i>
+            <h5 style="font-size: 1.125rem; font-weight: 600; color: white; margin-bottom: 0.5rem;">Comparisons Made</h5>
+            <p style="font-size: 3rem; font-weight: 800; color: #f8c050;">9</p>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Add responsive grid for larger screens */
+    @media (min-width: 768px) {
+        div[style*="grid-template-columns: 1fr;"] {
+            grid-template-columns: 1fr 1fr 1fr !important;
+        }
+    }
+    
+    .app-card {
+        background: #0A0A0A;
+        border: 1px solid #1A1A1A;
+        border-radius: 20px;
+        box-shadow: 0 0 5px rgba(255, 255, 255, 0.1);
+        transition: transform 0.3s, box-shadow 0.3s;
+    }
+    
+    .app-card:hover {
+        box-shadow: 0 0 15px rgba(154, 228, 154, 0.5);
+    }
+</style>
+{% endblock %}
