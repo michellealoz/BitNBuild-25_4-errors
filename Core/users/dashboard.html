@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Review Radar- dashboard</title>
+    <script src="app.js" defer></script>
+</head> 
+<style>
+:root
+{
+  --primary-color: #7b889e;
+  --secondary-color: #394d6d;
+  --base-color: #dfd2d5;
+  --text-color: rgb(245, 245, 245);
+  --background-color:#feffff;
+
+}
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background-color: var(--background-color);
+    color: var(--text-color);
+    font-size: 16px;
+    line-height: 1.6;
+}
+
+/* Header */
+header {
+    background-color: var(--base-color);
+    color: var(--secondary-color);
+    padding: 25px 0;
+    text-align: center;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+header h1 {
+    font-size: 2rem;
+}
+
+/* Main Content */
+main {
+    padding: 20px;
+    text-align: center;
+}
+
+/* Sections */
+section {
+    background-color: var(--primary-color);
+    color: var(--text-color);
+    margin: 20px auto;
+    padding: 25px;
+    max-width: 900px;
+    border-radius: 12px;
+    box-shadow: 0 6px 12px rgba(0,0,0,0.08);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+section:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.12);
+}
+
+section h2 {
+    margin-bottom: 15px;
+    font-size: 1.5rem;
+    border-bottom: 2px solid var(--text-color);
+    display: inline-block;
+    padding-bottom: 5px;
+}
+
+/* Footer */
+footer {
+    text-align: center;
+    padding: 15px 0;
+    background-color: #111827;
+    color: var(--text-color);
+    margin-top: 20px;
+    font-size: 0.9rem;
+}
+
+/* Links */
+a {
+    color: var(--text-color);
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+</style>
+<body>
+    <header>
+        <h1>
+            Customer Review Analysis Dashboard
+            
+        </h1>
+        <!--button-->
+        <button id="backButton">Go Back</button>
+    </header>
+    <main>
+        <p></p>
+    </main>
+
+<!-- dashboard -->
+<section>
+<h2>Overview panel</h2>
+
+   <!--section 1-->
+  <section>
+    <h3>Total reviews</h3>
+    <p>Content for subsection 1.</p>
+  </section>
+ <!--section 2-->
+  <section>
+    <h3>trends over time(days/months/years)</h3>
+    <p>Content for subsection 2.</p>
+  </section>
+ <!--section 3-->
+    <section>
+      <h4>Average Rating</h4>
+      <p>More deeply nested section content.</p>
+    </section>
+
+</section>
+     
+    <!-- Section main 2 -->
+    <section>
+        <h2>Pros vs Cons</h2>
+
+         <p>This is the main section content.</p>
+
+</section>
+
+     <!--main section 3-->
+    <section>
+    <h2>Review Summary</h2>
+    <section>
+    <h3>Sentiment analysis</h3>
+    <p>Classifying your reviews as Positive, Neutral, or Negative..</p>
+  </section>
+
+  <section>
+    <h3>Subsection 2 Title</h3>
+    <p>Content for subsection 2.</p>
+    </section>
+    </section>
+
+    <!--main section 4-->
+    <section>
+        <h2>Top Reviews </h2>
+        <section>
+    <h3>Most Helpful Review</h3>
+    <!--paste Review-->
+    </section>
+    <section>
+    <h3>Subsection 2 Title</h3>
+    <p>Content for subsection 2.</p>
+    <!--Show percentage or count per star rating using a horizontal bar chart.-->
+    </section>
+    </section>
+
+    <footer>
+        <p>&copy; 2025 Review Radar</p>
+    </footer>
+</body>
+</html>
