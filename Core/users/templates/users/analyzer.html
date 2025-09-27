@@ -1,351 +1,248 @@
-{% extends 'users/base.html' %}
-
-{% block content %}
-<!-- Analysis Form -->
-<div class="card mb-4">
-    <div class="card-body">
-        <form method="post" id="analysis-form">
-            {% csrf_token %}
-            <div class="input-group">
-                <span class="input-group-text"><i class="fas fa-link"></i></span>
-                <input type="url" name="product_url" class="form-control form-control-lg" 
-                       placeholder="https://www.amazon.com/dp/PRODUCT_ID or https://www.amazon.in/dp/PRODUCT_ID" 
-                       value="{{ product_url|default:'' }}" required>
-                <button class="btn btn-success fw-bold px-4" type="submit" id="analyze-btn">
-                    <i class="fas fa-cogs me-2"></i>Analyze
-                </button>
-            </div>
-            <small class="form-text text-muted mt-2">
-                Supported: Amazon.com, Amazon.in, Amazon.co.uk. Use direct product links for best results.
-            </small>
-        </form>
-        {% if error %}
-            <div class="alert alert-danger mt-3" role="alert">
-                <i class="fas fa-exclamation-triangle me-2"></i>{{ error }}
-            </div>
-        {% endif %}
-    </div>
-</div>
-
-<!-- Loading Spinner -->
-<div id="loading-spinner" class="text-center mb-4" style="display: none;">
-    <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
-        <span class="visually-hidden">Loading...</span>
-    </div>
-    <p class="mt-3">Scraping product details and reviews... This may take 1-2 minutes.</p>
-    <div class="progress mt-2" style="height: 6px;">
-        <div class="progress-bar progress-bar-striped progress-bar-animated" style="width: 100%"></div>
-    </div>
-</div>
-
-<!-- Results Section -->
-{% if data %}
-<div id="results-section">
-    <!-- Product Header -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h3>Analysis Results for "{{ data.product_name }}"</h3>
-        <span class="badge bg-info fs-6">
-            <i class="fas fa-database me-1"></i>
-            {{ data.public_opinion.total_reviews_analyzed }} Reviews Analyzed
-        </span>
-    </div>
-    
-    <!-- Product Basic Info Card -->
-    <div class="card mb-4">
-        <div class="card-body">
-            <div class="row align-items-center">
-                <div class="col-md-8">
-                    <h5 class="card-title mb-2">{{ data.product_name }}</h5>
-                    <div class="row text-muted">
-                        {% if data.rating and data.rating != "Not found" %}
-                        <div class="col-auto">
-                            <strong>Rating:</strong> {{ data.rating }}
-                        </div>
-                        {% endif %}
-                        {% if data.price and data.price != "Not found" %}
-                        <div class="col-auto">
-                            <strong>Price:</strong> ₹{{ data.price }}
-                        </div>
-                        {% endif %}
-                        {% if data.review_insights.verified_reviews_count %}
-                        <div class="col-auto">
-                            <strong>Verified:</strong> {{ data.review_insights.verified_reviews_count }} reviews
-                        </div>
-                        {% endif %}
-                    </div>
-                </div>
-                <div class="col-md-4 text-end">
-                    <a href="{{ product_url }}" target="_blank" class="btn btn-outline-primary btn-sm">
-                        <i class="fas fa-external-link-alt me-2"></i>View on Amazon
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Sentiment Overview Row -->
-    <div class="row">
-        <!-- Overall Sentiment Score -->
-        <div class="col-lg-4 mb-4">
-            <div class="card h-100">
-                <div class="card-header fw-bold d-flex justify-content-between align-items-center">
-                    <span>Overall Sentiment Score</span>
-                    {% with score=data.public_opinion.positive_percent %}
-                    <span class="badge {% if score >= 70 %}bg-success{% elif score >= 50 %}bg-warning{% else %}bg-danger{% endif %}">
-                        {% if score >= 70 %}Excellent{% elif score >= 50 %}Average{% else %}Poor{% endif %}
-                    </span>
-                    {% endwith %}
-                </div>
-                <div class="card-body text-center">
-                    {% with positive_percent=data.public_opinion.positive_percent %}
-                    <h1 class="display-3 fw-bolder 
-                        {% if positive_percent >= 70 %}text-success
-                        {% elif positive_percent >= 50 %}text-warning
-                        {% else %}text-danger{% endif %}">
-                        {{ positive_percent }}<small class="text-muted">/100</small>
-                    </h1>
-                    <div class="progress mb-3" style="height: 12px;">
-                        <div class="progress-bar 
-                            {% if positive_percent >= 70 %}bg-success
-                            {% elif positive_percent >= 50 %}bg-warning
-                            {% else %}bg-danger{% endif %}" 
-                            style="width: {{ positive_percent }}%">
-                        </div>
-                    </div>
-                    <p class="text-muted mb-2">{{ data.public_opinion.total_reviews_analyzed }} reviews analyzed</p>
-                    {% if data.public_opinion.average_rating %}
-                    <p class="mb-0">
-                        <i class="fas fa-star text-warning me-1"></i>
-                        Average Rating: <strong>{{ data.public_opinion.average_rating|floatformat:1 }}/5</strong>
-                    </p>
-                    {% endif %}
-                    {% endwith %}
-                </div>
-            </div>
-        </div>
-
-        <!-- Sentiment Chart -->
-        <div class="col-lg-8 mb-4">
-            <div class="card h-100">
-                <div class="card-header fw-bold">Sentiment Distribution</div>
-                <div class="card-body d-flex align-items-center justify-content-center">
-                    <canvas id="sentimentChart" width="400" height="250"></canvas>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Quick Summary -->
-    {% if data.public_opinion.quick_summary and data.public_opinion.quick_summary != "Insufficient review data." %}
-    <div class="card mb-4">
-        <div class="card-header fw-bold">
-            <i class="fas fa-bolt me-2"></i>Quick Summary
-        </div>
-        <div class="card-body">
-            <p class="lead mb-0">{{ data.public_opinion.quick_summary }}</p>
-        </div>
-    </div>
-    {% endif %}
-
-    <!-- Pros and Cons -->
-    <div class="row">
-        <div class="col-md-6 mb-4">
-            <div class="card h-100">
-                <div class="card-header fw-bold text-success d-flex align-items-center">
-                    <i class="fas fa-thumbs-up me-2"></i>Key Strengths
-                    <span class="badge bg-success ms-2">{{ data.pros_cons_panel.pros|length }}</span>
-                </div>
-                <div class="card-body p-0">
-                    <ul class="list-group list-group-flush">
-                        {% if data.pros_cons_panel.pros %}
-                            {% for pro in data.pros_cons_panel.pros %}
-                                <li class="list-group-item d-flex align-items-center">
-                                    <i class="fas fa-check text-success me-2"></i>
-                                    {{ pro|title }}
-                                </li>
-                            {% endfor %}
-                        {% else %}
-                            <li class="list-group-item text-muted text-center py-4">
-                                <i class="fas fa-info-circle me-2"></i>
-                                No significant strengths identified in reviews
-                            </li>
-                        {% endif %}
-                    </ul>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-6 mb-4">
-            <div class="card h-100">
-                <div class="card-header fw-bold text-danger d-flex align-items-center">
-                    <i class="fas fa-thumbs-down me-2"></i>Key Concerns
-                    <span class="badge bg-danger ms-2">{{ data.pros_cons_panel.cons|length }}</span>
-                </div>
-                <div class="card-body p-0">
-                    <ul class="list-group list-group-flush">
-                        {% if data.pros_cons_panel.cons %}
-                            {% for con in data.pros_cons_panel.cons %}
-                                <li class="list-group-item d-flex align-items-center">
-                                    <i class="fas fa-times text-danger me-2"></i>
-                                    {{ con|title }}
-                                </li>
-                            {% endfor %}
-                        {% else %}
-                            <li class="list-group-item text-muted text-center py-4">
-                                <i class="fas fa-info-circle me-2"></i>
-                                No significant concerns identified in reviews
-                            </li>
-                        {% endif %}
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Detailed Analysis -->
-    {% if data.review_summary_generator and data.review_summary_generator != "Not enough reviews for detailed summary." %}
-    <div class="card mb-4">
-        <div class="card-header fw-bold d-flex align-items-center">
-            <i class="fas fa-file-alt me-2"></i>Detailed Analysis
-            <span class="badge bg-primary ms-2">AI Generated</span>
-        </div>
-        <div class="card-body">
-            <p class="mb-0">{{ data.review_summary_generator }}</p>
-        </div>
-    </div>
-    {% endif %}
-
-    <!-- Product Description -->
-    {% if data.description and data.description != "Not found" %}
-    <div class="card mb-4">
-        <div class="card-header fw-bold">
-            <i class="fas fa-info-circle me-2"></i>Product Highlights
-        </div>
-        <div class="card-body">
-            <p>{{ data.description|truncatewords:150 }}</p>
-        </div>
-    </div>
-    {% endif %}
-
-    <!-- Analysis Metadata -->
-    <div class="card">
-        <div class="card-body text-center text-muted">
-            <small>
-                <i class="fas fa-clock me-1"></i>
-                Analysis generated on {% now "F j, Y, g:i a" %} | 
-                <i class="fas fa-microchip me-1"></i>
-                Powered by AI sentiment analysis
-            </small>
-        </div>
-    </div>
-</div>
-{% else %}
-<!-- Placeholder when no data -->
-<div id="no-results" class="text-center py-5">
-    <i class="fas fa-search fa-3x text-muted mb-3"></i>
-    <h4 class="text-muted">Enter an Amazon product URL to analyze reviews</h4>
-    <p class="text-muted">We'll analyze customer sentiment, extract key pros/cons, and generate AI-powered summaries.</p>
-    <div class="mt-4">
-        <div class="row justify-content-center">
-            <div class="col-md-8">
-                <div class="alert alert-info">
-                    <h6><i class="fas fa-lightbulb me-2"></i>Tips for best results:</h6>
-                    <ul class="mb-0">
-                        <li>Use direct Amazon product links (containing '/dp/')</li>
-                        <li>Ensure the product has customer reviews</li>
-                        <li>Supported regions: Amazon.com, Amazon.in, Amazon.co.uk</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-{% endif %}
-{% endblock %}
-
-{% block extra_js %}
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
-    // Enhanced form submission handler
-    document.getElementById('analysis-form')?.addEventListener('submit', function(e) {
-        const analyzeBtn = document.getElementById('analyze-btn');
-        const loadingSpinner = document.getElementById('loading-spinner');
-        
-        if (analyzeBtn && loadingSpinner) {
-            // Show loading state
-            analyzeBtn.disabled = true;
-            analyzeBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Analyzing...';
-            loadingSpinner.style.display = 'block';
-            
-            // Hide previous results
-            const resultsSection = document.getElementById('results-section');
-            const noResults = document.getElementById('no-results');
-            if (resultsSection) resultsSection.style.display = 'none';
-            if (noResults) noResults.style.display = 'none';
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gemini Text Analyser</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Define the Neon Green color for easy reference in CSS */
+        :root {
+            --neon-green: #9ae49a;
+            --neon-blue: #4A90E2; /* For contrast/primary highlights */
+            --neon-green-shadow: 0 0 15px rgba(154, 228, 154, 0.5);
+            --neon-blue-shadow: 0 0 15px rgba(74, 144, 226, 0.5);
         }
-    });
 
-    // Enhanced chart initialization
-    {% if data %}
-    document.addEventListener('DOMContentLoaded', function() {
-        const ctx = document.getElementById('sentimentChart');
-        if (ctx) {
-            const sentimentData = {
-                positive: {{ data.public_opinion.positive_percent }},
-                negative: {{ data.public_opinion.negative_percent }},
-                neutral: {{ data.public_opinion.neutral_percent }}
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #000000;
+            color: #E0F7FA;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+        }
+        /* Card with subtle border and glow */
+        .app-card {
+            background: #0A0A0A;
+            border: 1px solid #1A1A1A;
+            border-radius: 20px;
+            box-shadow: var(--neon-green-shadow);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .app-card-blue {
+            box-shadow: var(--neon-blue-shadow);
+        }
+
+        /* Input Fields */
+        .form-input {
+            background: #000000;
+            border: 1px solid #333333;
+            color: white;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            padding: 0.75rem 1rem;
+        }
+        /* Input Focus: Neon Green Border and Shadow */
+        .form-input:focus {
+            outline: none;
+            border-color: var(--neon-green);
+            box-shadow: 0 0 0 2px rgba(154, 228, 154, 0.3);
+        }
+        /* Primary Button: Neon Green Background and Glow */
+        .btn-primary {
+            background: var(--neon-green);
+            color: #000000;
+            border-radius: 12px;
+            font-weight: 700;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(154, 228, 154, 0.4); 
+        }
+        /* Stronger glow and scale on hover */
+        .btn-primary:hover {
+            transform: scale(1.02);
+            box-shadow: 0 0 25px rgba(154, 228, 154, 0.8); 
+        }
+        
+        /* Custom scrollbar styling for the textarea */
+        textarea::-webkit-scrollbar {
+            width: 8px;
+        }
+        textarea::-webkit-scrollbar-thumb {
+            background-color: #333333; 
+            border-radius: 4px;
+        }
+        textarea::-webkit-scrollbar-track {
+            background: #000000;
+        }
+
+        /* Utility classes for text colors */
+        .text-neon-green { color: var(--neon-green); }
+        .text-neon-blue { color: var(--neon-blue); }
+        .bg-neon-green { background-color: var(--neon-green); }
+        .bg-neon-blue { background-color: var(--neon-blue); }
+        .border-neon-green { border-color: var(--neon-green); }
+        .border-neon-blue { border-color: var(--neon-blue); }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen p-4 font-sans">
+
+    <!-- Main Container Card -->
+    <div class="w-full max-w-2xl app-card p-8 space-y-6">
+        <h1 class="text-3xl font-extrabold text-neon-green text-center tracking-tight">AI Text Analyzer</h1>
+        <p class="text-center text-sm text-gray-400">Input your text and select an analysis type for instant insights powered by Gemini.</p>
+        
+        <!-- Input Section -->
+        <div class="space-y-4">
+            <label for="textArea" class="block text-sm font-medium text-neon-green">Text Input</label>
+            <textarea id="textArea" rows="8" placeholder="Paste your article, email, or passage here..."
+                class="w-full form-input"></textarea>
+        </div>
+
+        <!-- Controls Section -->
+        <div class="flex flex-col sm:flex-row gap-4">
+            <div class="flex-grow">
+                <label for="analysisType" class="block text-sm font-medium text-neon-green mb-1">Analysis Type</label>
+                <select id="analysisType"
+                    class="w-full form-input appearance-none">
+                    <option value="summarize">Summarize</option>
+                    <option value="sentiment">Sentiment Analysis</option>
+                    <option value="keywords">Keyword Extraction</option>
+                    <option value="tone">Tone of Voice</option>
+                </select>
+            </div>
+            <button id="analyzeButton" onclick="analyzeText()"
+                class="sm:mt-6 w-full sm:w-auto px-6 py-3 btn-primary disabled:opacity-50 disabled:cursor-not-allowed">
+                Analyze Text
+            </button>
+        </div>
+
+        <!-- Result Section -->
+        <div id="resultContainer" class="hidden space-y-4 pt-4">
+            <h2 class="text-xl font-bold text-neon-blue border-b border-neon-blue pb-2">Analysis Result</h2>
+            <!-- Result container with black background and neon border/text -->
+            <div id="resultContent" class="p-4 bg-black border border-neon-green rounded-lg text-white whitespace-pre-wrap">
+                <!-- Analysis result will be displayed here -->
+            </div>
+        </div>
+
+        <!-- Loading Spinner -->
+        <div id="loadingSpinner" class="hidden flex justify-center items-center py-8">
+            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-neon-green"></div>
+            <p class="ml-4 text-neon-green font-medium">Analyzing...</p>
+        </div>
+
+    </div>
+
+    <script type="module">
+        // Global constants for Firebase/Auth (MUST be used if available)
+        const __app_id = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const __firebase_config = typeof __firebase_config !== 'undefined' ? __firebase_config : null;
+        const __initial_auth_token = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+        const MODEL_NAME = "gemini-2.5-flash-preview-05-20";
+        const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL_NAME}:generateContent?key=`;
+        
+        const textArea = document.getElementById('textArea');
+        const analyzeButton = document.getElementById('analyzeButton');
+        const loadingSpinner = document.getElementById('loadingSpinner');
+        const resultContainer = document.getElementById('resultContainer');
+        const resultContent = document.getElementById('resultContent');
+
+        // Function to set UI state (loading/enabled)
+        function setUIState(isLoading) {
+            analyzeButton.disabled = isLoading;
+            textArea.disabled = isLoading;
+            loadingSpinner.classList.toggle('hidden', !isLoading);
+            analyzeButton.textContent = isLoading ? 'Processing...' : 'Analyze Text';
+            if (isLoading) {
+                resultContainer.classList.add('hidden');
+                resultContent.textContent = '';
+            }
+        }
+
+        // Main analysis function
+        window.analyzeText = async function() {
+            const userText = textArea.value.trim();
+            if (!userText) {
+                resultContent.textContent = 'Please enter some text to analyze.';
+                resultContainer.classList.remove('hidden');
+                return;
+            }
+
+            setUIState(true);
+
+            const analysisType = document.getElementById('analysisType').value;
+            let systemPrompt = "";
+
+            switch(analysisType) {
+                case 'summarize':
+                    systemPrompt = "You are an expert summarization bot. Provide a concise, neutral, and accurate summary of the provided text in 3-5 sentences.";
+                    break;
+                case 'sentiment':
+                    systemPrompt = "You are an expert sentiment analyst. Analyze the provided text and determine the overall sentiment (Positive, Negative, or Neutral). Provide a clear title for the result and a one-paragraph explanation for your rating.";
+                    break;
+                case 'keywords':
+                    systemPrompt = "You are an expert keyword extraction tool. Identify the 5 most important keywords or phrases from the text and list them as a bulleted markdown list.";
+                    break;
+                case 'tone':
+                    systemPrompt = "You are a professional communication expert. Determine the primary tone of voice (e.g., Formal, Casual, Urgent, Reflective) used in the text and provide a brief justification.";
+                    break;
+                default:
+                    systemPrompt = "Analyze the user's text and provide a concise, high-quality analysis based on the selected type.";
+            }
+
+            const userQuery = `Text to analyze: "${userText}"`;
+
+            const payload = {
+                contents: [{ parts: [{ text: userQuery }] }],
+                systemInstruction: { parts: [{ text: systemPrompt }] },
             };
-            
-            new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels: ['Positive', 'Negative', 'Neutral'],
-                    datasets: [{
-                        data: [sentimentData.positive, sentimentData.negative, sentimentData.neutral],
-                        backgroundColor: [
-                            'rgba(25, 135, 84, 0.8)',
-                            'rgba(220, 53, 69, 0.8)',
-                            'rgba(108, 117, 125, 0.8)'
-                        ],
-                        borderColor: [
-                            'rgba(25, 135, 84, 1)',
-                            'rgba(220, 53, 69, 1)',
-                            'rgba(108, 117, 125, 1)'
-                        ],
-                        borderWidth: 2,
-                        hoverOffset: 15
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    cutout: '65%',
-                    plugins: {
-                        legend: {
-                            position: 'bottom',
-                            labels: {
-                                padding: 20,
-                                usePointStyle: true,
-                                font: {
-                                    size: 12
-                                }
-                            }
-                        },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    return `${context.label}: ${context.raw}% (${Math.round(context.raw * {{ data.public_opinion.total_reviews_analyzed }} / 100)} reviews)`;
-                                }
-                            }
-                        }
-                    },
-                    animation: {
-                        animateScale: true,
-                        animateRotate: true
+
+            let responseText = "Analysis failed. Please try again.";
+            let attempt = 0;
+            const maxRetries = 3;
+
+            while (attempt < maxRetries) {
+                try {
+                    const response = await fetch(API_URL, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+
+                    const result = await response.json();
+                    const candidate = result.candidates?.[0];
+
+                    if (candidate && candidate.content?.parts?.[0]?.text) {
+                        responseText = candidate.content.parts[0].text;
+                        break; // Success, break the retry loop
+                    } else {
+                        throw new Error("Invalid response structure from API.");
+                    }
+                } catch (error) {
+                    console.error(`Attempt ${attempt + 1} failed:`, error);
+                    attempt++;
+                    if (attempt < maxRetries) {
+                        const delay = Math.pow(2, attempt) * 1000; // Exponential backoff (2s, 4s, 8s)
+                        await new Promise(resolve => setTimeout(resolve, delay));
+                        responseText = `Analysis failed after multiple retries (${maxRetries}). Please check the console for details.`;
                     }
                 }
-            });
+            }
+
+            setUIState(false);
+            resultContent.textContent = responseText;
+            resultContainer.classList.remove('hidden');
         }
-    });
-    {% endif %}
-</script>
-{% endblock %}
+    </script>
+</body>
+</html>
