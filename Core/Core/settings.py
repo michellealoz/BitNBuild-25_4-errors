@@ -158,6 +158,8 @@ LOGGING = {
     },
 }
 
+REVIEW_SCRAPE_KEY = os.getenv('REVIEW_SCRAPE_KEY')
+
 LOGIN_URL = '/user/login/'
 LOGIN_REDIRECT_URL = '/user/dashboard/'
 LOGOUT_REDIRECT_URL = '/'
