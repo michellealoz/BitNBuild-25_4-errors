@@ -28,7 +28,7 @@ def user_signup(request):
 
 
 # Step 2: Profile Setup (store in session)
-@login_required
+@login_required(login_url='/user/login/')
 def user_profile_setup_view(request):
     if request.method == 'POST':
         # Save form data to session
@@ -45,7 +45,7 @@ def user_profile_setup_view(request):
 
 
 # Step 3: Profile Complete (save to DB)
-@login_required
+@login_required(login_url='/user/login/')
 def user_profile_complete(request):
     data = request.session.get('user_profile_info')
     if not data:
@@ -112,4 +112,53 @@ def analysis_view(request):
                     error_detail = str(e)
                 context['error'] = f"An error occurred: {error_detail}"
 
-    return render(request, "analysis_template.html", context)
+    return render(request, "users/analyzer.html", context)
+
+@login_required(login_url='/user/login/')
+def compare_product(request):
+    """
+    Handles the comparison of two products by calling the FastAPI endpoint twice.
+    """
+    context = {}
+    if request.method == "POST":
+        product_url_1 = request.POST.get("product_url_1")
+        product_url_2 = request.POST.get("product_url_2")
+        
+        # Pass URLs back to the template to repopulate the form
+        context['product_url_1'] = product_url_1
+        context['product_url_2'] = product_url_2
+
+        if product_url_1 and product_url_2:
+            data1 = fetch_analysis_data(product_url_1)
+            data2 = fetch_analysis_data(product_url_2)
+
+            if "error" in data1:
+                context['error'] = f"Product 1 failed: {data1['error']}"
+            elif "error" in data2:
+                 context['error'] = f"Product 2 failed: {data2['error']}"
+            else:
+                context['data1'] = data1
+                context['data2'] = data2
+        else:
+            context['error'] = "Please provide both product URLs to compare."
+
+    return render(request, 'users/compare.html', context)
+
+def fetch_analysis_data(url: str) -> dict:
+    """
+    A helper function to call the FastAPI endpoint for a single URL.
+    This helps keep the compare_view clean (DRY principle).
+    """
+    FASTAPI_ANALYSIS_URL = "http://127.0.0.1:8001/analyze/"
+    try:
+        response = requests.post(FASTAPI_ANALYSIS_URL, json={"url": url}, timeout=90)
+        response.raise_for_status()
+        return response.json()
+    except requests.exceptions.Timeout:
+        return {"error": "Analysis timed out."}
+    except requests.exceptions.RequestException as e:
+        try:
+            error_detail = e.response.json().get('detail', str(e))
+        except (AttributeError, ValueError):
+            error_detail = str(e)
+        return {"error": error_detail}

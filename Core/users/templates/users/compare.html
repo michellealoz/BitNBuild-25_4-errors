@@ -1,0 +1,99 @@
+{% extends 'users/base.html' %}
+
+{% block title %}Compare Products{% endblock %}
+
+{% block content_header %}
+<div class="content-header">
+    <h1>{% block page_title %}Compare Products{% endblock %}</h1>
+    <p>Enter two product URLs to see a side-by-side comparison of their reviews.</p>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="card mb-4">
+    <div class="card-body">
+        <div class="row g-3 align-items-center">
+            <div class="col-lg-5">
+                <input type="url" class="form-control" placeholder="Product URL 1...">
+            </div>
+            <div class="col-lg-2 text-center">
+                <span class="fw-bold h5 text-muted">VS</span>
+            </div>
+            <div class="col-lg-5">
+                <input type="url" class="form-control" placeholder="Product URL 2...">
+            </div>
+        </div>
+        <div class="text-center mt-3">
+            <button class="btn btn-success fw-bold px-5" type="button">
+                <i class="fas fa-balance-scale me-2"></i>Compare
+            </button>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6 mb-4">
+        <div class="card h-100 border-primary border-2">
+            <div class="card-header bg-primary text-white fw-bold h5">Product A: ProTech Gadget</div>
+            <div class="table-responsive">
+                <table class="table table-striped table-hover mb-0">
+                    <tbody>
+                        <tr>
+                            <th scope="row">Overall Score</th>
+                            <td class="fw-bold text-primary">8.5 / 10</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Price</th>
+                            <td>$299.99</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Positive Reviews</th>
+                            <td>81%</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Key Feature</th>
+                            <td>Long Battery Life</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Top Complaint</th>
+                            <td>Bulky Design</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 mb-4">
+        <div class="card h-100 border-success border-2">
+            <div class="card-header bg-success text-white fw-bold h5">Product B: Nova Speaker</div>
+            <div class="table-responsive">
+                <table class="table table-striped table-hover mb-0">
+                    <tbody>
+                        <tr>
+                            <th scope="row">Overall Score</th>
+                            <td class="fw-bold text-success">8.2 / 10</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Price</th>
+                            <td>$249.99</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Positive Reviews</th>
+                            <td>78%</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Key Feature</th>
+                            <td>Superior Sound Quality</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Top Complaint</th>
+                            <td>Connectivity Issues</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

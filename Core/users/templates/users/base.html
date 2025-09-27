@@ -292,7 +292,7 @@
                     <!-- <span class="nav-emoji" aria-hidden="true">🏠</span> -->
                     <span class="nav-label">Dashboard</span>
                 </a>
-                <a href="#" class="nav-item {% if request.resolver_match.url_name == 'appointments' %}active{% endif %}">
+                <a href="{% url 'analyzer' %}" class="nav-item {% if request.resolver_match.url_name == 'appointments' %}active{% endif %}">
                     <!-- <span class="nav-emoji" aria-hidden="true">📅</span> -->
                     <span class="nav-label">Analyzer</span>
                 </a>
@@ -300,9 +300,9 @@
                     <!-- <span class="nav-emoji" aria-hidden="true">❤️‍🩹</span> -->
                     <span class="nav-label">Records</span>
                 </a>
-                <a href="#" class="nav-item {% if request.resolver_match.url_name == 'prescriptions' %}active{% endif %}">
+                <a href="{% url 'compare' %}" class="nav-item {% if request.resolver_match.url_name == 'prescriptions' %}active{% endif %}">
                     <!-- <span class="nav-emoji" aria-hidden="true">💊</span> -->
-                    <span class="nav-label">Comapre</span>
+                    <span class="nav-label">Compare</span>
                 </a>
                 <a href="#" class="nav-item {% if request.resolver_match.url_name == 'find_doctor' %}active{% endif %}">
                     <!-- <span class="nav-emoji" aria-hidden="true">👩‍⚕️</span> -->
@@ -329,7 +329,6 @@
             {% block content_header %}
             <div class="content-header">
                 <h1>{% block page_title %}Dashboard{% endblock %}</h1>
-                <p>{% block page_description %}Welcome to your AyurCare health portal{% endblock %}</p>
             </div>
             {% endblock %}
             

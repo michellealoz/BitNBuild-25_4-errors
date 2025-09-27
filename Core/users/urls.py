@@ -12,4 +12,6 @@ urlpatterns = [
     path('setup/', views.user_profile_setup_view, name='user_profile_setup'),
     path('complete/', views.user_profile_complete, name='user_profile_complete'),
     path('dashboard/', views.user_dashboard, name='user_dashboard'),
+    path('compare', views.compare_product, name='compare'),
+    path('analyzer', views.analysis_view, name='analyzer'),
 ]
