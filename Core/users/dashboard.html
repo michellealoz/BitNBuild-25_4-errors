@@ -10,11 +10,11 @@
 <style>
 :root
 {
-  --primary-color: #7b889e;
-  --secondary-color: #394d6d;
-  --base-color: #dfd2d5;
-  --text-color: rgb(245, 245, 245);
-  --background-color:#feffff;
+  --primary-color: #88abe0;
+  --secondary-color: #15426ada;
+  --base-color: #8abead;
+  --text-color: #040507;
+  --background-color:#ffffff;
 
 }
 * {
@@ -42,6 +42,7 @@ header {
 
 header h1 {
     font-size: 2rem;
+    color: var(--text-color)
 }
 
 /* Main Content */
@@ -89,26 +90,32 @@ section h2 {
     display: inline-block;
     padding-bottom: 5px;
 }
-
+button {
+    background-color: var(--secondary-color);
+    color: var(--background-color);
+    padding: 10px 20px;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+    font-size: 1rem;
+    margin-top: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 20px;
+}
+button:hover {
+    background-color: var(--base-color);
+    color: var(--secondary-color);
+}
 
 /* Footer */
 footer {
     text-align: center;
     padding: 15px 0;
-    background-color: #111827;
+    background-color: #bdcff5;
     color: var(--text-color);
     margin-top: 20px;
     font-size: 0.9rem;
-}
-
-/* Links */
-a {
-    color: var(--text-color);
-    text-decoration: none;
-}
-
-a:hover {
-    text-decoration: underline;
 }
 
 </style>
@@ -172,11 +179,11 @@ a:hover {
     <h3>Most Helpful Review</h3>
     <!--paste Review-->
     </section>
-    <section>
-    <h3>Subsection 2 Title</h3>
-    <p>Content for subsection 2.</p>
-    <!--Show percentage or count per star rating using a horizontal bar chart.-->
-    </section>
+    <!-- Add this inside your Top Reviews section -->
+<section>
+    <h3>Ratings Distribution</h3>
+    <canvas id="ratingsBarChart" width="400" height="200"></canvas>
+</section>
     </section>
     </div>
      </main>
@@ -218,6 +225,40 @@ const myBarChart = new Chart(ctx, {
                 'rgba(54, 162, 235, 1)',
                 'rgba(255, 206, 86, 1)',
                 'rgba(255, 99, 132, 1)'
+            ],
+            borderWidth: 1
+        }]
+    },
+    options: {
+        scales: {
+            y: { beginAtZero: true }
+        }
+    }
+});
+
+
+// Ratings Bar Chart
+const ratingsCtx = document.getElementById('ratingsBarChart').getContext('2d');
+new Chart(ratingsCtx, {
+    type: 'bar',
+    data: {
+        labels: ['1 Star', '2 Stars', '3 Stars', '4 Stars', '5 Stars'],
+        datasets: [{
+            label: 'Number of Ratings',
+            data: [5, 12, 18, 30, 45], // Example data, replace with your actual ratings count
+            backgroundColor: [
+                '#ef4444', // 1 Star - red
+                '#f59e42', // 2 Stars - orange
+                '#fbbf24', // 3 Stars - yellow
+                '#34d399', // 4 Stars - green
+                '#3b82f6'  // 5 Stars - blue
+            ],
+            borderColor: [
+                '#b91c1c',
+                '#c2410c',
+                '#b45309',
+                '#059669',
+                '#1e40af'
             ],
             borderWidth: 1
         }]
