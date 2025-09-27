@@ -1,121 +1,264 @@
-{% extends 'users/base.html' %}
+{% load widget_tweaks %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Compare Products - Review Radar</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        /* Define the Neon Green color for easy reference in CSS */
+        :root {
+            --neon-green: #9ae49a;
+            --neon-blue: #4A90E2; /* For contrast/primary highlights */
+            --neon-green-shadow: 0 0 15px rgba(154, 228, 154, 0.5);
+            --neon-blue-shadow: 0 0 15px rgba(74, 144, 226, 0.5);
+        }
 
-{% block title %}Compare Products{% endblock %}
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #000000;
+            color: #E0F7FA;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+        }
+        /* Card with subtle border and glow */
+        .app-card {
+            background: #0A0A0A;
+            border: 1px solid #1A1A1A;
+            border-radius: 20px;
+            box-shadow: var(--neon-green-shadow);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .app-card-blue {
+            box-shadow: var(--neon-blue-shadow);
+        }
 
-{% block content_header %}
-<div class="content-header">
-    <h1>{% block page_title %}Compare Products{% endblock %}</h1>
-    <p>Enter two product URLs to see a side-by-side comparison of their reviews.</p>
-</div>
-{% endblock %}
-
-{% block content %}
-<!-- The form now has a method, action, and CSRF token -->
-<form method="post">
-    {% csrf_token %}
-    <div class="card mb-4">
-        <div class="card-body">
-            <div class="row g-3 align-items-center">
-                <div class="col-lg-5">
-                    <!-- Inputs now have 'name' attributes and 'value' to remember old input -->
-                    <input type="url" name="product_url_1" class="form-control" placeholder="Product URL 1..." value="{{ product_url_1|default:'' }}" required>
+        /* Input Fields */
+        .form-input {
+            background: #000000;
+            border: 1px solid #333333;
+            color: white;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            padding: 0.75rem 1rem;
+        }
+        /* Input Focus: Neon Green Border and Shadow */
+        .form-input:focus {
+            outline: none;
+            border-color: var(--neon-green);
+            box-shadow: 0 0 0 2px rgba(154, 228, 154, 0.3);
+        }
+        /* Primary Button: Neon Green Background and Glow */
+        .btn-primary {
+            background: var(--neon-green);
+            color: #000000;
+            border-radius: 12px;
+            font-weight: 700;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(154, 228, 154, 0.4); 
+        }
+        /* Stronger glow and scale on hover */
+        .btn-primary:hover {
+            transform: scale(1.02);
+            box-shadow: 0 0 25px rgba(154, 228, 154, 0.8); 
+        }
+        
+        /* Table Styling for Comparison */
+        .comparison-table tr {
+            border-bottom: 1px solid #1A1A1A;
+        }
+        .comparison-table th {
+            font-weight: 400;
+            color: #ccc;
+            padding: 0.75rem 1rem;
+        }
+        .comparison-table td {
+            font-weight: 500;
+            padding: 0.75rem 1rem;
+        }
+        .comparison-table tbody tr:nth-child(odd) {
+            background-color: rgba(10, 10, 10, 0.5); /* Slightly darker stripe */
+        }
+        /* Utility classes for text colors */
+        .text-neon-green { color: var(--neon-green); }
+        .text-neon-blue { color: var(--neon-blue); }
+        .bg-neon-green { background-color: var(--neon-green); }
+        .bg-neon-blue { background-color: var(--neon-blue); }
+        .border-neon-green { border-color: var(--neon-green); }
+        .border-neon-blue { border-color: var(--neon-blue); }
+    </style>
+</head>
+<body class="p-4">
+    <div class="w-full max-w-4xl mx-auto">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <div class="flex items-center justify-center gap-3 mb-4">
+                <div class="w-12 h-12 bg-[#9ae49a] rounded-2xl flex items-center justify-center shadow-lg shadow-[#9ae49a]/30">
+                    <svg class="w-6 h-6 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                    </svg>
                 </div>
-                <div class="col-lg-2 text-center">
-                    <span class="fw-bold h5 text-muted">VS</span>
-                </div>
-                <div class="col-lg-5">
-                    <input type="url" name="product_url_2" class="form-control" placeholder="Product URL 2..." value="{{ product_url_2|default:'' }}" required>
-                </div>
-            </div>
-            <div class="text-center mt-3">
-                <!-- Button is now type="submit" -->
-                <button class="btn btn-success fw-bold px-5" type="submit">
-                    <i class="fas fa-balance-scale me-2"></i>Compare
-                </button>
+                <h1 class="text-3xl font-bold text-white">Review <span class="text-[#9ae49a]">Radar</span></h1>
             </div>
         </div>
-    </div>
-</form>
 
-<!-- Display error messages if any -->
-{% if error %}
-<div class="alert alert-danger" role="alert">
-    <strong>Error:</strong> {{ error }}
-</div>
-{% endif %}
+        <!-- Page Title -->
+        <div class="content-header text-center mb-8">
+            <h1 class="text-3xl font-extrabold text-white">Product <span class="text-neon-green">Comparison</span></h1>
+            <p class="text-gray-400 mt-2">Enter two product URLs to see a side-by-side analysis of their reviews.</p>
+        </div>
 
-<!-- Display the comparison results only if both data sets are available -->
-{% if data1 and data2 %}
-<div class="row">
-    <!-- Product 1 Card -->
-    <div class="col-md-6 mb-4">
-        <div class="card h-100 border-primary border-2">
-            <div class="card-header bg-primary text-white fw-bold h5">
-                Product A: {{ data1.product_name|truncatechars:30 }}
+        <!-- Comparison Form -->
+        <form method="post">
+            {% csrf_token %}
+            <div class="app-card mb-8 p-6 shadow-xl shadow-[#9ae49a]/20">
+                <div class="flex flex-col lg:flex-row gap-4 items-center">
+                    <!-- Product URL 1 -->
+                    <div class="flex-1 w-full">
+                        <input type="url" name="product_url_1" class="form-input w-full" placeholder="Product URL 1 (e.g., Amazon link)..." value="{{ product_url_1|default:'' }}" required>
+                    </div>
+                    
+                    <div class="lg:w-auto w-full text-center py-2 lg:py-0">
+                        <span class="font-bold text-lg text-gray-500">VS</span>
+                    </div>
+                    
+                    <!-- Product URL 2 -->
+                    <div class="flex-1 w-full">
+                        <input type="url" name="product_url_2" class="form-input w-full" placeholder="Product URL 2 (e.g., BestBuy link)..." value="{{ product_url_2|default:'' }}" required>
+                    </div>
+                </div>
+                
+                <div class="text-center mt-6">
+                    <button class="btn-primary py-3 px-8 text-lg" type="submit">
+                        <svg class="w-5 h-5 inline-block me-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.526a2 2 0 011.789-2.894l3.5-7A2 2 0 0114 10zM5.131 3.834a2 2 0 00-1.79 2.894l3.5 7A2 2 0 0010 16h4a2 2 0 001.788-2.894l-3.5-7a2 2 0 00-1.789-2.894H5.131z"></path></svg>
+                        Compare Products
+                    </button>
+                </div>
             </div>
-            <div class="table-responsive">
-                <table class="table table-striped table-hover mb-0">
-                    <tbody>
-                        <tr>
-                            <th scope="row">Overall Score</th>
-                            <td class="fw-bold text-primary">{{ data1.overall_score }} / 10</td>
-                        </tr>
-                        <tr>
-                            <th scope="row">Price</th>
-                            <td>₹{{ data1.price }}</td>
-                        </tr>
-                        <tr>
-                            <th scope="row">Positive Reviews</th>
-                            <td>{{ data1.public_opinion.positive_percent }}%</td>
-                        </tr>
-                        <tr>
-                            <th scope="row">Top Pro</th>
-                            <td>{{ data1.pros_cons_panel.pros.0|default:'N/A' }}</td>
-                        </tr>
-                        <tr>
-                            <th scope="row">Top Con</th>
-                            <td>{{ data1.pros_cons_panel.cons.0|default:'N/A' }}</td>
-                        </tr>
-                    </tbody>
-                </table>
+        </form>
+
+        <!-- Display error messages if any -->
+        {% if error %}
+        <div class="p-4 rounded-xl bg-red-900/40 border border-red-700/50 text-red-400 mb-8">
+            <strong class="font-semibold">Error:</strong> {{ error }}
+        </div>
+        {% endif %}
+
+        <!-- Display the comparison results only if both data sets are available -->
+        {% if data1 and data2 %}
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
+            <!-- Product 1 Card (Neon Blue Highlight) -->
+            <div class="mb-4">
+                <div class="app-card app-card-blue h-full border border-2 border-neon-blue">
+                    <!-- Header (Blue) -->
+                    <div class="bg-neon-blue text-black p-4 rounded-t-[19px] font-extrabold text-xl">
+                        Product A: {{ data1.product_name|truncatechars:30 }}
+                    </div>
+                    
+                    <!-- Table -->
+                    <div class="overflow-x-auto">
+                        <table class="comparison-table w-full">
+                            <tbody>
+                                <tr>
+                                    <th>Overall Score</th>
+                                    <td class="fw-bold text-neon-blue">{{ data1.overall_score }} / 10</td>
+                                </tr>
+                                <tr>
+                                    <th>Price</th>
+                                    <td>₹{{ data1.price }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Positive Reviews</th>
+                                    <td>{{ data1.public_opinion.positive_percent }}%</td>
+                                </tr>
+                                <tr>
+                                    <th>Top Pro</th>
+                                    <td>{{ data1.pros_cons_panel.pros.0|default:'N/A' }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Top Con</th>
+                                    <td>{{ data1.pros_cons_panel.cons.0|default:'N/A' }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Product 2 Card (Neon Green Highlight) -->
+            <div class="mb-4">
+                <div class="app-card h-full border border-2 border-neon-green">
+                    <!-- Header (Green) -->
+                    <div class="bg-neon-green text-black p-4 rounded-t-[19px] font-extrabold text-xl">
+                        Product B: {{ data2.product_name|truncatechars:30 }}
+                    </div>
+                    
+                    <!-- Table -->
+                    <div class="overflow-x-auto">
+                        <table class="comparison-table w-full">
+                            <tbody>
+                                <tr>
+                                    <th>Overall Score</th>
+                                    <td class="fw-bold text-neon-green">{{ data2.overall_score }} / 10</td>
+                                </tr>
+                                <tr>
+                                    <th>Price</th>
+                                    <td>₹{{ data2.price }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Positive Reviews</th>
+                                    <td>{{ data2.public_opinion.positive_percent }}%</td>
+                                </tr>
+                                <tr>
+                                    <th>Top Pro</th>
+                                    <td>{{ data2.pros_cons_panel.pros.0|default:'N/A' }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Top Con</th>
+                                    <td>{{ data2.pros_cons_panel.cons.0|default:'N/A' }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
 
-    <!-- Product 2 Card -->
-    <div class="col-md-6 mb-4">
-        <div class="card h-100 border-success border-2">
-            <div class="card-header bg-success text-white fw-bold h5">
-                Product B: {{ data2.product_name|truncatechars:30 }}
+        <!-- Recommendation Summary Block -->
+        <div class="app-card p-6 border-2 border-white/10 mt-8">
+            <h3 class="text-2xl font-bold mb-4 text-center">🤖 <span class="text-neon-green">Recommendation</span> Summary</h3>
+            <p class="text-lg text-gray-300 text-center">Based on public opinion and key feature analysis:</p>
+            
+            <div class="mt-4 p-4 rounded-xl border border-neon-blue/50 bg-blue-900/20 mb-3">
+                <p class="font-semibold text-white">Go for <span class="text-neon-blue">Product A</span> ({{ data1.product_name|truncatechars:30 }}) IF:</p>
+                <ul class="list-disc list-inside ml-4 text-gray-400">
+                    <li>Your primary focus is <span class="text-neon-blue font-medium">{{ data1.pros_cons_panel.pros.0|default:'(feature not specified)' }}</span> (its most-praised aspect).</li>
+                    <li>You prioritize its <span class="text-neon-blue font-medium">higher overall score</span> ({{ data1.overall_score }} / 10).</li>
+                </ul>
             </div>
-            <div class="table-responsive">
-                <table class="table table-striped table-hover mb-0">
-                    <tbody>
-                        <tr>
-                            <th scope="row">Overall Score</th>
-                            <td class="fw-bold text-success">{{ data2.overall_score }} / 10</td>
-                        </tr>
-                        <tr>
-                            <th scope="row">Price</th>
-                            <td>₹{{ data2.price }}</td>
-                        </tr>
-                        <tr>
-                            <th scope="row">Positive Reviews</th>
-                            <td>{{ data2.public_opinion.positive_percent }}%</td>
-                        </tr>
-                        <tr>
-                            <th scope="row">Top Pro</th>
-                            <td>{{ data2.pros_cons_panel.pros.0|default:'N/A' }}</td>
-                        </tr>
-                        <tr>
-                            <th scope="row">Top Con</th>
-                            <td>{{ data2.pros_cons_panel.cons.0|default:'N/A' }}</td>
-                        </tr>
-                    </tbody>
-                </table>
+            
+            <div class="p-4 rounded-xl border border-neon-green/50 bg-green-900/20">
+                <p class="font-semibold text-white">Go for <span class="text-neon-green">Product B</span> ({{ data2.product_name|truncatechars:30 }}) IF:</p>
+                <ul class="list-disc list-inside ml-4 text-gray-400">
+                    <li>Your primary focus is <span class="text-neon-green font-medium">{{ data2.pros_cons_panel.pros.0|default:'(feature not specified)' }}</span> (its most-praised aspect).</li>
+                    <li>You prioritize its <span class="text-neon-green font-medium">higher positive review percentage</span> ({{ data2.public_opinion.positive_percent }}%).</li>
+                </ul>
             </div>
+            
+            <p class="text-sm text-gray-500 mt-4 text-center">Always consider the <span class="text-red-400">Top Con</span> for both products before deciding.</p>
+        </div>
+        {% endif %}
+
+        <!-- Back to Dashboard -->
+        <div class="text-center mt-8">
+            <a href="{% url 'user_dashboard' %}" class="text-neon-green hover:text-white font-medium">← Back to Dashboard</a>
         </div>
     </div>
-</div>
-{% endif %}
-{% endblock %}
+</body>
+</html>
