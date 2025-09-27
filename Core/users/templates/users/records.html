@@ -1,0 +1,159 @@
+{% extends 'users/base.html' %}
+
+{% block title %}My Records - Review Radar{% endblock %}
+
+{% block page_title %}My Saved Analyses{% endblock %}
+{% block page_subtitle %}Review your past product analysis records here.{% endblock %}
+
+{% block content %}
+
+<div id="records-accordion">
+    {% if records %}
+        {% for record in records %}
+        <div class="app-card mb-4 accordion-item">
+            <!-- Accordion Header -->
+            <button class="accordion-header" aria-expanded="false" aria-controls="record-{{ record.id }}">
+                <div style="display: flex; align-items: center; gap: 1rem; flex: 1;">
+                     
+                    <img src="{{ record.analysis_data.image_url }}" alt="{{ record.product_name }}" style="width: 60px; height: 60px; object-fit: contain; border-radius: 8px; background-color: white; padding: 5px; flex-shrink: 0;">
+                    <div style="text-align: left;">
+                        <h5 style="color: white; margin: 0; font-size: 1.1rem;">{{ record.product_name }}</h5>
+                        <small style="color: #A0AEC0;">Analyzed on: {{ record.created_at|date:"F j, Y, g:i a" }}</small>
+                    </div>
+                </div>
+                <div class="accordion-icon">
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+            </button>
+
+            <!-- Accordion Body (Collapsible Content) -->
+            <div id="record-{{ record.id }}" class="accordion-body" style="display: none;">
+                <div class="p-6">
+                    {% with data=record.analysis_data %}
+                    <div style="display: grid; grid-template-columns: 1fr; gap: 1.5rem;" class="analysis-grid-records">
+                        <!-- Left Column -->
+                        <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+                             <!-- Sentiment Score -->
+                            <div style="background-color: #1A202C; border-radius: 12px; padding: 1.5rem;">
+                                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                                    <span style="font-weight: bold; color: white;">Overall Sentiment</span>
+                                    {% with score=data.public_opinion.positive_percent %}
+                                    <span style="font-weight: 500; background-color: {% if score >= 70 %}rgba(154, 228, 154, 0.1){% elif score >= 50 %}rgba(248, 192, 80, 0.1){% else %}rgba(255, 107, 107, 0.1){% endif %}; color: {% if score >= 70 %}#9ae49a{% elif score >= 50 %}#f8c050{% else %}#FF6B6B{% endif %}; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.875rem;">
+                                        {% if score >= 70 %}Excellent{% elif score >= 50 %}Average{% else %}Poor{% endif %}
+                                    </span>
+                                    {% endwith %}
+                                </div>
+                                <div style="text-align: center;">
+                                     {% with positive_percent=data.public_opinion.positive_percent %}
+                                    <h1 style="font-size: 3rem; font-weight: 800; color: {% if positive_percent >= 70 %}#9ae49a{% elif positive_percent >= 50 %}#f8c050{% else %}#FF6B6B{% endif %}; margin-bottom: 0.5rem;">
+                                        {{ positive_percent }}<small style="color: #A0AEC0; font-size: 1.5rem;">%</small>
+                                    </h1>
+                                    <p style="color: #A0AEC0; margin-top: -0.5rem; margin-bottom: 1.5rem;">Positive</p>
+                                    {% endwith %}
+                                </div>
+                            </div>
+                            <!-- Pros and Cons -->
+                            <div style="background-color: #1A202C; border-radius: 12px; padding: 1.5rem;">
+                                <h5 style="color: white; margin-top:0; margin-bottom: 1.5rem; text-align: center;">Verdict</h5>
+                                <div style="font-weight: bold; color: #9ae49a; margin-bottom: 1rem;"><i class="fas fa-thumbs-up me-2"></i>Strengths</div>
+                                <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.75rem;">
+                                    {% for pro in data.pros_cons_panel.pros %}<li><i class="fas fa-check-circle me-2" style="color: #9ae49a;"></i>{{ pro|title }}</li>{% empty %}<li>No significant strengths.</li>{% endfor %}
+                                </ul>
+                                <hr style="border-color: #4A5568; margin: 1.5rem 0;">
+                                <div style="font-weight: bold; color: #FF6B6B; margin-bottom: 1rem;"><i class="fas fa-thumbs-down me-2"></i>Concerns</div>
+                                <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.75rem;">
+                                    {% for con in data.pros_cons_panel.cons %}<li><i class="fas fa-times-circle me-2" style="color: #FF6B6B;"></i>{{ con|title }}</li>{% empty %}<li>No significant concerns.</li>{% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+                        <!-- Right Column -->
+                        <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+                            <div style="background-color: #1A202C; border-radius: 12px; padding: 1.5rem;">
+                                <div style="font-weight: bold; color: white; margin-bottom: 1rem;"><i class="fas fa-bolt me-2" style="color: #9ae49a;"></i>AI Quick Summary</div>
+                                <p style="color: #D1D5DB; margin: 0; line-height: 1.7;">{{ data.public_opinion.quick_summary }}</p>
+                            </div>
+                            <div style="background-color: #1A202C; border-radius: 12px; padding: 1.5rem;">
+                                <div style="font-weight: bold; color: white; margin-bottom: 1rem;"><i class="fas fa-file-alt me-2" style="color: #4A90E2;"></i>AI Detailed Analysis</div>
+                                <div style="color: #D1D5DB; margin: 0; line-height: 1.7; font-size: 0.95rem;">{{ data.review_summary_generator|linebreaksbr }}</div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endwith %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="app-card text-center p-8">
+            <div style="width: 80px; height: 80px; margin: 0 auto 1.5rem auto; background-color: #2D3748; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                <i class="fas fa-folder-open fa-2x" style="color: #A0AEC0;"></i>
+            </div>
+            <h4 style="color: #E5E7EB; margin-bottom: 0.5rem;">No Records Found</h4>
+            <p style="color: #A0AEC0;">You haven't analyzed any products yet. Go to the <a href="{% url 'analyzer' %}" style="color: #9ae49a;">Analyzer</a> to get started!</p>
+        </div>
+    {% endif %}
+</div>
+
+<style>
+    .accordion-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+        padding: 1rem 1.5rem;
+        background-color: transparent;
+        border: none;
+        cursor: pointer;
+        text-align: left;
+    }
+    .accordion-item {
+        overflow: hidden;
+        transition: background-color 0.3s ease;
+    }
+    .accordion-item:has(.accordion-header[aria-expanded="true"]) {
+        background-color: #2D3748; /* Highlight color when open */
+    }
+    .accordion-icon {
+        transition: transform 0.3s ease;
+    }
+    .accordion-header[aria-expanded="true"] .accordion-icon {
+        transform: rotate(180deg);
+    }
+    .accordion-body {
+        border-top: 1px solid #4A5568;
+    }
+    @media (min-width: 992px) {
+        .analysis-grid-records {
+            grid-template-columns: 1fr 1.5fr !important;
+        }
+    }
+</style>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const accordionHeaders = document.querySelectorAll('.accordion-header');
+
+        accordionHeaders.forEach(header => {
+            header.addEventListener('click', function () {
+                const isExpanded = this.getAttribute('aria-expanded') === 'true';
+                
+                // Optional: Close all other accordions
+                accordionHeaders.forEach(h => {
+                    if (h !== this) {
+                        h.setAttribute('aria-expanded', 'false');
+                        document.getElementById(h.getAttribute('aria-controls')).style.display = 'none';
+                    }
+                });
+
+                // Toggle the clicked accordion
+                this.setAttribute('aria-expanded', !isExpanded);
+                const accordionBody = document.getElementById(this.getAttribute('aria-controls'));
+                accordionBody.style.display = isExpanded ? 'none' : 'block';
+            });
+        });
+    });
+</script>
+{% endblock %}

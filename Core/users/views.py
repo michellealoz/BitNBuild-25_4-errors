@@ -99,6 +99,7 @@ def user_login_view(request):
             messages.error(request, 'Invalid username or password.')
     return render(request, 'users/login.html')
 
+from .models import ProductAnalysis
 
 @login_required(login_url='/user/login/')
 def analysis_view(request):
@@ -109,30 +110,35 @@ def analysis_view(request):
         product_url = request.POST.get("product_url", "").strip()
         if product_url:
             try:
-                # Enhanced Amazon URL validation
                 if not any(domain in product_url for domain in ['amazon.com', 'amazon.in', 'amazon.co.uk']):
                     context['error'] = "Please enter a valid Amazon product URL from supported regions (com, in, co.uk)."
                 elif '/dp/' not in product_url and '/product/' not in product_url:
                     context['error'] = "Please enter a direct Amazon product URL containing '/dp/' or '/product/'."
                 else:
-                    # Clean URL - extract product ID if needed
                     if '?' in product_url:
                         product_url = product_url.split('?')[0]
                     
-                    # Set timeout and make request
                     response = requests.post(FASTAPI_ANALYSIS_URL, 
                                            json={"url": product_url}, 
-                                           timeout=120)  # Increased timeout
+                                           timeout=120)
                     response.raise_for_status()
                     
                     api_data = response.json()
                     
-                    # Enhanced data validation
                     if 'error' in api_data:
                         context['error'] = api_data['error']
                     else:
                         context['data'] = api_data
                         context['product_url'] = product_url
+
+                        # --- NEW: Save the successful analysis to the database ---
+                        ProductAnalysis.objects.create(
+                            user=request.user,
+                            product_url=product_url,
+                            product_name=api_data.get('product_name', 'Unknown Product'),
+                            analysis_data=api_data
+                        )
+                        # ---------------------------------------------------------
 
             except requests.exceptions.Timeout:
                 context['error'] = "The analysis took too long to complete. Please try again with a different product."
@@ -151,6 +157,18 @@ def analysis_view(request):
 
     return render(request, "users/analyzer.html", context)
 
+
+@login_required(login_url='/user/login/')
+def records_view(request):
+    """
+    Fetches and displays all saved product analyses for the logged-in user.
+    """
+    # Fetch all analysis records for the current user, ordered by most recent
+    user_records = ProductAnalysis.objects.filter(user=request.user)
+    context = {
+        'records': user_records
+    }
+    return render(request, "users/records.html", context)
 
 login_required(login_url='/user/login/')
 def compare_product(request):

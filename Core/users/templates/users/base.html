@@ -382,7 +382,7 @@
                     <i class="fas fa-search-dollar"></i>
                     <span class="nav-label">Analyzer</span>
                 </a>
-                <a href="#" class="nav-item {% if request.resolver_match.url_name == 'records' %}active{% endif %}">
+                <a href="{% url 'records' %}" class="nav-item {% if request.resolver_match.url_name == 'records' %}active{% endif %}">
                     <i class="fas fa-save"></i>
                     <span class="nav-label">Records</span>
                 </a>
