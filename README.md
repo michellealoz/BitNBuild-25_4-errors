@@ -1,4 +1,4 @@
-👋 Hi, we’re Team 4 Erros — Hruday Patil, Michelle Aloz, Alycia Coutinho, Rochelle Fernandes — the team behind Review Radar!
+👋 Hi, we’re Team 4 Errors — Hruday Patil, Michelle Aloz, Alycia Coutinho, Rochelle Fernandes — the team behind Review Radar!
 
 
 # 🛒 Background about Review Radar
