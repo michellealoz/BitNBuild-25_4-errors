@@ -176,10 +176,8 @@ def generate_comprehensive_analysis(product_data: dict) -> dict:
 
     review_texts = [r['text'] for r in reviews]
     
-    # --- UPDATED: Use the new rating classifier ---
     predictions = rating_classifier(review_texts, truncation=True, max_length=512, padding=True)
     
-    # --- FIX: Correctly parse the star rating from labels like "5 stars" ---
     star_ratings = [int(p['label'].split()[0]) for p in predictions]
 
     positive_count = sum(1 for star in star_ratings if star >= 4)
@@ -192,12 +190,17 @@ def generate_comprehensive_analysis(product_data: dict) -> dict:
     positive_reviews = [text for text, star in zip(review_texts, star_ratings) if star >= 4]
     negative_reviews = [text for text, star in zip(review_texts, star_ratings) if star <= 2]
     
-    # --- UPDATED: Use the new focused keyword extraction ---
     product_name = product_data.get('product_name', '')
     top_pros = extract_focused_keywords(positive_reviews, product_name)
     top_cons = extract_focused_keywords(negative_reviews, product_name)
 
-    summary = summarizer(" ".join(review_texts), max_length=50, min_length=15, do_sample=False)[0]['summary_text']
+    # --- FIX: Added truncation=True to prevent crashes on long review text ---
+    summary_text = " ".join(review_texts)
+    if len(summary_text) > 100: # Only summarize if there's enough text
+        summary = summarizer(summary_text, max_length=50, min_length=15, do_sample=False, truncation=True)[0]['summary_text']
+    else:
+        summary = "Not enough review text for a summary."
+
 
     return {
         "public_opinion": {
@@ -211,7 +214,6 @@ def generate_comprehensive_analysis(product_data: dict) -> dict:
         "pros_cons_panel": {"pros": top_pros, "cons": top_cons}
     }
 
-# --- 5. Main API Endpoint ---
 @app.post("/analyze/")
 async def analyze_url(input_data: URLInput):
     APIFY_API_TOKEN = os.getenv("APIFY")
