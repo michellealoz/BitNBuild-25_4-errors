@@ -8,15 +8,16 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script>
+        // Applying the neon theme
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
-                        primary: '#0D47A1',   // Corporate Blue
-                        secondary: '#1E88E5', // Lighter Blue
-                        accent: '#10B981',    // Vibrant Green
-                        light: '#F5F7FA',     // Off-White
-                        dark: '#1A202C',      // Dark Gray/Blue
+                        primary: '#39FF14',   // Neon Green
+                        secondary: '#00F0FF',  // Electric Cyan
+                        accent: '#39FF14',   // Neon Green for consistency
+                        light: '#000000',     // Black background
+                        dark: '#000000',      // Black background
                     },
                     fontFamily: {
                         poppins: ['Poppins', 'sans-serif'],
@@ -25,377 +26,244 @@
                 }
             }
         }
-    tailwind.config = {
-        theme: {
-            extend: {
-                colors: {
-                    primary: '#39FF14',   // Neon Green
-                    secondary: '#00F0FF', // Electric Cyan (optional accent)
-                    accent: '#39FF14',    // Neon Green
-                    light: '#000000',     // Black background
-                    dark: '#000000',      // Black background
-                },
-                fontFamily: {
-                    poppins: ['Poppins', 'sans-serif'],
-                    serif: ['Playfair Display', 'serif'],
-                },
-            }
-        }
-    }
-
-    
-
     </script>
     <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet">
     <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
     <style>
         :root {
-    --neon-green: #39FF14; /* Neon Green */
-    --neon-blue: #00F0FF;  /* Electric Cyan */
-    --neon-pink: #FF4DFF;  /* Neon Pink */
-    --dark-bg: #000000;    /* True Black */
-    --text-light: #EAEAEA; /* Soft white for readability */
-}
-nav a {
-    color: #000 !important;
-}
-   body {
-        background: #000000 !important;
-        color: #fff !important;
-    }
-    .bg-light, .bg-white, .bg-dark {
-        background-color: #000000 !important;
-    }
-    .text-dark, .text-gray-600, .text-gray-500, .text-gray-400, .text-gray-200, .text-gray-800 {
-        color: #fff !important;
-    }
-    .text-primary, .text-accent {
-        color: #39FF14 !important;
-    }
-    .bg-primary, .bg-accent {
-        background-color: #39FF14 !important;
-        color: #000 !important;
-    }
-    .border-primary {
-        border-color: #39FF14 !important;
-    }
-    .shadow-lg, .shadow-xl, .shadow-2xl {
-        box-shadow: 0 0 32px 8px #39FF14, 0 8px 32px 0 rgba(0,0,0,0.7) !important;
-    }
-    .rounded-lg, .rounded-xl {
-        border-radius: 12px !important;
-    }
-    a:hover, button:hover {
-        color: #39FF14 !important;
-        text-shadow: 0 0 8px #39FF14;
-    }
-
-/* Body */
-body {
-    font-family: 'Poppins', sans-serif;
-    color: var(--text-light);
-    background: var(--dark-bg);
-}
-
-/* Hero Background with neon overlay */
-.hero-bg {
-    background: #000;
-    box-shadow: 0 0 30px rgba(0, 240, 255, 0.4); /* neon cyan glow */
-    position: relative;
-    overflow: hidden;
-}
-
-/* Pricing Card (popular plan) */
-.pricing-card-popular {
-    transform: scale(1.05);
-    border: 2px solid var(--neon-green);
-    box-shadow: 0 0 20px rgba(57, 255, 20, 0.6);
-    border-radius: 12px;
-}
-
-/* Google Translate minimal theming */
-.goog-te-banner-frame,
-#goog-gt-tt { display: none !important; }
-html { margin-top: 0 !important; }
-body { top: 0 !important; }
-#google_translate_element { display: none; }
-
-/* Language Selector (neon hover) */
-.language-select {
-    background-color: transparent;
-    border: none;
-    color: var(--neon-blue);
-    padding: 0.5rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all .3s ease;
-}
-
-.language-select:hover {
-    color: var(--neon-green);
-    text-shadow: 0 0 8px var(--neon-green);
-}
-.hero-bg p {
-    color: #fff !important;
-}
-
+            --neon-green: #39FF14;
+            --neon-blue: #00F0FF;
+            --dark-bg: #000000;
+            --text-light: #EAEAEA;
+        }
+        body { background: #000000 !important; color: #fff !important; font-family: 'Poppins', sans-serif; }
+        .bg-light, .bg-white, .bg-dark { background-color: #000000 !important; }
+        .text-dark, .text-gray-600, .text-gray-500, .text-gray-400, .text-gray-200, .text-gray-800, nav a { color: #fff !important; }
+        .text-primary, .text-accent { color: #39FF14 !important; }
+        .bg-primary, .bg-accent { background-color: #39FF14 !important; color: #000 !important; }
+        .border-primary { border-color: #39FF14 !important; }
+        .shadow-lg, .shadow-xl, .shadow-2xl { box-shadow: 0 0 18px 2px rgba(57, 255, 20, 0.5), 0 8px 32px 0 rgba(0,0,0,0.7) !important; }
+        .rounded-lg, .rounded-xl { border-radius: 12px !important; }
+        button:hover { color: #000 !important; }
+        a:hover, button:hover { text-shadow: 0 0 8px #39FF14; }
+        .hero-bg { background: #000; box-shadow: 0 0 30px rgba(0, 240, 255, 0.4); position: relative; overflow: hidden; }
+        .hero-bg p { color: #fff !important; }
+        .pricing-card-popular { transform: scale(1.05); border: 2px solid var(--neon-green); box-shadow: 0 0 20px rgba(57, 255, 20, 0.6); border-radius: 12px; }
+        .goog-te-banner-frame, #goog-gt-tt { display: none !important; }
+        html { margin-top: 0 !important; }
+        body { top: 0 !important; }
+        #google_translate_element { display: none; }
+        .language-select { background-color: transparent; border: none; color: var(--neon-blue); padding: 0.5rem; font-weight: 500; cursor: pointer; transition: all .3s ease; }
+        .language-select:hover { color: var(--neon-green); text-shadow: 0 0 8px var(--neon-green); }
     </style>
 </head>
 <body class="bg-light">
 
-    <header class="fixed w-full bg-white/80 backdrop-blur-sm shadow-sm z-50">
-    <div class="container mx-auto px-6 py-4">
-        <div class="flex items-center justify-between">
-            <a href="/" class="text-2xl font-bold">
-                <span class="text-black">Review</span><span class="text-primary">Radar</span>
-            </a>
-            <nav class="hidden md:flex items-center space-x-8">
-                <a href="#features" class="text-black hover:text-primary font-medium transition-colors">Features</a>
-                <a href="#pricing" class="text-black hover:text-primary font-medium transition-colors">Pricing</a>
-                <a href="#contact" class="text-black hover:text-primary font-medium transition-colors">Contact</a>
-                <select id="custom_language_select" class="language-select text-black font-bold">
-                    <option value="de" class="text-black">IN</option>
-                    <option value="en" class="text-black">EN</option>
-                    <option value="es" class="text-black">ES</option>
-                    <option value="fr" class="text-black">FR</option>
-                </select>
-                <div id="google_translate_element"></div>
-            </nav>
-            <div class="flex items-center space-x-4">
-                <a href="/user/login" class="px-5 py-2 text-black font-semibold hover:text-primary transition-colors">Log In</a>
-                <a href="/user/signup" class="px-5 py-2 bg-primary text-black font-bold rounded-lg shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5">Sign Up</a>
+    <header class="fixed w-full bg-black/80 backdrop-blur-sm shadow-sm z-50">
+        <div class="container mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <a href="/" class="text-2xl font-bold">
+                    <span class="text-white">Review</span><span class="text-primary">Radar</span>
+                </a>
+                <nav class="hidden md:flex items-center space-x-8">
+                    <a href="#features" class="hover:text-primary font-medium transition-colors">Features</a>
+                    <a href="#pricing" class="hover:text-primary font-medium transition-colors">Pricing</a>
+                    <a href="#contact" class="hover:text-primary font-medium transition-colors">Contact</a>
+                </nav>
+                <div class="flex items-center space-x-4">
+                    <a href="/user/login" class="px-5 py-2 font-semibold hover:text-primary transition-colors">Log In</a>
+                    <a href="/user/signup" class="px-5 py-2 bg-primary text-black font-bold rounded-lg shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5">Sign Up</a>
+                </div>
             </div>
         </div>
-    </div>
     </header>
 
-<section class="relative h-screen flex items-center justify-center text-center text-white hero-bg">
-    <canvas id="neonStars" style="position:absolute;top:0;left:0;width:100%;height:100%;z-index:1;"></canvas>
-    <div class="container mx-auto px-6 z-10" data-aos="fade-up" style="position:relative;z-index:2;">
-        <h1 class="text-4xl md:text-6xl font-extrabold leading-tight mb-4">
-            Spot the Trends. Track the Truth.
-        </h1>
-        <p class="text-lg md:text-xl max-w-3xl mx-auto text-white font-bold mb-8">
-    Our innovative platform provides the tools you need and brings all the customer reviews into one smart dashboard. It's time to visualise the trends, track your feedback and turn the insights into action.
-</p>
+    <section class="relative h-screen flex items-center justify-center text-center text-white hero-bg">
+        <canvas id="neonStars" style="position:absolute;top:0;left:0;width:100%;height:100%;z-index:1;"></canvas>
+        <div class="container mx-auto px-6 z-10" data-aos="fade-up" style="position:relative;z-index:2;">
+            <h1 class="text-4xl md:text-6xl font-extrabold leading-tight mb-4">Spot the Trends. Track the Truth.</h1>
+            <p class="text-lg md:text-xl max-w-3xl mx-auto text-white font-bold mb-8">
+                Our innovative platform provides the tools you need and brings all the customer reviews into one smart dashboard. It's time to visualise the trends, track your feedback and turn the insights into action.
+            </p>
             <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                <a href="#pricing" class="px-8 py-4 bg-accent text-white font-bold rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300">
-                    Get Started for Free
-                </a>
-                <a href="#features" class="px-8 py-4 bg-white text-dark font-bold rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300">
-                    Explore Features
-                </a>
+                <a href="#pricing" class="px-8 py-4 bg-accent text-black font-bold rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300">Get Started for Free</a>
+                <a href="#features" class="px-8 py-4 bg-white text-dark font-bold rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300">Explore Features</a>
             </div>
         </div>
     </section>
-<script>
-    // Neon flies animation
-    const canvas = document.getElementById('neonStars');
-    const ctx = canvas.getContext('2d');
-    let w, h;
-    function resize() {
-        w = canvas.width = window.innerWidth;
-        h = canvas.height = document.querySelector('.hero-bg').offsetHeight;
-    }
-    resize();
-    window.addEventListener('resize', resize);
 
-    const flies = Array.from({length: 60}, () => ({
-        x: Math.random() * w,
-        y: Math.random() * h,
-        r: Math.random() * 2 + 1,
-        dx: (Math.random() - 0.5) * 0.5,
-        dy: (Math.random() - 0.5) * 0.5,
-        color: Math.random() > 0.5 ? '#39FF14' : '#00F0FF'
-    }));
-
-    function animate() {
-        ctx.clearRect(0, 0, w, h);
-        for (let fly of flies) {
-            ctx.shadowBlur = 12;
-            ctx.shadowColor = fly.color;
-            ctx.beginPath();
-            ctx.arc(fly.x, fly.y, fly.r, 0, Math.PI * 2);
-            ctx.fillStyle = fly.color;
-            ctx.fill();
-            fly.x += fly.dx;
-            fly.y += fly.dy;
-            if (fly.x < 0 || fly.x > w) fly.dx *= -1;
-            if (fly.y < 0 || fly.y > h) fly.dy *= -1;
-        }
-        requestAnimationFrame(animate);
-    }
-    animate();
-    </script>
     <section id="features" class="py-24">
         <div class="container mx-auto px-6">
             <div class="text-center mb-16" data-aos="fade-up">
-                <h2 class="text-4xl font-bold text-dark mb-4">Turn thousands of reviews into 1 clear insight.</h2>
-                <p class="text-gray-600 max-w-2xl mx-auto text-lg">Transform scattered feedback into a crystal-clear radar of customer sentiment.</p>
+                <h2 class="text-4xl font-bold mb-4">Turn thousands of reviews into 1 clear insight.</h2>
+                <p class="max-w-2xl mx-auto text-lg">Transform scattered feedback into a crystal-clear radar of customer sentiment.</p>
             </div>
             
-            <div class="flex flex-row items-center gap-12 mb-20" data-aos="fade-right">
-    <div style="flex: 1 1 50%; min-width: 300px;">
-        <span class="font-semibold text-primary">CUSTOMIZABLE</span>
-        <h3 class="text-3xl font-bold text-dark my-3">Explore your Dashboard</h3>
-        <p class="text-gray-600 leading-relaxed mb-4">
-            Don't stress on scrolling and reading thousands of reviews.<br>
-            paste your product url here.
-        </p>
-        <div class="flex items-center gap-2 mb-4">
-            <input 
-                type="text" 
-                placeholder="Paste product URL..." 
-                class="w-64 px-4 py-2 rounded-md border border-gray-300 focus:border-primary focus:ring-1 focus:ring-primary text-sm shadow-sm"
-            >
-            <button 
-                class="px-4 py-2 bg-primary text-white rounded-md font-semibold hover:bg-secondary transition-colors text-sm"
-            >
-                Analyze
-            </button>
-        </div>
-        <a href="#" class="font-semibold text-primary hover:text-secondary">Learn More &rarr;</a>
-    </div>
-    <div style="flex: 1 1 50%; min-width: 300px;">
-        <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=1470&auto=format&fit=crop&ixlib=rb-4.0.3" alt="Dashboard Image" style="max-width:350px; border-radius:12px;">
-    </div>
-           </p>
-                </div>
-            </div>
-
-    <section id="pricing" class="py-24 bg-white">
-        <div class="container mx-auto px-6">
-            <div class="text-center mb-16" data-aos="fade-up">
-                <h2 class="text-4xl font-bold text-dark mb-4">Simple, Transparent Pricing</h2>
-                <p class="text-gray-600 max-w-2xl mx-auto text-lg">Choose the plan that's right for you. No hidden fees, ever.</p>
-            </div>
-
-            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8 justify-center items-center">
-                <div class="bg-light rounded-xl shadow-lg p-8 text-center transition-transform transform hover:-translate-y-2" data-aos="fade-up" data-aos-delay="100">
-                    <h3 class="text-2xl font-bold text-dark mb-2">Individual</h3>
-                    <p class="text-gray-500 mb-6">For freelancers and solo-preneurs.</p>
-                    <div class="my-6">
-                        <span class="text-5xl font-extrabold text-dark">₹899</span>
-                        <span class="text-gray-500">/ month</span>
+            <div class="flex flex-wrap items-center justify-center gap-12 mb-20" data-aos="fade-right">
+                <div class="w-full lg:w-1/2">
+                    <span class="font-semibold text-primary">TRY IT NOW</span>
+                    <h3 class="text-3xl font-bold my-3">Get a Glimpse of the Power</h3>
+                    <p class="leading-relaxed mb-4">Don't stress on scrolling. Paste any Amazon product URL below to see a mini-report.</p>
+                    
+                    <div class="flex items-center gap-2 mb-4">
+                        <input 
+                            id="product-url-input"
+                            type="text" 
+                            placeholder="Paste product URL..." 
+                            class="w-full px-4 py-2 rounded-md bg-gray-900 border border-gray-700 text-white focus:border-primary focus:ring-1 focus:ring-primary text-sm shadow-sm"
+                        >
+                        <button 
+                            id="analyze-button"
+                            class="w-36 px-4 py-2 bg-primary text-black rounded-md font-semibold hover:bg-opacity-80 transition-colors text-sm"
+                        >
+                            Analyze
+                        </button>
                     </div>
-                    <ul class="space-y-4 text-left my-8">
-                        <li class="flex items-center"><i class="fas fa-check-circle text-accent mr-3"></i> 5 Projects</li>
-                        <li class="flex items-center"><i class="fas fa-check-circle text-accent mr-3"></i> 10GB Storage</li>
-                        <li class="flex items-center"><i class="fas fa-check-circle text-accent mr-3"></i> Basic Analytics</li>
-                        <li class="flex items-center"><i class="fas fa-check-circle text-accent mr-3"></i> Community Support</li>
-                    </ul>
-                    <a href="/signup/individual" class="w-full block px-6 py-3 bg-white border-2 border-primary text-primary font-semibold rounded-lg hover:bg-primary hover:text-white transition-colors">Choose Plan</a>
-                </div>
 
-                <div class="bg-white rounded-xl shadow-2xl p-8 text-center relative pricing-card-popular" data-aos="fade-up">
-                     <span class="absolute top-0 -translate-y-1/2 left-1/2 -translate-x-1/2 bg-accent text-white text-xs font-bold px-3 py-1 rounded-full uppercase">Most Popular</span>
-                    <h3 class="text-2xl font-bold text-primary mb-2">Teams</h3>
-                    <p class="text-gray-500 mb-6">For growing businesses and teams.</p>
-                    <div class="my-6">
-                        <span class="text-5xl font-extrabold text-dark">₹1899</span>
-                        <span class="text-gray-500">/ month</span>
-                    </div>
-                    <ul class="space-y-4 text-left my-8">
-                        <li class="flex items-center"><i class="fas fa-check-circle text-accent mr-3"></i> Unlimited Projects</li>
-                        <li class="flex items-center"><i class="fas fa-check-circle text-accent mr-3"></i> 100GB Storage</li>
-                        <li class="flex items-center"><i class="fas fa-check-circle text-accent mr-3"></i> Advanced Analytics</li>
-                        <li class="flex items-center"><i class="fas fa-check-circle text-accent mr-3"></i> Priority Email Support</li>
-                        <li class="flex items-center"><i class="fas fa-check-circle text-accent mr-3"></i> Team Collaboration Tools</li>
-                    </ul>
-                    <a href="/signup/team" class="w-full block px-6 py-3 bg-accent text-white font-semibold rounded-lg hover:opacity-90 transition-opacity">Choose Plan</a>
-                </div>
+                    <div id="analysis-results-container" class="mt-6 min-h-[100px]"></div>
 
-                <div class="bg-light rounded-xl shadow-lg p-8 text-center transition-transform transform hover:-translate-y-2" data-aos="fade-up" data-aos-delay="200">
-                    <h3 class="text-2xl font-bold text-dark mb-2">Enterprise</h3>
-                    <p class="text-gray-500 mb-6">For large-scale organizations.</p>
-                    <div class="my-6">
-                        <span class="text-4xl font-extrabold text-dark">Let's Talk</span>
-                    </div>
-                    <ul class="space-y-4 text-left my-8">
-                        <li class="flex items-center"><i class="fas fa-check-circle text-accent mr-3"></i> Everything in Teams</li>
-                        <li class="flex items-center"><i class="fas fa-check-circle text-accent mr-3"></i> Unlimited Storage</li>
-                        <li class="flex items-center"><i class="fas fa-check-circle text-accent mr-3"></i> Dedicated Account Manager</li>
-                        <li class="flex items-center"><i class="fas fa-check-circle text-accent mr-3"></i> 24/7 Phone Support</li>
-                    </ul>
-                    <a href="/contact-sales" class="w-full block px-6 py-3 bg-white border-2 border-primary text-primary font-semibold rounded-lg hover:bg-primary hover:text-white transition-colors">Contact Sales</a>
+                </div>
+                <div class="w-full lg:w-auto">
+                    <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=1470&auto=format&fit=crop&ixlib=rb-4.0.3" alt="Dashboard Image" class="max-w-md w-full rounded-xl shadow-lg">
                 </div>
             </div>
         </div>
     </section>
-
-    <footer id="contact" class="bg-dark text-white pt-20 pb-6">
-        <div class="container mx-auto px-6">
-            <div class="grid grid-cols-1 md:grid-cols-12 gap-12 mb-16">
-                <div class="md:col-span-5 space-y-4">
-                    <h3 class="text-2xl font-bold">ReviewRadar</h3>
-                    <p class="text-gray-400 leading-relaxed pr-8">
-                        Empowering customers with the tools to review, select, and Buy. Join thousands of satisfied customers today!!!!
-                    </p>
-                    <div class="flex space-x-4 pt-2">
-                        <a href="#" class="text-gray-400 hover:text-white transition-colors"><i class="fab fa-twitter fa-lg"></i></a>
-                        <a href="#" class="text-gray-400 hover:text-white transition-colors"><i class="fab fa-instagram fa-lg"></i></a>
-                        <a href="#" class="text-gray-400 hover:text-white transition-colors"><i class="fab fa-linkedin-in fa-lg"></i></a>
-                        <a href="#" class="text-gray-400 hover:text-white transition-colors"><i class="fab fa-github fa-lg"></i></a>
-                    </div>
-                </div>
-
-                <div class="md:col-span-4 grid grid-cols-2 gap-8">
-                    <div>
-                        <h4 class="text-lg font-semibold text-white mb-4">Product</h4>
-                        <ul class="space-y-3">
-                            <li><a href="#features" class="text-gray-400 hover:text-white transition-colors">Features</a></li>
-                            <li><a href="#pricing" class="text-gray-400 hover:text-white transition-colors">Pricing</a></li>
-                            <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Integrations</a></li>
-                            <li><a href="#" class="text-gray-400 hover:text-white transition-colors">API Docs</a></li>
-                        </ul>
-                    </div>
-                    <div>
-                        <h4 class="text-lg font-semibold text-white mb-4">Company</h4>
-                        <ul class="space-y-3">
-                            <li><a href="#" class="text-gray-400 hover:text-white transition-colors">About Us</a></li>
-                            <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Dashboard</a></li>
-                            <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Contact</a></li>
-                        </ul>
-                    </div>
-                </div>
-
-                <div class="md:col-span-3 space-y-4">
-                    <h4 class="text-lg font-semibold text-white">Get in Touch</h4>
-                    <ul class="space-y-3">
-                        <li class="flex items-center text-gray-400"><i class="fas fa-envelope w-5 mr-2"></i> info@ReviewRadar.com</li>
-                        <li class="flex items-center text-gray-400"><i class="fas fa-phone w-5 mr-2"></i> +91 98223-48567</li>
-                        <li class="flex items-start text-gray-400"><i class="fas fa-map-marker-alt w-5 mr-2 mt-1"></i> Mumbai, India</li>
-                    </ul>
-                </div>
-            </div>
-            
-            <div class="pt-8 border-t border-gray-800 text-center text-gray-500 text-sm">
-                <p>&copy; 2025 Review Radar. All rights reserved.</p>
-            </div>
-        </div>
-    </footer>
-
+    
+    <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
     <script>
-        AOS.init({
-            duration: 800,
-            once: true,
-            offset: 50
+        AOS.init({ duration: 800, once: true, offset: 50 });
+        
+        // --- Neon Stars Animation (No Changes) ---
+        const canvas = document.getElementById('neonStars');
+        const ctx = canvas.getContext('2d');
+        let w, h;
+        function resize() {
+            w = canvas.width = window.innerWidth;
+            h = canvas.height = document.querySelector('.hero-bg').offsetHeight;
+        }
+        resize();
+        window.addEventListener('resize', resize);
+        const flies = Array.from({length: 60}, () => ({ x: Math.random()*w, y: Math.random()*h, r: Math.random()*2+1, dx: (Math.random()-0.5)*0.5, dy: (Math.random()-0.5)*0.5, color: Math.random() > 0.5 ? '#39FF14' : '#00F0FF' }));
+        function animate() {
+            ctx.clearRect(0,0,w,h);
+            for (let fly of flies) {
+                ctx.shadowBlur=12; ctx.shadowColor=fly.color; ctx.beginPath(); ctx.arc(fly.x, fly.y, fly.r, 0, Math.PI*2); ctx.fillStyle=fly.color; ctx.fill();
+                fly.x += fly.dx; fly.y += fly.dy;
+                if(fly.x<0||fly.x>w) fly.dx*=-1;
+                if(fly.y<0||fly.y>h) fly.dy*=-1;
+            }
+            requestAnimationFrame(animate);
+        }
+        animate();
+    </script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const urlInput = document.getElementById('product-url-input');
+            const analyzeBtn = document.getElementById('analyze-button');
+            const resultsContainer = document.getElementById('analysis-results-container');
+            
+            const FASTAPI_ENDPOINT = 'http://127.0.0.1:8001/analyze/';
+
+            analyzeBtn.addEventListener('click', () => {
+                const url = urlInput.value.trim();
+                if (!url) {
+                    resultsContainer.innerHTML = `<div class="p-4 bg-red-900 bg-opacity-50 text-red-300 border border-red-700 rounded-md">Error: Please paste a product URL first.</div>`;
+                    return;
+                }
+                
+                // Show loader and disable button
+                resultsContainer.innerHTML = `
+                    <div class="text-center text-gray-400">
+                        <div style="border-left-color: #39FF14;" class="w-8 h-8 border-4 border-gray-700 border-solid rounded-full animate-spin mx-auto"></div>
+                        <p class="mt-2">Analyzing... This may take a moment.</p>
+                    </div>`;
+                analyzeBtn.disabled = true;
+                analyzeBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+
+                // Call the backend
+                fetch(FASTAPI_ENDPOINT, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ url: url }),
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        return response.json().then(err => {
+                            throw new Error(err.detail || `Server error: ${response.status}`);
+                        });
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    displayGlimpse(data);
+                })
+                .catch(error => {
+                    resultsContainer.innerHTML = `<div class="p-4 bg-red-900 bg-opacity-50 text-red-300 border border-red-700 rounded-md">Error: ${error.message}</div>`;
+                })
+                .finally(() => {
+                    analyzeBtn.disabled = false;
+                    analyzeBtn.textContent = 'Analyze';
+                });
+            });
+
+            function displayGlimpse(data) {
+                if (!data || !data.public_opinion) {
+                    resultsContainer.innerHTML = `<div class="p-4 bg-red-900 bg-opacity-50 text-red-300 border border-red-700 rounded-md">Error: Received invalid data from the server.</div>`;
+                    return;
+                }
+
+                const { public_opinion, pros_cons_panel } = data;
+
+                // Build the inner HTML for the glimpse report
+                resultsContainer.innerHTML = `
+                    <div class="border border-gray-800 rounded-lg p-6 bg-black shadow-lg animate-fade-in">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <div class="md:col-span-1 flex flex-col items-center justify-center text-center bg-gray-900 p-4 rounded-lg">
+                                <div class="text-5xl font-extrabold text-primary">${public_opinion.positive_percent}%</div>
+                                <div class="text-sm font-medium text-gray-400 mt-1">Positive Sentiment</div>
+                            </div>
+                            <div class="md:col-span-2">
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                                    <div>
+                                        <h3 class="font-bold text-primary mb-3 flex items-center gap-2"><i class="fas fa-thumbs-up"></i> Strengths</h3>
+                                        <ul class="space-y-3 text-sm">
+                                            ${pros_cons_panel.pros.slice(0, 2).map(pro => `
+                                                <li>
+                                                    <p class="font-semibold text-gray-300">${pro.keyword}</p>
+                                                    <blockquote class="text-gray-500 italic border-l-2 border-green-800 pl-2 mt-1">"${pro.examples[0] || ''}"</blockquote>
+                                                </li>
+                                            `).join('') || '<li class="text-gray-500">Not enough data.</li>'}
+                                        </ul>
+                                    </div>
+                                    <div>
+                                        <h3 class="font-bold text-red-500 mb-3 flex items-center gap-2"><i class="fas fa-thumbs-down"></i> Concerns</h3>
+                                        <ul class="space-y-3 text-sm">
+                                             ${pros_cons_panel.cons.slice(0, 2).map(con => `
+                                                <li>
+                                                    <p class="font-semibold text-gray-300">${con.keyword}</p>
+                                                    <blockquote class="text-gray-500 italic border-l-2 border-red-800 pl-2 mt-1">"${con.examples[0] || ''}"</blockquote>
+                                                </li>
+                                            `).join('') || '<li class="text-gray-500">Not enough data.</li>'}
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
         });
     </script>
-
-    <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
-    <script type="text/javascript">
-        function googleTranslateElementInit() {
-            new google.translate.TranslateElement({ pageLanguage: 'en', includedLanguages: 'en,es,fr,de', autoDisplay: false }, 'google_translate_element');
-            const customSelect = document.getElementById('custom_language_select');
-            customSelect.addEventListener('change', function() {
-                const gtCombo = document.querySelector('.goog-te-combo');
-                if (gtCombo) {
-                    gtCombo.value = this.value;
-                    gtCombo.dispatchEvent(new Event('change'));
-                }
-            });
+    <style>
+        .animate-fade-in {
+            animation: fadeIn 0.5s ease-in-out;
         }
-    </script>
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
 </body>
 </html>
