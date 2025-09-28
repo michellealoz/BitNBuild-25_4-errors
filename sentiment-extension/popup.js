@@ -13,8 +13,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const prosListEl = document.getElementById('pros-list');
     const consListEl = document.getElementById('cons-list');
 
+    const FASTAPI_ENDPOINT = 'http://127.0.0.1:8001/analyze/';
+
     analyzeBtn.addEventListener('click', () => {
-        // Get the current active tab
         chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
             const currentTab = tabs[0];
             if (!currentTab || !currentTab.url) {
@@ -22,32 +23,25 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
             
-            // Show loader and hide previous results/errors
             loader.classList.remove('hidden');
             resultsDiv.classList.add('hidden');
             errorDiv.classList.add('hidden');
             analyzeBtn.disabled = true;
 
-            // Call the FastAPI backend
             callBackend(currentTab.url);
         });
     });
 
     function callBackend(url) {
-        const FASTAPI_ENDPOINT = 'http://127.0.0.1:8001/analyze/';
-
         fetch(FASTAPI_ENDPOINT, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ url: url }),
         })
         .then(response => {
             if (!response.ok) {
-                // Try to get a detailed error message from the backend
                 return response.json().then(err => {
-                    throw new Error(err.detail || `Server responded with status: ${response.status}`);
+                    throw new Error(err.detail || `Server error: ${response.status}`);
                 });
             }
             return response.json();
@@ -75,44 +69,68 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        // Product Name
         productNameEl.textContent = data.product_name || 'Product Name Not Found';
 
-        // Overall Score (requires calculation, let's approximate for now)
-        const rating = parseFloat((data.rating || "0").split(' ')[0]);
-        const positive_percent = data.public_opinion.positive_percent || 0;
-        const score = ((rating / 5 * 10) * 0.6) + ((positive_percent / 10) * 0.4);
-        scoreEl.textContent = `${score.toFixed(1)} / 10`;
+        if (data.overall_score) {
+            scoreEl.textContent = `${data.overall_score} / 10`;
+        } else {
+            const rating = parseFloat((data.rating || "0").split(' ')[0]);
+            const positive_percent = data.public_opinion.positive_percent || 0;
+            const score = ((rating / 5 * 10) * 0.6) + ((positive_percent / 10) * 0.4);
+            scoreEl.textContent = `${score.toFixed(1)} / 10`;
+        }
 
-        // Sentiment Bar
-        positiveBarEl.style.width = `${positive_percent}%`;
-        sentimentTextEl.textContent = `${positive_percent}% Positive Sentiment`;
-
-        // Summary
+        const positivePercent = data.public_opinion.positive_percent || 0;
+        positiveBarEl.style.width = `${positivePercent}%`;
+        sentimentTextEl.textContent = `${positivePercent}% Positive`;
         summaryEl.textContent = data.review_summary_generator || 'No summary available.';
 
-        // Pros
-        const pros = data.pros_cons_panel.pros || [];
-        let prosHtml = '<h4>Pros</h4><ul>';
-        if (pros.length > 0) {
-            pros.forEach(pro => { prosHtml += `<li>${pro}</li>`; });
-        } else {
-            prosHtml += '<li>N/A</li>';
-        }
-        prosHtml += '</ul>';
-        prosListEl.innerHTML = prosHtml;
-
-        // Cons
-        const cons = data.pros_cons_panel.cons || [];
-        let consHtml = '<h4>Cons</h4><ul>';
-        if (cons.length > 0) {
-            cons.forEach(con => { consHtml += `<li>${con}</li>`; });
-        } else {
-            consHtml += '<li>N/A</li>';
-        }
-        consHtml += '</ul>';
-        consListEl.innerHTML = consHtml;
+        populateVerdictList(prosListEl, 'Pros', data.pros_cons_panel.pros, 'icon-green');
+        populateVerdictList(consListEl, 'Cons', data.pros_cons_panel.cons, 'icon-red');
 
         resultsDiv.classList.remove('hidden');
+    }
+
+    /**
+     * Helper function to build and display the pros and cons lists correctly.
+     */
+    function populateVerdictList(element, title, items, iconClass) {
+        element.innerHTML = ''; 
+
+        const titleIcon = title === 'Pros' ? 'fa-thumbs-up' : 'fa-thumbs-down';
+        const titleEl = document.createElement('h3');
+        titleEl.innerHTML = `<i class="fas ${titleIcon} ${iconClass}"></i>${title}`;
+        element.appendChild(titleEl);
+
+        const ul = document.createElement('ul');
+        ul.className = 'verdict-list';
+
+        if (!items || items.length === 0) {
+            const li = document.createElement('li');
+            li.className = 'empty-list';
+            li.textContent = 'N/A';
+            ul.appendChild(li);
+        } else {
+            items.slice(0, 4).forEach(item => {
+                const li = document.createElement('li');
+                
+                // **FIX 1:** Use "keyword" with a lowercase k
+                const keywordEl = document.createElement('span');
+                keywordEl.className = 'keyword';
+                keywordEl.textContent = item.keyword; // Corrected from item.Keyword
+                li.appendChild(keywordEl);
+
+                // **FIX 2:** Use "examples" with a lowercase e
+                if (item.examples && item.examples.length > 0) {
+                    const example = item.examples[0].length > 50 ? item.examples[0].substring(0, 50) + '...' : item.examples[0];
+                    const quoteEl = document.createElement('blockquote');
+                    quoteEl.className = 'example-quote';
+                    quoteEl.textContent = `"${example}"`;
+                    li.appendChild(quoteEl);
+                }
+                ul.appendChild(li);
+            });
+        }
+        element.appendChild(ul);
     }
 });

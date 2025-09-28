@@ -245,7 +245,6 @@ def compare_product(request):
 def fetch_analysis_data(url: str) -> dict:
     """
     Calls the FastAPI endpoint to get product details and AI analysis.
-    This is now the single source of truth for product data.
     """
     FASTAPI_ANALYSIS_URL = "http://127.0.0.1:8001/analyze/"
     try:
@@ -253,11 +252,8 @@ def fetch_analysis_data(url: str) -> dict:
         response.raise_for_status()
         api_data = response.json()
         
-        # Calculate the overall score and add it to the data object
         api_data['overall_score'] = calculate_overall_score(api_data)
-        
         return api_data
-
     except requests.exceptions.Timeout:
         return {"error": "The analysis took too long to complete. The product page might be complex or the service is busy."}
     except requests.exceptions.ConnectionError:
@@ -272,8 +268,6 @@ def fetch_analysis_data(url: str) -> dict:
 def calculate_overall_score(data: dict) -> float:
     """
     Calculates a weighted score out of 10 based on star rating and AI sentiment.
-    - 60% weight on the actual star rating.
-    - 40% weight on the AI-analyzed positive sentiment from reviews.
     """
     try:
         rating_text = data.get('rating', '0')
@@ -325,8 +319,23 @@ def extract_key_differences(data1: dict, data2: dict) -> list:
     Identifies and returns a list of the most significant differences
     between two products based on their AI-analyzed pros.
     """
-    pros1 = set(data1.get('pros_cons_panel', {}).get('pros', []))
-    pros2 = set(data2.get('pros_cons_panel', {}).get('pros', []))
+    # --- FIX STARTS HERE ---
+    # This function now robustly handles multiple data structures for pros/cons.
+    def get_keyword(item):
+        """Helper to extract the keyword string from various possible formats."""
+        if isinstance(item, dict):
+            # Handles {'Keyword': '...'} and {'feature': '...'}
+            return item.get('Keyword') or item.get('feature')
+        # Assumes item is already a string
+        return item
+
+    pros_list1 = data1.get('pros_cons_panel', {}).get('pros', [])
+    pros_list2 = data2.get('pros_cons_panel', {}).get('pros', [])
+
+    # Create sets of keywords, filtering out any None values
+    pros1 = set(get_keyword(p) for p in pros_list1 if get_keyword(p))
+    pros2 = set(get_keyword(p) for p in pros_list2 if get_keyword(p))
+    # --- FIX ENDS HERE ---
 
     unique_to_1 = list(pros1 - pros2)
     unique_to_2 = list(pros2 - pros1)
@@ -349,4 +358,3 @@ def extract_key_differences(data1: dict, data2: dict) -> list:
         return ["Both products share very similar strengths according to user reviews."]
         
     return differences
-

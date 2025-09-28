@@ -22,17 +22,60 @@
                 </div>
             </div>
             <!-- Pros and Cons -->
-            <div style="background-color: #1A202C; border-radius: 12px; padding: 1.5rem;">
-                <h5 style="color: white; margin-top:0; margin-bottom: 1.5rem; text-align: center;">Verdict</h5>
-                <div style="font-weight: bold; color: #9ae49a; margin-bottom: 1rem;"><i class="fas fa-thumbs-up me-2"></i>Strengths</div>
-                <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.75rem;">
-                    {% for pro in data.pros_cons_panel.pros %}<li><i class="fas fa-check-circle me-2" style="color: #9ae49a;"></i>{{ pro|title }}</li>{% empty %}<li>No significant strengths.</li>{% endfor %}
-                </ul>
-                <hr style="border-color: #4A5568; margin: 1.5rem 0;">
-                <div style="font-weight: bold; color: #FF6B6B; margin-bottom: 1rem;"><i class="fas fa-thumbs-down me-2"></i>Concerns</div>
-                <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.75rem;">
-                    {% for con in data.pros_cons_panel.cons %}<li><i class="fas fa-times-circle me-2" style="color: #FF6B6B;"></i>{{ con|title }}</li>{% empty %}<li>No significant concerns.</li>{% endfor %}
-                </ul>
+                        <div class="app-card" style="padding: 2.5rem;">
+                <h5 style="color: white; font-size: 1.3rem; margin: 0 0 2.5rem 0; text-align: center; font-weight: 700;">Verdict at a Glance</h5>
+                
+                <!-- Key Strengths -->
+                <div style="margin-bottom: 3rem;">
+                    <div style="font-weight: bold; color: #9ae49a; display: flex; align-items: center; margin-bottom: 2rem; font-size: 1.15rem;">
+                        <i class="fas fa-thumbs-up me-3" style="font-size: 1.2rem;"></i>Key Strengths
+                    </div>
+                    <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 2rem;">
+                        {% for pro in data.pros_cons_panel.pros %}
+                            <li style="display: flex; align-items: flex-start; gap: 1.2rem;">
+                                <i class="fas fa-check-circle" style="color: #9ae49a; margin-top: 6px; flex-shrink: 0; font-size: 1.1rem;"></i>
+                                <div style="line-height: 1.7;">
+                                    <strong style="color: #E5E7EB; font-size: 1.05rem; display: block; margin-bottom: 0.8rem;">{{ pro.keyword|title }}</strong>
+                                    {% for example in pro.examples %}
+                                        <blockquote style="margin: 0; padding: 1rem 0 0 1.2rem; border-left: 3px solid #4A5568; color: #B3BAC5; font-style: italic; font-size: 0.95rem; line-height: 1.6;">
+                                            "{{ example }}"
+                                        </blockquote>
+                                        {% if not forloop.last %}<div style="margin: 0.8rem 0;"></div>{% endif %}
+                                    {% endfor %}
+                                </div>
+                            </li>
+                        {% empty %}
+                            <li style="color: #718096; padding: 1rem 0;"><i class="fas fa-info-circle me-2"></i>No significant strengths identified.</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+
+                <hr style="border: none; height: 2px; background: linear-gradient(to right, transparent, #4A5568, transparent); margin: 0;">
+
+                <!-- Key Concerns -->
+                <div style="margin-top: 3rem;">
+                    <div style="font-weight: bold; color: #FF6B6B; display: flex; align-items: center; margin-bottom: 2rem; font-size: 1.15rem;">
+                        <i class="fas fa-thumbs-down me-3" style="font-size: 1.2rem;"></i>Key Concerns
+                    </div>
+                    <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 2rem;">
+                        {% for con in data.pros_cons_panel.cons %}
+                            <li style="display: flex; align-items: flex-start; gap: 1.2rem;">
+                                <i class="fas fa-times-circle" style="color: #FF6B6B; margin-top: 6px; flex-shrink: 0; font-size: 1.1rem;"></i>
+                                <div style="line-height: 1.7;">
+                                    <strong style="color: #E5E7EB; font-size: 1.05rem; display: block; margin-bottom: 0.8rem;">{{ con.keyword|title }}</strong>
+                                    {% for example in con.examples %}
+                                        <blockquote style="margin: 0; padding: 1rem 0 0 1.2rem; border-left: 3px solid #4A5568; color: #B3BAC5; font-style: italic; font-size: 0.95rem; line-height: 1.6;">
+                                            "{{ example }}"
+                                        </blockquote>
+                                        {% if not forloop.last %}<div style="margin: 0.8rem 0;"></div>{% endif %}
+                                    {% endfor %}
+                                </div>
+                            </li>
+                        {% empty %}
+                            <li style="color: #718096; padding: 1rem 0;"><i class="fas fa-info-circle me-2"></i>No significant concerns identified.</li>
+                        {% endfor %}
+                    </ul>
+                </div>
             </div>
         </div>
         <!-- Right Column -->

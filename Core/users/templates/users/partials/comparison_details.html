@@ -1,99 +1,193 @@
-<div class="p-4" style="background-color: #1A202C;">
-    <div style="display: grid; grid-template-columns: 1fr; gap: 1rem;" class="comparison-grid-records">
+<div class="compact-comparison-container">
+    <div class="compact-grid">
         
-        <!-- Product 1 -->
-        <div class="app-card" style="background-color: #2D3748; border-left: 4px solid {% if data1.overall_score > data2.overall_score %}#9ae49a{% else %}#4A90E2{% endif %};">
-            <div style="padding: 1rem;">
-                <!-- Header -->
-                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
-                    <h6 style="font-weight: bold; color: white; margin: 0; font-size: 1rem;">{{ data1.product_name|truncatechars:45 }}</h6>
-                    {% if data1.overall_score > data2.overall_score %}
-                    <span style="background: #9ae49a; color: #000000; padding: 0.15rem 0.6rem; border-radius: 9999px; font-size: 0.75rem; font-weight: bold; flex-shrink: 0; margin-left: 0.5rem;">WINNER</span>
-                    {% endif %}
+        <div class="compact-card {% if data1.overall_score > data2.overall_score %}is-winner{% endif %}">
+            <div class="compact-header">
+                <h6 class="compact-title">{{ data1.product_name|truncatechars:45 }}</h6>
+                {% if data1.overall_score > data2.overall_score %}
+                <span class="compact-winner-badge">WINNER</span>
+                {% endif %}
+            </div>
+            
+            <div class="compact-metrics">
+                <div>
+                    <div class="metric-value score-blue">{{ data1.overall_score }}<small>/10</small></div>
+                    <small class="metric-label">Score</small>
                 </div>
-                
-                <!-- At a Glance Metrics -->
-                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; text-align: center; margin-bottom: 1rem; padding: 1rem; background-color: #1A202C; border-radius: 8px;">
-                    <div>
-                        <div style="font-size: 1.5rem; font-weight: 700; color: #4A90E2;">{{ data1.overall_score }}<small>/10</small></div>
-                        <small style="color: #9CA3AF; font-size: 0.75rem;">Score</small>
-                    </div>
-                    <div>
-                        <div style="font-size: 1.25rem; font-weight: 700; color: #9ae49a;">{{ data1.public_opinion.average_rating }}/5</div>
-                        <small style="color: #9CA3AF; font-size: 0.75rem;">Rating</small>
-                    </div>
-                     <div>
-                        <div style="font-size: 1.1rem; font-weight: 700; color: white;">₹{{ data1.price|default:"N/A" }}</div>
-                        <small style="color: #9CA3AF; font-size: 0.75rem;">Price</small>
-                    </div>
+                <div>
+                    <div class="metric-value score-green">{{ data1.public_opinion.average_rating }}/5</div>
+                    <small class="metric-label">Rating</small>
                 </div>
+                <div>
+                    <div class="metric-value">₹{{ data1.price|default:"N/A" }}</div>
+                    <small class="metric-label">Price</small>
+                </div>
+            </div>
 
-                <!-- Pros and Cons -->
-                <div style="font-size: 0.875rem;">
-                    <h6 style="color: #9ae49a; font-weight: bold; margin-bottom: 0.5rem; font-size: 0.9rem;"><i class="fas fa-thumbs-up me-2"></i>Strengths</h6>
-                    <ul style="list-style: none; padding-left: 0; margin: 0; display: flex; flex-direction: column; gap: 0.3rem;">
-                        {% for pro in data1.pros_cons_panel.pros|slice:":2" %}<li><i class="fas fa-check me-2" style="font-size: 0.75rem;"></i>{{ pro|title }}</li>{% empty %}<li style="color: #718096;">-</li>{% endfor %}
-                    </ul>
-                    <hr style="border-color: #4A5568; margin: 0.75rem 0;">
-                    <h6 style="color: #f87171; font-weight: bold; margin-bottom: 0.5rem; font-size: 0.9rem;"><i class="fas fa-thumbs-down me-2"></i>Concerns</h6>
-                    <ul style="list-style: none; padding-left: 0; margin: 0; display: flex; flex-direction: column; gap: 0.3rem;">
-                         {% for con in data1.pros_cons_panel.cons|slice:":2" %}<li><i class="fas fa-times me-2" style="font-size: 0.75rem;"></i>{{ con|title }}</li>{% empty %}<li style="color: #718096;">-</li>{% endfor %}
-                    </ul>
-                </div>
+            <div class="compact-verdict">
+                <h6 class="verdict-heading verdict-green"><i class="fas fa-thumbs-up me-2"></i>Strengths</h6>
+                <ul class="verdict-point-list">
+                    {% for pro in data1.pros_cons_panel.pros|slice:":2" %}
+                    <li>
+                        <strong class="keyword-point">{{ pro.keyword|title }}</strong>
+                        {% if pro.examples.0 %}
+                        <blockquote class="quote-point">"{{ pro.examples.0|truncatechars:60 }}"</blockquote>
+                        {% endif %}
+                    </li>
+                    {% empty %}
+                    <li class="verdict-empty-point">-</li>
+                    {% endfor %}
+                </ul>
+                <hr class="compact-divider">
+                <h6 class="verdict-heading verdict-red"><i class="fas fa-thumbs-down me-2"></i>Concerns</h6>
+                <ul class="verdict-point-list">
+                    {% for con in data1.pros_cons_panel.cons|slice:":2" %}
+                    <li>
+                        <strong class="keyword-point">{{ con.keyword|title }}</strong>
+                        {% if con.examples.0 %}
+                        <blockquote class="quote-point">"{{ con.examples.0|truncatechars:60 }}"</blockquote>
+                        {% endif %}
+                    </li>
+                    {% empty %}
+                    <li class="verdict-empty-point">-</li>
+                    {% endfor %}
+                </ul>
             </div>
         </div>
     
-        <!-- Product 2 -->
-        <div class="app-card" style="background-color: #2D3748; border-left: 4px solid {% if data2.overall_score > data1.overall_score %}#9ae49a{% else %}#4A90E2{% endif %};">
-            <div style="padding: 1rem;">
-                <!-- Header -->
-                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
-                    <h6 style="font-weight: bold; color: white; margin: 0; font-size: 1rem;">{{ data2.product_name|truncatechars:45 }}</h6>
-                    {% if data2.overall_score > data1.overall_score %}
-                    <span style="background: #9ae49a; color: #000000; padding: 0.15rem 0.6rem; border-radius: 9999px; font-size: 0.75rem; font-weight: bold; flex-shrink: 0; margin-left: 0.5rem;">WINNER</span>
-                    {% endif %}
+        <div class="compact-card {% if data2.overall_score > data1.overall_score %}is-winner{% endif %}">
+            <div class="compact-header">
+                <h6 class="compact-title">{{ data2.product_name|truncatechars:45 }}</h6>
+                {% if data2.overall_score > data1.overall_score %}
+                <span class="compact-winner-badge">WINNER</span>
+                {% endif %}
+            </div>
+            
+            <div class="compact-metrics">
+                <div>
+                    <div class="metric-value score-blue">{{ data2.overall_score }}<small>/10</small></div>
+                    <small class="metric-label">Score</small>
                 </div>
-
-                <!-- At a Glance Metrics -->
-                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; text-align: center; margin-bottom: 1rem; padding: 1rem; background-color: #1A202C; border-radius: 8px;">
-                    <div>
-                        <div style="font-size: 1.5rem; font-weight: 700; color: #4A90E2;">{{ data2.overall_score }}<small>/10</small></div>
-                        <small style="color: #9CA3AF; font-size: 0.75rem;">Score</small>
-                    </div>
-                    <div>
-                        <div style="font-size: 1.25rem; font-weight: 700; color: #9ae49a;">{{ data2.public_opinion.average_rating }}/5</div>
-                        <small style="color: #9CA3AF; font-size: 0.75rem;">Rating</small>
-                    </div>
-                     <div>
-                        <div style="font-size: 1.1rem; font-weight: 700; color: white;">₹{{ data2.price|default:"N/A" }}</div>
-                        <small style="color: #9CA3AF; font-size: 0.75rem;">Price</small>
-                    </div>
+                <div>
+                    <div class="metric-value score-green">{{ data2.public_opinion.average_rating }}/5</div>
+                    <small class="metric-label">Rating</small>
                 </div>
-
-                <!-- Pros and Cons -->
-                <div style="font-size: 0.875rem;">
-                    <h6 style="color: #9ae49a; font-weight: bold; margin-bottom: 0.5rem; font-size: 0.9rem;"><i class="fas fa-thumbs-up me-2"></i>Strengths</h6>
-                    <ul style="list-style: none; padding-left: 0; margin: 0; display: flex; flex-direction: column; gap: 0.3rem;">
-                        {% for pro in data2.pros_cons_panel.pros|slice:":2" %}<li><i class="fas fa-check me-2" style="font-size: 0.75rem;"></i>{{ pro|title }}</li>{% empty %}<li style="color: #718096;">-</li>{% endfor %}
-                    </ul>
-                     <hr style="border-color: #4A5568; margin: 0.75rem 0;">
-                    <h6 style="color: #f87171; font-weight: bold; margin-bottom: 0.5rem; font-size: 0.9rem;"><i class="fas fa-thumbs-down me-2"></i>Concerns</h6>
-                    <ul style="list-style: none; padding-left: 0; margin: 0; display: flex; flex-direction: column; gap: 0.3rem;">
-                        {% for con in data2.pros_cons_panel.cons|slice:":2" %}<li><i class="fas fa-times me-2" style="font-size: 0.75rem;"></i>{{ con|title }}</li>{% empty %}<li style="color: #718096;">-</li>{% endfor %}
-                    </ul>
+                <div>
+                    <div class="metric-value">₹{{ data2.price|default:"N/A" }}</div>
+                    <small class="metric-label">Price</small>
                 </div>
             </div>
+
+            <div class="compact-verdict">
+                <h6 class="verdict-heading verdict-green"><i class="fas fa-thumbs-up me-2"></i>Strengths</h6>
+                <ul class="verdict-point-list">
+                    {% for pro in data2.pros_cons_panel.pros|slice:":2" %}
+                    <li>
+                        <strong class="keyword-point">{{ pro.keyword|title }}</strong>
+                        {% if pro.examples.0 %}
+                        <blockquote class="quote-point">"{{ pro.examples.0|truncatechars:60 }}"</blockquote>
+                        {% endif %}
+                    </li>
+                    {% empty %}
+                    <li class="verdict-empty-point">-</li>
+                    {% endfor %}
+                </ul>
+                <hr class="compact-divider">
+                <h6 class="verdict-heading verdict-red"><i class="fas fa-thumbs-down me-2"></i>Concerns</h6>
+                <ul class="verdict-point-list">
+                    {% for con in data2.pros_cons_panel.cons|slice:":2" %}
+                    <li>
+                        <strong class="keyword-point">{{ con.keyword|title }}</strong>
+                        {% if con.examples.0 %}
+                        <blockquote class="quote-point">"{{ con.examples.0|truncatechars:60 }}"</blockquote>
+                        {% endif %}
+                    </li>
+                    {% empty %}
+                    <li class="verdict-empty-point">-</li>
+                    {% endfor %}
+                </ul>
+            </div>
         </div>
+
     </div>
 </div>
-<style>
-@media (min-width: 768px) {
-    .comparison-grid-records {
-        grid-template-columns: 1fr 1fr;
-    }
-    .analysis-grid-records {
-        grid-template-columns: 1fr 1.5fr;
-    }
-}
-</style>
 
+<style>
+    .compact-comparison-container {
+        background-color: #1A202C;
+        padding: 1rem;
+    }
+    .compact-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    @media (min-width: 768px) {
+        .compact-grid {
+            grid-template-columns: 1fr 1fr;
+        }
+    }
+    .compact-card {
+        background-color: #2D3748;
+        border-radius: 8px;
+        padding: 1rem;
+        border-left: 4px solid #4A90E2;
+    }
+    .compact-card.is-winner {
+        border-left-color: #9ae49a;
+    }
+    .compact-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 1rem;
+    }
+    .compact-title {
+        font-weight: bold;
+        color: white;
+        margin: 0;
+        font-size: 1rem;
+    }
+    .compact-winner-badge {
+        background: #9ae49a;
+        color: #000000;
+        padding: 0.15rem 0.6rem;
+        border-radius: 9999px;
+        font-size: 0.75rem;
+        font-weight: bold;
+        flex-shrink: 0;
+        margin-left: 0.5rem;
+    }
+    .compact-metrics {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1rem;
+        text-align: center;
+        margin-bottom: 1rem;
+        padding: 1rem;
+        background-color: #1A202C;
+        border-radius: 8px;
+    }
+    .metric-value { font-size: 1.5rem; font-weight: 700; color: white; }
+    .metric-value.score-blue { color: #4A90E2; }
+    .metric-value.score-green { color: #9ae49a; }
+    .metric-label { color: #9CA3AF; font-size: 0.75rem; }
+    
+    .compact-verdict { font-size: 0.875rem; }
+    .verdict-heading { font-weight: bold; margin-bottom: 0.5rem; font-size: 0.9rem; }
+    .verdict-heading.verdict-green { color: #9ae49a; }
+    .verdict-heading.verdict-red { color: #f87171; }
+    
+    .verdict-point-list { list-style: none; padding-left: 0; margin: 0; display: flex; flex-direction: column; gap: 0.75rem; }
+    .keyword-point { display: block; }
+    .quote-point {
+        font-style: italic;
+        color: #9CA3AF;
+        padding-left: 0.75rem;
+        border-left: 2px solid #4A5568;
+        margin: 0.25rem 0 0 0;
+        font-size: 0.8rem;
+    }
+    .verdict-empty-point { color: #718096; }
+    .compact-divider { border-color: #4A5568; margin: 0.75rem 0; }
+</style>

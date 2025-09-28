@@ -3,205 +3,249 @@
 {% block title %}Compare Products - Review Radar{% endblock %}
 
 {% block page_title %}Compare Products{% endblock %}
-{% block page_subtitle %}Enter two Amazon product URLs to see a side-by-side comparison.{% endblock %}
+{% block page_subtitle %}Enter two Amazon product URLs for a side-by-side AI-powered comparison.{% endblock %}
 
 {% block content %}
-<form method="post">
-    {% csrf_token %}
-    <div class="app-card mb-6 p-6">
-        <div class="card-body">
-            <div style="display: flex; gap: 1rem; align-items: center; margin-bottom: 1rem;">
-                <div style="flex: 1;">
-                    <input type="url" name="product_url_1" class="form-input" 
-                           placeholder="https://www.amazon.in/dp/PRODUCT_ID1" 
-                           value="{{ product_url_1|default:'' }}" required>
-                </div>
-                <div style="text-align: center;">
-                    <span style="font-weight: bold; font-size: 1.25rem; color: #9CA3AF;">VS</span>
-                </div>
-                <div style="flex: 1;">
-                    <input type="url" name="product_url_2" class="form-input" 
-                           placeholder="https://www.amazon.in/dp/PRODUCT_ID2" 
-                           value="{{ product_url_2|default:'' }}" required>
-                </div>
+<div class="app-card mb-8">
+    <form method="post">
+        {% csrf_token %}
+        <div class="form-grid">
+            <div class="input-group">
+                <input type="url" name="product_url_1" class="form-input" placeholder="https://www.amazon.in/dp/PRODUCT_ID1" value="{{ product_url_1|default:'' }}" required>
             </div>
-            <div class="text-center mt-4">
-                <button class="btn-primary px-8 py-3 text-lg" type="submit">
-                    <i class="fas fa-balance-scale me-2"></i>Compare Products
-                </button>
+            <div class="vs-divider">VS</div>
+            <div class="input-group">
+                <input type="url" name="product_url_2" class="form-input" placeholder="https://www.amazon.in/dp/PRODUCT_ID2" value="{{ product_url_2|default:'' }}" required>
             </div>
         </div>
-    </div>
-</form>
-<!-- Add this line to create more space -->
-<div style="margin-bottom: 3rem;"></div>
+        <div class="text-center mt-6">
+            <button class="btn btn-primary" type="submit">
+                <i class="fas fa-balance-scale me-2"></i>Compare Products
+            </button>
+        </div>
+    </form>
+</div>
+
 {% if error %}
-<div class="alert alert-error mb-6" role="alert">
+<div class="alert alert-error" role="alert">
     <i class="fas fa-exclamation-triangle me-2"></i><strong>Error:</strong> {{ error }}
 </div>
 {% endif %}
 
 {% if data1 and data2 %}
-<!-- Comparison Results -->
-<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem;">
-    <!-- Product 1 -->
-    <div class="app-card" style="border: {% if data1.overall_score > data2.overall_score %}2px solid #9ae49a{% else %}1px solid #4A90E2{% endif %};">
-        <div style="padding: 1rem; background: {% if data1.overall_score > data2.overall_score %}#9ae49a{% else %}#4A90E2{% endif %}; color: {% if data1.overall_score > data2.overall_score %}#000000{% else %}#ffffff{% endif %}; font-weight: bold; border-radius: 0.5rem 0.5rem 0 0;">
-            <i class="fas fa-box me-2"></i>Product A
-            {% if data1.overall_score > data2.overall_score %}
-            <span style="float: right; background: #f8c050; color: #000000; padding: 0.25rem 0.5rem; border-radius: 0.25rem; font-size: 0.875rem;">WINNER</span>
-            {% endif %}
+<div class="comparison-grid fade-in-animation">
+    
+    <div class="comparison-card {% if data1.overall_score > data2.overall_score %}is-winner{% endif %}">
+        <div class="card-header">
+            <span><i class="fas fa-box me-2"></i>Product A</span>
+            {% if data1.overall_score > data2.overall_score %}<span class="winner-badge"><i class="fas fa-star me-1"></i>WINNER</span>{% endif %}
         </div>
-        <div style="padding: 1.5rem;">
-            <h5 style="font-size: 1.25rem; font-weight: bold; color: white; margin-bottom: 1rem;">{{ data1.product_name|truncatechars:50 }}</h5>
+        <div class="card-content">
+            <h5 class="product-title">{{ data1.product_name|truncatechars:60 }}</h5>
             
-            <!-- Scores -->
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; text-align: center; margin-bottom: 1.5rem;">
+            <div class="scores-grid">
                 <div>
-                    <div style="font-size: 2.25rem; font-weight: bold; color: #4A90E2;">{{ data1.overall_score }}/10</div>
-                    <small style="color: #9CA3AF;">Overall Score</small>
+                    <div class="score-value score-blue">{{ data1.overall_score }}/10</div>
+                    <div class="score-label">Overall Score</div>
                 </div>
                 <div>
-                    <div style="font-size: 1.5rem; font-weight: bold; color: #9ae49a;">{{ data1.public_opinion.average_rating }}/5</div>
-                    <small style="color: #9CA3AF;">Average Rating</small>
+                    <div class="score-value score-green">{{ data1.public_opinion.average_rating }}/5</div>
+                    <div class="score-label">Avg. Rating</div>
                 </div>
             </div>
 
-            <!-- Price and Sentiment Info -->
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem;">
+            <div class="stats-grid">
                 <div>
-                    <div style="color: #9CA3AF; font-size: 0.875rem;">Price:</div>
-                    <div style="font-weight: bold; color: white; font-size: 1.125rem;">₹{{ data1.price|default:"Not available" }}</div>
+                    <div class="stat-label">Price:</div>
+                    <div class="stat-value">₹{{ data1.price|default:"N/A" }}</div>
                 </div>
                 <div>
-                    <div style="color: #9CA3AF; font-size: 0.875rem;">Positive Sentiment:</div>
-                    <div style="width: 100%; background: #374151; border-radius: 9999px; height: 0.5rem; margin-bottom: 0.25rem;">
-                        <div style="background: #9ae49a; height: 0.5rem; border-radius: 9999px; width: {{ data1.public_opinion.positive_percent }}%;"></div>
+                    <div class="stat-label">Positive Sentiment:</div>
+                    <div class="progress-bar-bg">
+                        <div class="progress-bar-fg" style="width: {{ data1.public_opinion.positive_percent }}%;"></div>
                     </div>
-                    <div style="color: #9ae49a; font-size: 0.875rem;">{{ data1.public_opinion.positive_percent }}%</div>
+                    <div class="sentiment-value">{{ data1.public_opinion.positive_percent }}%</div>
                 </div>
             </div>
 
-            <!-- Strengths -->
-            <div style="margin-top: 1.5rem;">
-                <h6 style="color: #9ae49a; font-weight: bold; margin-bottom: 0.75rem;"><i class="fas fa-thumbs-up me-2"></i> Strengths:</h6>
-                <ul style="list-style: none; padding: 0; margin: 0;">
-                    {% for pro in data1.pros_cons_panel.pros %}
-                    <li style="display: flex; align-items: center; margin-bottom: 0.5rem;">
-                        <i class="fas fa-check text-neon-green me-3" style="color: #9ae49a;"></i>
-                        <span style="color: white;">{{ pro|title }}</span>
-                    </li>
-                    {% endfor %}
-                </ul>
-            </div>
-
-            <!-- Concerns -->
-            <div style="margin-top: 1rem;">
-                <h6 style="color: #f87171; font-weight: bold; margin-bottom: 0.75rem;"><i class="fas fa-thumbs-down me-2"></i> Concerns:</h6>
-                <ul style="list-style: none; padding: 0; margin: 0;">
-                    {% for con in data1.pros_cons_panel.cons %}
-                    <li style="display: flex; align-items: center; margin-bottom: 0.5rem;">
-                        <i class="fas fa-times me-3" style="color: #f87171;"></i>
-                        <span style="color: white;">{{ con|title }}</span>
-                    </li>
-                    {% endfor %}
-                </ul>
+            <div class="verdict-card">
+                <h5 class="verdict-main-title">Verdict at a Glance</h5>
+                <div>
+                    <div class="verdict-title verdict-green"><i class="fas fa-thumbs-up me-3"></i>Key Strengths</div>
+                    <ul class="verdict-list">
+                        {% for pro in data1.pros_cons_panel.pros %}
+                        <li class="verdict-item">
+                            <i class="fas fa-check-circle verdict-green"></i>
+                            <div>
+                                <strong class="keyword-title">{{ pro.keyword|title }}</strong>
+                                {% for example in pro.examples %}
+                                <blockquote class="review-quote">"{{ example|linebreaksbr }}"</blockquote>
+                                {% endfor %}
+                            </div>
+                        </li>
+                        {% empty %}
+                        <li class="verdict-empty"><i class="fas fa-info-circle me-2"></i>No significant strengths identified.</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                <hr class="verdict-divider">
+                <div>
+                    <div class="verdict-title verdict-red"><i class="fas fa-thumbs-down me-3"></i>Key Concerns</div>
+                    <ul class="verdict-list">
+                        {% for con in data1.pros_cons_panel.cons %}
+                        <li class="verdict-item">
+                            <i class="fas fa-times-circle verdict-red"></i>
+                            <div>
+                                <strong class="keyword-title">{{ con.keyword|title }}</strong>
+                                {% for example in con.examples %}
+                                <blockquote class="review-quote">"{{ example|linebreaksbr }}"</blockquote>
+                                {% endfor %}
+                            </div>
+                        </li>
+                        {% empty %}
+                        <li class="verdict-empty"><i class="fas fa-info-circle me-2"></i>No significant concerns identified.</li>
+                        {% endfor %}
+                    </ul>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- Product 2 -->
-    <div class="app-card" style="border: {% if data2.overall_score > data1.overall_score %}2px solid #9ae49a{% else %}1px solid #4A90E2{% endif %};">
-        <div style="padding: 1rem; background: {% if data2.overall_score > data1.overall_score %}#9ae49a{% else %}#4A90E2{% endif %}; color: {% if data2.overall_score > data1.overall_score %}#000000{% else %}#ffffff{% endif %}; font-weight: bold; border-radius: 0.5rem 0.5rem 0 0;">
-            <i class="fas fa-box me-2"></i>Product B
-            {% if data2.overall_score > data1.overall_score %}
-            <span style="float: right; background: #f8c050; color: #000000; padding: 0.25rem 0.5rem; border-radius: 0.25rem; font-size: 0.875rem;">WINNER</span>
-            {% endif %}
+    <div class="comparison-card {% if data2.overall_score > data1.overall_score %}is-winner{% endif %}">
+        <div class="card-header">
+            <span><i class="fas fa-box me-2"></i>Product B</span>
+            {% if data2.overall_score > data1.overall_score %}<span class="winner-badge"><i class="fas fa-star me-1"></i>WINNER</span>{% endif %}
         </div>
-        <div style="padding: 1.5rem;">
-            <h5 style="font-size: 1.25rem; font-weight: bold; color: white; margin-bottom: 1rem;">{{ data2.product_name|truncatechars:50 }}</h5>
+        <div class="card-content">
+            <h5 class="product-title">{{ data2.product_name|truncatechars:60 }}</h5>
+
+            <div class="scores-grid">
+                <div>
+                    <div class="score-value score-blue">{{ data2.overall_score }}/10</div>
+                    <div class="score-label">Overall Score</div>
+                </div>
+                <div>
+                    <div class="score-value score-green">{{ data2.public_opinion.average_rating }}/5</div>
+                    <div class="score-label">Avg. Rating</div>
+                </div>
+            </div>
+
+            <div class="stats-grid">
+                <div>
+                    <div class="stat-label">Price:</div>
+                    <div class="stat-value">₹{{ data2.price|default:"N/A" }}</div>
+                </div>
+                <div>
+                    <div class="stat-label">Positive Sentiment:</div>
+                    <div class="progress-bar-bg">
+                        <div class="progress-bar-fg" style="width: {{ data2.public_opinion.positive_percent }}%;"></div>
+                    </div>
+                    <div class="sentiment-value">{{ data2.public_opinion.positive_percent }}%</div>
+                </div>
+            </div>
             
-            <!-- Scores -->
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; text-align: center; margin-bottom: 1.5rem;">
+            <div class="verdict-card">
+                <h5 class="verdict-main-title">Verdict at a Glance</h5>
                 <div>
-                    <div style="font-size: 2.25rem; font-weight: bold; color: #4A90E2;">{{ data2.overall_score }}/10</div>
-                    <small style="color: #9CA3AF;">Overall Score</small>
+                    <div class="verdict-title verdict-green"><i class="fas fa-thumbs-up me-3"></i>Key Strengths</div>
+                    <ul class="verdict-list">
+                        {% for pro in data2.pros_cons_panel.pros %}
+                        <li class="verdict-item">
+                            <i class="fas fa-check-circle verdict-green"></i>
+                            <div>
+                                <strong class="keyword-title">{{ pro.keyword|title }}</strong>
+                                {% for example in pro.examples %}
+                                <blockquote class="review-quote">"{{ example|linebreaksbr }}"</blockquote>
+                                {% endfor %}
+                            </div>
+                        </li>
+                        {% empty %}
+                        <li class="verdict-empty"><i class="fas fa-info-circle me-2"></i>No significant strengths identified.</li>
+                        {% endfor %}
+                    </ul>
                 </div>
+                <hr class="verdict-divider">
                 <div>
-                    <div style="font-size: 1.5rem; font-weight: bold; color: #9ae49a;">{{ data2.public_opinion.average_rating }}/5</div>
-                    <small style="color: #9CA3AF;">Average Rating</small>
+                    <div class="verdict-title verdict-red"><i class="fas fa-thumbs-down me-3"></i>Key Concerns</div>
+                    <ul class="verdict-list">
+                        {% for con in data2.pros_cons_panel.cons %}
+                        <li class="verdict-item">
+                            <i class="fas fa-times-circle verdict-red"></i>
+                            <div>
+                                <strong class="keyword-title">{{ con.keyword|title }}</strong>
+                                {% for example in con.examples %}
+                                <blockquote class="review-quote">"{{ example|linebreaksbr }}"</blockquote>
+                                {% endfor %}
+                            </div>
+                        </li>
+                        {% empty %}
+                        <li class="verdict-empty"><i class="fas fa-info-circle me-2"></i>No significant concerns identified.</li>
+                        {% endfor %}
+                    </ul>
                 </div>
-            </div>
-
-            <!-- Price and Sentiment Info -->
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem;">
-                <div>
-                    <div style="color: #9CA3AF; font-size: 0.875rem;">Price:</div>
-                    <div style="font-weight: bold; color: white; font-size: 1.125rem;">₹{{ data2.price|default:"Not available" }}</div>
-                </div>
-                <div>
-                    <div style="color: #9CA3AF; font-size: 0.875rem;">Positive Sentiment:</div>
-                    <div style="width: 100%; background: #374151; border-radius: 9999px; height: 0.5rem; margin-bottom: 0.25rem;">
-                        <div style="background: #9ae49a; height: 0.5rem; border-radius: 9999px; width: {{ data2.public_opinion.positive_percent }}%;"></div>
-                    </div>
-                    <div style="color: #9ae49a; font-size: 0.875rem;">{{ data2.public_opinion.positive_percent }}%</div>
-                </div>
-            </div>
-
-            <!-- Strengths -->
-            <div style="margin-top: 1.5rem;">
-                <h6 style="color: #9ae49a; font-weight: bold; margin-bottom: 0.75rem;"><i class="fas fa-thumbs-up me-2"></i> Strengths:</h6>
-                <ul style="list-style: none; padding: 0; margin: 0;">
-                    {% for pro in data2.pros_cons_panel.pros %}
-                    <li style="display: flex; align-items: center; margin-bottom: 0.5rem;">
-                        <i class="fas fa-check text-neon-green me-3" style="color: #9ae49a;"></i>
-                        <span style="color: white;">{{ pro|title }}</span>
-                    </li>
-                    {% endfor %}
-                </ul>
-            </div>
-
-            <!-- Concerns -->
-            <div style="margin-top: 1rem;">
-                <h6 style="color: #f87171; font-weight: bold; margin-bottom: 0.75rem;"><i class="fas fa-thumbs-down me-2"></i> Concerns:</h6>
-                <ul style="list-style: none; padding: 0; margin: 0;">
-                    {% for con in data2.pros_cons_panel.cons %}
-                    <li style="display: flex; align-items: center; margin-bottom: 0.5rem;">
-                        <i class="fas fa-times me-3" style="color: #f87171;"></i>
-                        <span style="color: white;">{{ con|title }}</span>
-                    </li>
-                    {% endfor %}
-                </ul>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Quick Comparison Summary -->
-<div class="app-card">
-    <div style="padding: 1rem; background: #374151; border-radius: 0.5rem 0.5rem 0 0;">
-        <h6 style="margin-bottom: 0; color: white; font-weight: bold;"><i class="fas fa-chart-bar me-2"></i>Quick Comparison</h6>
-    </div>
-    <div style="padding: 1.5rem;">
-        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; text-align: center;">
-            <div>
-                <div style="font-size: 1.5rem; font-weight: bold; {% if data1.overall_score > data2.overall_score %}color: #9ae49a{% else %}color: white{% endif %};">
-                    {{ data1.overall_score }}
-                </div>
-                <small style="color: #9CA3AF;">Product A Score</small>
-            </div>
-            <div>
-                <div style="font-size: 1.25rem; color: #9CA3AF;">VS</div>
-                <small style="color: #9CA3AF;">Comparison</small>
-            </div>
-            <div>
-                <div style="font-size: 1.5rem; font-weight: bold; {% if data2.overall_score > data1.overall_score %}color: #9ae49a{% else %}color: white{% endif %};">
-                    {{ data2.overall_score }}
-                </div>
-                <small style="color: #9CA3AF;">Product B Score</small>
             </div>
         </div>
     </div>
 </div>
 {% endif %}
+{% endblock %}
+
+
+{% block extra_css %}
+<style>
+    /* Base Components */
+    .app-card { background-color: #2D3748; border-radius: 12px; padding: 1.5rem; border: 1px solid #4A5568; }
+    .btn-primary { background-color: #9ae49a; color: #1A202C; padding: 0.75rem 2rem; border-radius: 12px; font-weight: 600; border: none; cursor: pointer; transition: background-color 0.2s ease; }
+    .btn-primary:hover { background-color: #7fdd7f; }
+    .alert-error { margin-bottom: 1.5rem; background-color: rgba(255, 107, 107, 0.1); color: #FF6B6B; padding: 1rem; border-radius: 12px; border: 1px solid #FF6B6B; }
+
+    /* Form Styles */
+    .form-grid { display: grid; grid-template-columns: 1fr auto 1fr; gap: 1rem; align-items: center; }
+    .form-input { width: 100%; background-color: #1A202C; border: 1px solid #4A5568; color: #E5E7EB; padding: 0.9rem; border-radius: 12px; }
+    .vs-divider { font-weight: bold; font-size: 1.25rem; color: #9CA3AF; }
+
+    /* Comparison Layout */
+    .comparison-grid { display: grid; grid-template-columns: 1fr; gap: 2rem; }
+    @media (min-width: 992px) { .comparison-grid { grid-template-columns: 1fr 1fr; } }
+    
+    .comparison-card { background-color: #2D3748; border-radius: 12px; border: 1px solid #4A90E2; }
+    .comparison-card.is-winner { border: 2px solid #9ae49a; }
+    
+    .card-header { padding: 1rem; font-weight: bold; border-radius: 11px 11px 0 0; background-color: #4A90E2; color: #ffffff; display: flex; justify-content: space-between; align-items: center; }
+    .is-winner .card-header { background-color: #9ae49a; color: #1A202C; }
+    .winner-badge { background: #f8c050; color: #000000; padding: 0.25rem 0.75rem; border-radius: 6px; font-size: 0.875rem; }
+    .card-content { padding: 1.5rem; }
+
+    /* Inner Card Content */
+    .product-title { font-size: 1.25rem; font-weight: bold; color: white; margin-bottom: 1.5rem; min-height: 3.75rem; }
+    .scores-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; text-align: center; margin-bottom: 2rem; }
+    .score-value { font-size: 2rem; font-weight: bold; }
+    .score-label { color: #9CA3AF; font-size: 0.875rem; }
+    .score-blue { color: #4A90E2; }
+    .score-green { color: #9ae49a; }
+
+    .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 2rem; }
+    .stat-label { color: #9CA3AF; font-size: 0.875rem; }
+    .stat-value { font-weight: bold; color: white; font-size: 1.125rem; }
+    .progress-bar-bg { width: 100%; background: #374151; border-radius: 9999px; height: 8px; margin-top: 4px; }
+    .progress-bar-fg { background: #9ae49a; height: 100%; border-radius: 9999px; }
+    .sentiment-value { color: #9ae49a; font-size: 0.875rem; text-align: right; }
+
+    /* Verdict Section Styles */
+    .verdict-card { background-color: #1A202C; border-radius: 12px; padding: 1.5rem; margin-top: 1rem; }
+    .verdict-main-title { color: white; font-size: 1.2rem; margin: 0 0 1.5rem 0; text-align: center; font-weight: 700; }
+    .verdict-title { font-weight: bold; display: flex; align-items: center; margin-bottom: 1.5rem; font-size: 1.1rem; }
+    .verdict-green { color: #9ae49a; }
+    .verdict-red { color: #FF6B6B; }
+    .verdict-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 1.5rem; }
+    .verdict-item { display: flex; align-items: flex-start; gap: 1rem; }
+    .verdict-item i { margin-top: 5px; flex-shrink: 0; }
+    .keyword-title { color: #E5E7EB; font-size: 1.05rem; display: block; margin-bottom: 0.5rem; }
+    .review-quote { margin: 0; padding-left: 1rem; border-left: 3px solid #4A5568; color: #B3BAC5; font-style: italic; font-size: 0.95rem; line-height: 1.6; }
+    .verdict-empty { color: #718096; }
+    .verdict-divider { border: none; height: 1px; background: linear-gradient(to right, transparent, #4A5568, transparent); margin: 2rem 0; }
+
+    .fade-in-animation { animation: fadeIn 0.5s ease-in-out; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+</style>
 {% endblock %}
