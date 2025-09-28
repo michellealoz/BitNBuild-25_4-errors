@@ -1,7 +1,9 @@
+👋 Hi, we’re Team 4 Erros — Hruday Patil, Michelle Aloz, Alycia Coutinho, Rochelle Fernandes — the team behind Review Radar!
 
-# 🛒 Review Radar
 
-**Review Radar** is a smart web tool and browser extension that helps online shoppers make faster, smarter decisions by summarizing and comparing customer reviews from e-commerce product pages. Instead of scrolling through thousands of reviews, Review Radar gives you a clean, AI-powered summary — and even recommends the best product when you're stuck deciding between options.
+# 🛒 Background about Review Radar
+
+Our Project **Review Radar** is a smart web tool and browser extension that helps online shoppers make faster, smarter decisions by summarizing and comparing customer reviews from e-commerce product pages. Instead of scrolling through thousands of reviews, Review Radar gives you a clean, AI-powered summary — and even recommends the best product when you're stuck deciding between options.
 
 ---
 
