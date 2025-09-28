@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Settings - Review Radar</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+    :root {
+        --primary: #2e4aad;
+        --background: #f7f9fc;
+        --surface: #fff;
+        --text: #222;
+        --border: #d8dbe8;
+        --accent: #e5eaf5;
+    }
+    body {
+        background: var(--background);
+        font-family: 'Segoe UI', Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        color: var(--text);
+        transition: background 0.3s, color 0.3s;
+    }
+    header {
+        background: var(--primary);
+        color: #fff;
+        padding: 2rem 1rem 1rem 1rem;
+        text-align: center;
+    }
+    main {
+        max-width: 560px;
+        margin: 2rem auto;
+        background: var(--surface);
+        border-radius: 10px;
+        box-shadow: 0 2px 14px rgba(46,74,173,0.09);
+        padding: 2rem 2rem 1.5rem 2rem;
+    }
+    h1 {
+        font-weight: 700;
+        margin: 0;
+    }
+    section {
+        margin-bottom: 2rem;
+        border-bottom: 1px solid var(--accent);
+        padding-bottom: 1.3rem;
+    }
+    section:last-child {
+        border-bottom: none;
+        margin-bottom: 0;
+    }
+    label {
+        font-weight: 500;
+        display: block;
+        margin-bottom: 0.3rem;
+    }
+    input[type="text"],
+    input[type="email"],
+    select {
+        width: 100%;
+        padding: 0.6rem;
+        margin-bottom: 1.1rem;
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        font-size: 1rem;
+        background: #f5f7fa;
+    }
+    .settings-group {
+        margin-bottom: 1.2rem;
+    }
+    .toggle-switch {
+        display: flex;
+        align-items: center;
+        gap: 0.7em;
+    }
+    .toggle {
+        width: 42px;
+        height: 22px;
+        background: #bbb;
+        border-radius: 11px;
+        position: relative;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+    .toggle[data-dark="true"] {
+        background: var(--primary);
+    }
+    .toggle-knob {
+        position: absolute;
+        top: 3px;
+        left: 3px;
+        width: 16px;
+        height: 16px;
+        background: #fff;
+        border-radius: 50%;
+        transition: left 0.2s;
+    }
+    .toggle[data-dark="true"] .toggle-knob {
+        left: 23px;
+        background: #ffe066;
+    }
+    .delete-btn {
+        background: #e53935;
+        color: #fff;
+        border: none;
+        border-radius: 6px;
+        padding: 0.7rem 1.3rem;
+        font-size: 1rem;
+        cursor: pointer;
+        font-weight: 500;
+        transition: background 0.2s;
+        margin-top: 0.7rem;
+    }
+    .delete-btn:hover {
+        background: #b71c1c;
+    }
+    .support-link {
+        color: var(--primary);
+        text-decoration: underline;
+        cursor: pointer;
+    }
+    .privacy-text {
+        font-size: 0.97rem;
+        color: #444;
+        background: #f5f7fa;
+        padding: 0.7rem 1rem;
+        border-radius: 6px;
+        margin-top: 0.5rem;
+        margin-bottom: 0.5rem;
+    }
+    .view-radio-group {
+        display: flex;
+        gap: 2rem;
+        margin-bottom: 1.1rem;
+    }
+    .view-radio-group label {
+        display: flex;
+        align-items: center;
+        gap: 0.3em;
+        font-weight: 400;
+        margin-bottom: 0;
+    }
+    @media (max-width: 600px) {
+        main { padding: 1rem; max-width: 100%; }
+    }
+    /* Dark Mode */
+    body.dark-mode {
+        --background: #1e2230;
+        --surface: #252a3a;
+        --text: #f4f4f4;
+        --border: #444869;
+        --accent: #363b55;
+    }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Settings</h1>
+    </header>
+    <main>
+        <!-- Appearance / Theme -->
+        <section>
+            <div class="settings-group toggle-switch">
+                <label for="themeToggle">Theme/Appearance:</label>
+                <div class="toggle" id="themeToggle" data-dark="false" title="Toggle dark/light mode">
+                    <div class="toggle-knob"></div>
+                </div>
+                <span id="themeIcon" aria-label="theme">☀️</span>
+            </div>
+        </section>
+        <!-- Default Analysis View -->
+        <section>
+            <div class="settings-group">
+                <label>Default Analysis View:</label>
+                <div class="view-radio-group">
+                    <label>
+                        <input type="radio" name="analysisView" value="pie" checked>
+                        Pie Chart
+                    </label>
+                    <label>
+                        <input type="radio" name="analysisView" value="bar">
+                        Bar Chart
+                    </label>
+                    <label>
+                        <input type="radio" name="analysisView" value="table">
+                        Table
+                    </label>
+                </div>
+            </div>
+        </section>
+        <!-- Language Selection -->
+        <section>
+            <div class="settings-group">
+                <label for="languageSelect">Language:</label>
+                <select id="languageSelect">
+                    <option value="en">English</option>
+                    <option value="hi">Hindi</option>
+                    <option value="fr">French</option>
+                    <option value="es">Spanish</option>
+                    <!-- Add more languages as needed -->
+                </select>
+            </div>
+        </section>
+        <!-- Personal Info -->
+        <section>
+            <div class="settings-group">
+                <label for="settingsName">Name</label>
+                <input type="text" id="settingsName" placeholder="Your Name">
+
+                <label for="settingsEmail">Email</label>
+                <input type="email" id="settingsEmail" placeholder="your@email.com">
+            </div>
+        </section>
+        <!-- Notifications -->
+        <section>
+            <div class="settings-group">
+                <label>Notifications:</label>
+                <input type="checkbox" id="settingsNotify" checked>
+                <label for="settingsNotify" style="display:inline;">Receive email notifications</label>
+            </div>
+        </section>
+        <!-- Privacy -->
+        <section>
+            <div class="settings-group">
+                <label>Privacy:</label>
+                <div class="privacy-text">
+                    Review Radar does not store your product URLs or review text after analysis. No personal data is retained or shared. See our <a href="about-help-privacy.html" target="_blank" class="support-link">privacy policy</a> for more.
+                </div>
+            </div>
+        </section>
+        <!-- Delete Account -->
+        <section>
+            <div class="settings-group">
+                <label>Delete Account:</label>
+                <button class="delete-btn" onclick="confirmDelete()">Delete Account</button>
+            </div>
+        </section>
+        <!-- Help / Support -->
+        <section>
+            <div class="settings-group">
+                <label>Need help?</label>
+                <span class="support-link" onclick="window.location.href='mailto:support@reviewradar.com'">Contact Support</span>
+            </div>
+        </section>
+    </main>
+    <script>
+    // Theme Toggle
+    const themeToggle = document.getElementById('themeToggle');
+    const themeIcon = document.getElementById('themeIcon');
+    function setTheme(dark) {
+        if (dark) {
+            document.body.classList.add('dark-mode');
+            themeToggle.setAttribute('data-dark', 'true');
+            themeIcon.textContent = '🌙';
+        } else {
+            document.body.classList.remove('dark-mode');
+            themeToggle.setAttribute('data-dark', 'false');
+            themeIcon.textContent = '☀️';
+        }
+    }
+    themeToggle.addEventListener('click', function() {
+        const dark = themeToggle.getAttribute('data-dark') !== 'true';
+        setTheme(dark);
+    });
+
+    // Delete Account Confirmation
+    function confirmDelete() {
+        if (confirm("Are you sure you want to delete your account? This action cannot be undone.")) {
+            alert("Account deletion request submitted.");
+            // Add actual delete logic here
+        }
+    }
+    </script>
+</body>
+</html>
