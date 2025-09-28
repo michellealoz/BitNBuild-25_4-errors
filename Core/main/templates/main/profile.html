@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>My Profile - Review Radar</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+    body {
+        background: #f7f9fc;
+        font-family: 'Segoe UI', Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        color: #222;
+    }
+    header {
+        background: #2e4aad;
+        color: #fff;
+        padding: 2rem 1rem 1rem 1rem;
+        text-align: center;
+    }
+    main {
+        max-width: 500px;
+        margin: 2rem auto;
+        background: #fff;
+        border-radius: 10px;
+        box-shadow: 0 2px 12px rgba(46,74,173,0.08);
+        padding: 2rem;
+    }
+    h1 {
+        font-weight: 700;
+        margin: 0;
+    }
+    .profile-pic-section {
+        text-align: center;
+        margin-bottom: 1.5rem;
+    }
+    .profile-pic {
+        width: 110px;
+        height: 110px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 3px solid #2e4aad;
+        margin-bottom: 0.7rem;
+    }
+    label {
+        font-weight: 500;
+        display: block;
+        margin-bottom: 0.3rem;
+    }
+    input[type="text"],
+    input[type="email"],
+    input[type="tel"],
+    input[type="password"] {
+        width: 100%;
+        padding: 0.6rem;
+        margin-bottom: 1.1rem;
+        border: 1px solid #d8dbe8;
+        border-radius: 6px;
+        font-size: 1rem;
+        background: #f5f7fa;
+    }
+    .profile-form-section,
+    .password-section,
+    .preferences-section {
+        margin-bottom: 2rem;
+    }
+    .preferences-checkbox {
+        margin-right: 0.7rem;
+    }
+    .profile-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 1rem;
+    }
+    button {
+        background: #2e4aad;
+        color: #fff;
+        border: none;
+        border-radius: 6px;
+        padding: 0.7rem 1.6rem;
+        font-size: 1rem;
+        cursor: pointer;
+        font-weight: 500;
+        transition: background 0.2s;
+    }
+    button:hover {
+        background: #1d306f;
+    }
+    @media (max-width: 600px) {
+        main {
+            padding: 1rem;
+            max-width: 100%;
+        }
+    }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>My Profile</h1>
+    </header>
+    <main>
+        <!-- Profile Picture Section -->
+        <section class="profile-pic-section">
+            <img src="https://ui-avatars.com/api/?name=Your+Name&background=2e4aad&color=fff&size=110" alt="Profile Picture" class="profile-pic" id="profilePreview">
+            <div>
+                <input type="file" id="profilePicUpload" accept="image/*" style="display:none;">
+                <label for="profilePicUpload" style="cursor:pointer; color:#2e4aad; text-decoration:underline;">Upload Profile Picture</label>
+            </div>
+        </section>
+        <!-- Personal Info Edit -->
+        <section class="profile-form-section">
+            <form>
+                <label for="name">Name</label>
+                <input type="text" id="name" placeholder="Your Name">
+
+                <label for="email">Email</label>
+                <input type="email" id="email" placeholder="your@email.com">
+
+                <label for="phone">Phone</label>
+                <input type="tel" id="phone" placeholder="+1-234-567-8901">
+            </form>
+        </section>
+        <!-- Change Password -->
+        <section class="password-section">
+            <label for="currentPassword">Current Password</label>
+            <input type="password" id="currentPassword" placeholder="Current Password">
+
+            <label for="newPassword">New Password</label>
+            <input type="password" id="newPassword" placeholder="New Password">
+
+            <label for="confirmPassword">Confirm New Password</label>
+            <input type="password" id="confirmPassword" placeholder="Confirm New Password">
+        </section>
+        <!-- Preferences -->
+        <section class="preferences-section">
+            <label>Account Preferences:</label>
+            <div>
+                <input type="checkbox" id="emailNotifications" class="preferences-checkbox">
+                <label for="emailNotifications" style="display:inline;">Receive email notifications</label>
+            </div>
+        </section>
+        <!-- Actions -->
+        <div class="profile-actions">
+            <button type="button">Save Changes</button>
+            <button type="button" style="background:#888;">Cancel</button>
+        </div>
+    </main>
+    <script>
+    // Profile Picture Preview
+    const profilePicUpload = document.getElementById('profilePicUpload');
+    const profilePreview = document.getElementById('profilePreview');
+    profilePicUpload.addEventListener('change', function(e) {
+        if (e.target.files && e.target.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(ev) {
+                profilePreview.src = ev.target.result;
+            }
+            reader.readAsDataURL(e.target.files[0]);
+        }
+    });
+    // Clicking label opens file picker
+    document.querySelector('label[for="profilePicUpload"]').onclick = function() {
+        profilePicUpload.click();
+    };
+    </script>
+</body>
+</html>
