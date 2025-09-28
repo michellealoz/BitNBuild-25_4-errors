@@ -1,4 +1,3 @@
-
 fastapi
 uvicorn[standard]  # ASGI server with performance extras
 pydantic

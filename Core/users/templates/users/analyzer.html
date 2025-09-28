@@ -8,269 +8,338 @@
 {% block content %}
 
 <div class="app-card mb-8" style="padding: 2rem;">
+
     <form method="post" id="analysis-form">
+
         {% csrf_token %}
+
         <div style="display: flex; flex-wrap: wrap; gap: 1rem;">
+
             <div style="flex: 1 1 300px; display: flex; align-items: center;">
+
                 <span style="background-color: #2D3748; padding: 0.9rem 1rem; border-radius: 12px 0 0 12px; border: 1px solid #4A5568; border-right: none;">
+
                     <i class="fas fa-link" style="color: #9ae49a;"></i>
+
                 </span>
-                <input type="url" name="product_url" class="form-input" 
-                       placeholder="https://www.amazon.com/dp/PRODUCT_ID" 
+
+                <input type="url" name="product_url" class="form-input"
+
+                       placeholder="https://www.amazon.com/dp/PRODUCT_ID"
+
                        value="{{ product_url|default:'' }}" required
+
                        style="border-radius: 0 12px 12px 0; margin-left: -1px; background-color: #1A202C; border-color: #4A5568; padding-top: 0.9rem; padding-bottom: 0.9rem;">
+
             </div>
+
             <button class="btn-primary px-8" type="submit" id="analyze-btn" style="flex-shrink: 0;">
+
                 <i class="fas fa-cogs me-2"></i>Analyze
+
             </button>
+
         </div>
-    </form>
+
+    </form> 
     
     {% if error %}
-        <div class="alert alert-error" role="alert" style="margin-top: 1.5rem;">
-            <i class="fas fa-exclamation-triangle me-2"></i>{{ error }}
-        </div>
+    <div class="alert alert-error" role="alert">
+        <i class="fas fa-exclamation-triangle mr-2"></i>{{ error }}
+    </div>
     {% endif %}
 </div>
 
-<div id="loading-spinner" class="text-center mb-8" style="display: none;">
-    <div class="spinner-border" style="width: 3.5rem; height: 3.5rem; color: #9ae49a;" role="status">
-        <span class="visually-hidden">Loading...</span>
-    </div>
-    <p class="mt-4" style="color: #A0AEC0; font-size: 1.1rem;">Scraping product details and analyzing reviews...</p>
-    <p class="mt-2" style="color: #718096; font-size: 0.9rem;">This may take a moment. Good things come to those who wait!</p>
-    <div class="mt-4" style="width: 100%; background: #2D3748; border-radius: 9999px; height: 8px;">
-        <div style="background: #9ae49a; height: 8px; border-radius: 9999px; width: 100%; animation: pulse 2s infinite ease-in-out;"></div>
+<div id="loading-spinner" class="loading-container" style="display: none;">
+    <div class="spinner-border"></div>
+    <p class="loading-title">Scraping product details and analyzing reviews...</p>
+    <p class="loading-subtitle">This may take a moment. Good things come to those who wait!</p>
+    <div class="progress-bar-container">
+        <div class="progress-bar-animated"></div>
     </div>
 </div>
 
 {% if data %}
-<div id="results-section" style="animation: fadeIn 0.5s ease-in-out;">
+<div id="results-section" class="fade-in-animation">
 
-    <!-- Product Header Card -->
-    <div class="app-card mb-8" style="padding: 2.5rem;">
-        <div style="display: flex; flex-wrap: wrap; gap: 2.5rem; align-items: center;">
-            {% if data.image_url %}
-            <div style="flex-shrink: 0;">
-                <img src="{{ data.image_url }}" alt="{{ data.product_name }}" 
-                     style="width: 140px; height: 140px; object-fit: contain; border-radius: 12px; background-color: white; padding: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+    <div class="app-card product-header mb-8">
+        {% if data.images.0 %}
+        <div class="product-image-wrapper">
+            <img src="{{ data.images.0 }}" alt="{{ data.product_name }}" class="product-image">
+        </div>
+        {% endif %}
+        <div class="product-details">
+            <h3 class="product-title">{{ data.product_name }}</h3>
+            <div class="product-meta">
+                {% if data.rating and data.rating != "Not found" %}
+                <div class="meta-item"><i class="fas fa-star icon-star"></i><strong>{{ data.rating }}</strong></div>
+                {% endif %}
+                {% if data.price and data.price != "Not found" %}
+                <div class="meta-item"><i class="fas fa-tag icon-price"></i><strong>₹{{ data.price }}</strong></div>
+                {% endif %}
             </div>
-            {% endif %}
-
-            <div style="flex: 1 1 300px; min-width: 0;">
-                <h3 style="color: white; margin: 0 0 1.5rem 0; font-size: 1.75rem; line-height: 1.3; word-wrap: break-word;">{{ data.product_name }}</h3>
-                <div style="display: flex; gap: 2.5rem; color: #A0AEC0; align-items: center; flex-wrap: wrap; font-size: 1rem;">
-                    {% if data.rating and data.rating != "Not found" %}
-                    <div style="display: flex; align-items: center; gap: 0.5rem;">
-                        <i class="fas fa-star" style="color: #f8c050;"></i>
-                        <strong style="color: #E5E7EB;">{{ data.rating }}</strong>
-                    </div>
-                    {% endif %}
-                    {% if data.price and data.price != "Not found" %}
-                    <div style="display: flex; align-items: center; gap: 0.5rem;">
-                        <i class="fas fa-tag" style="color: #9ae49a;"></i>
-                        <strong style="color: #E5E7EB;">₹{{ data.price }}</strong>
-                    </div>
-                    {% endif %}
-                    <div style="display: flex; align-items: center; gap: 0.5rem;">
-                        <i class="fas fa-database" style="color: #4A90E2;"></i>
-                        <span>{{ data.public_opinion.total_reviews_analyzed }} Reviews Analyzed</span>
-                    </div>
-                </div>
-            </div>
-
-            <div style="flex-shrink: 0;">
-                <a href="{{ product_url }}" target="_blank" class="btn-secondary" style="text-decoration: none; display: inline-flex; align-items: center; padding: 0.75rem 1.5rem; white-space: nowrap;">
-                    <i class="fas fa-external-link-alt me-2"></i>View on Amazon
-                </a>
-            </div>
+        </div>
+        <div class="product-link">
+            <a href="{{ product_url }}" target="_blank" class="btn btn-secondary">
+                <i class="fas fa-external-link-alt mr-2"></i>View on Amazon
+            </a>
         </div>
     </div>
     
-    <!-- Main Analysis Grid -->
-    <div class="analysis-container" style="display: grid; grid-template-columns: 1fr; gap: 2rem; margin-bottom: 3rem;">
+    <div class="analysis-grid">
         
-        <!-- Left Column - Sentiment & Pros/Cons -->
-        <div class="left-column" style="display: flex; flex-direction: column; gap: 2rem;">
-            
-            <!-- Overall Sentiment Card -->
-            <div class="app-card" style="padding: 2.5rem;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
-                    <span style="font-weight: bold; color: white; font-size: 1.2rem;">Overall Sentiment</span>
+        <div class="grid-column">
+            <div class="app-card">
+                <div class="card-header">
+                    <span class="card-title">Overall Sentiment</span>
                     {% with score=data.public_opinion.positive_percent %}
-                    <span style="font-weight: 600; background-color: {% if score >= 70 %}rgba(154, 228, 154, 0.15){% elif score >= 50 %}rgba(248, 192, 80, 0.15){% else %}rgba(255, 107, 107, 0.15){% endif %}; 
-                          color: {% if score >= 70 %}#9ae49a{% elif score >= 50 %}#f8c050{% else %}#FF6B6B{% endif %}; 
-                          padding: 0.5rem 1rem; border-radius: 20px; font-size: 0.9rem;">
+                    <span class="badge 
+                        {% if score >= 70 %}badge-success{% elif score >= 50 %}badge-warning{% else %}badge-danger{% endif %}">
                         {% if score >= 70 %}Excellent{% elif score >= 50 %}Average{% else %}Poor{% endif %}
                     </span>
                     {% endwith %}
                 </div>
-                <div style="text-align: center;">
+                <div class="sentiment-score-container">
                     {% with positive_percent=data.public_opinion.positive_percent %}
-                    <h1 style="font-size: 4.5rem; font-weight: 800; 
-                        color: {% if positive_percent >= 70 %}#9ae49a{% elif positive_percent >= 50 %}#f8c050{% else %}#FF6B6B{% endif %};
-                        margin-bottom: 0.5rem; line-height: 1;">
-                        {{ positive_percent }}<small style="color: #A0AEC0; font-size: 2.2rem;">%</small>
+                    <h1 class="sentiment-score 
+                        {% if positive_percent >= 70 %}text-success{% elif positive_percent >= 50 %}text-warning{% else %}text-danger{% endif %}">
+                        {{ positive_percent }}<small class="percent-sign">%</small>
                     </h1>
-                    <p style="color: #A0AEC0; margin: 0 0 2.5rem 0; font-size: 1.1rem;">Positive Sentiment</p>
-                    <div style="width: 100%; background: #2D3748; border-radius: 9999px; height: 14px; overflow: hidden;">
-                        <div style="background: {% if positive_percent >= 70 %}#9ae49a{% elif positive_percent >= 50 %}#f8c050{% else %}#FF6B6B{% endif %}; 
-                             height: 14px; border-radius: 0 9999px 9999px 0; width: {{ positive_percent }}%; transition: width 0.8s ease-out;">
-                        </div>
-                    </div>
+                    <p class="sentiment-subtitle">Positive Sentiment</p>
                     {% endwith %}
                 </div>
             </div>
 
-            <!-- Pros & Cons Card -->
-            <div class="app-card" style="padding: 2.5rem;">
-                <h5 style="color: white; font-size: 1.3rem; margin: 0 0 2.5rem 0; text-align: center; font-weight: 700;">Verdict at a Glance</h5>
-                
-                <!-- Key Strengths -->
-                <div style="margin-bottom: 3rem;">
-                    <div style="font-weight: bold; color: #9ae49a; display: flex; align-items: center; margin-bottom: 2rem; font-size: 1.15rem;">
-                        <i class="fas fa-thumbs-up me-3" style="font-size: 1.2rem;"></i>Key Strengths
+            <div class="app-card">
+                <h3 class="card-title mb-6">Review Insights</h3>
+                <div class="space-y-4">
+                    <div class="insight-item">
+                        <span>Total Reviews Analyzed:</span>
+                        <strong>{{ data.public_opinion.total_reviews_analyzed }}</strong>
                     </div>
-                    <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 2rem;">
-                        {% for pro in data.pros_cons_panel.pros %}
-                            <li style="display: flex; align-items: flex-start; gap: 1.2rem;">
-                                <i class="fas fa-check-circle" style="color: #9ae49a; margin-top: 6px; flex-shrink: 0; font-size: 1.1rem;"></i>
-                                <div style="line-height: 1.7;">
-                                    <strong style="color: #E5E7EB; font-size: 1.05rem; display: block; margin-bottom: 0.8rem;">{{ pro.keyword|title }}</strong>
-                                    {% for example in pro.examples %}
-                                        <blockquote style="margin: 0; padding: 1rem 0 0 1.2rem; border-left: 3px solid #4A5568; color: #B3BAC5; font-style: italic; font-size: 0.95rem; line-height: 1.6;">
-                                            "{{ example }}"
-                                        </blockquote>
-                                        {% if not forloop.last %}<div style="margin: 0.8rem 0;"></div>{% endif %}
-                                    {% endfor %}
-                                </div>
-                            </li>
-                        {% empty %}
-                            <li style="color: #718096; padding: 1rem 0;"><i class="fas fa-info-circle me-2"></i>No significant strengths identified.</li>
-                        {% endfor %}
-                    </ul>
-                </div>
-
-                <hr style="border: none; height: 2px; background: linear-gradient(to right, transparent, #4A5568, transparent); margin: 0;">
-
-                <!-- Key Concerns -->
-                <div style="margin-top: 3rem;">
-                    <div style="font-weight: bold; color: #FF6B6B; display: flex; align-items: center; margin-bottom: 2rem; font-size: 1.15rem;">
-                        <i class="fas fa-thumbs-down me-3" style="font-size: 1.2rem;"></i>Key Concerns
+                    <div class="insight-item">
+                        <span>Verified Reviews:</span>
+                        <strong>{{ data.review_insights.verified_reviews_count }}</strong>
                     </div>
-                    <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 2rem;">
-                        {% for con in data.pros_cons_panel.cons %}
-                            <li style="display: flex; align-items: flex-start; gap: 1.2rem;">
-                                <i class="fas fa-times-circle" style="color: #FF6B6B; margin-top: 6px; flex-shrink: 0; font-size: 1.1rem;"></i>
-                                <div style="line-height: 1.7;">
-                                    <strong style="color: #E5E7EB; font-size: 1.05rem; display: block; margin-bottom: 0.8rem;">{{ con.keyword|title }}</strong>
-                                    {% for example in con.examples %}
-                                        <blockquote style="margin: 0; padding: 1rem 0 0 1.2rem; border-left: 3px solid #4A5568; color: #B3BAC5; font-style: italic; font-size: 0.95rem; line-height: 1.6;">
-                                            "{{ example }}"
-                                        </blockquote>
-                                        {% if not forloop.last %}<div style="margin: 0.8rem 0;"></div>{% endif %}
-                                    {% endfor %}
-                                </div>
-                            </li>
-                        {% empty %}
-                            <li style="color: #718096; padding: 1rem 0;"><i class="fas fa-info-circle me-2"></i>No significant concerns identified.</li>
-                        {% endfor %}
-                    </ul>
+                     <div class="insight-item">
+                        <span>Recent Reviews (2025):</span>
+                        <strong>{{ data.review_insights.recent_review_count }}</strong>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- Right Column - AI Analysis & Details -->
-        <div class="right-column" style="display: flex; flex-direction: column; gap: 2rem;">
-            
-            {% if data.public_opinion.quick_summary and data.public_opinion.quick_summary != "Insufficient review data." %}
-            <div class="app-card" style="padding: 2.5rem;">
-                <div style="font-weight: bold; color: white; margin-bottom: 2rem; display: flex; align-items: center; gap: 1rem; font-size: 1.2rem;">
-                    <i class="fas fa-bolt fa-fw" style="color: #9ae49a; font-size: 1.3rem;"></i>
-                    <span>AI Quick Summary</span>
+        <div class="grid-column">
+            <div class="app-card">
+                <h3 class="card-title mb-6">Rating Distribution</h3>
+                <div class="chart-container">
+                    <canvas id="ratingChart"></canvas>
                 </div>
-                <p style="color: #E5E7EB; font-size: 1.1rem; margin: 0; line-height: 1.8;">{{ data.public_opinion.quick_summary }}</p>
             </div>
-            {% endif %}
 
-            {% if data.review_summary_generator and data.review_summary_generator != "Not enough reviews for detailed summary." %}
-            <div class="app-card" style="padding: 2.5rem;">
-                <div style="font-weight: bold; color: white; margin-bottom: 2rem; display: flex; align-items: center; gap: 1rem; font-size: 1.2rem;">
-                    <i class="fas fa-file-alt fa-fw" style="color: #4A90E2; font-size: 1.3rem;"></i>
-                    <span>AI Detailed Analysis</span>
-                </div>
-                <div style="color: #E5E7EB; margin: 0; line-height: 1.8; font-size: 1.05rem;">
-                    {{ data.review_summary_generator|linebreaksbr }}
+            <div class="app-card">
+                <h3 class="card-title text-center mb-8">Verdict at a Glance</h3>
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div>
+                        <div class="verdict-title text-success"><i class="fas fa-thumbs-up mr-3"></i>Key Strengths</div>
+                        <ul class="verdict-list">
+                            {% for pro in data.pros_cons_panel.pros|slice:":3" %}
+                            <li class="verdict-item">
+                                <i class="fas fa-check-circle text-success"></i>
+                                <div>
+                                    <strong class="keyword-title">{{ pro.keyword|title }}</strong>
+                                    <blockquote class="review-quote">"{{ pro.examples.0|truncatechars:80 }}"</blockquote>
+                                </div>
+                            </li>
+                            {% empty %}
+                            <li class="verdict-empty"><i class="fas fa-info-circle mr-2"></i>No significant strengths found.</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    <div>
+                        <div class="verdict-title text-danger"><i class="fas fa-thumbs-down mr-3"></i>Key Concerns</div>
+                         <ul class="verdict-list">
+                            {% for con in data.pros_cons_panel.cons|slice:":3" %}
+                            <li class="verdict-item">
+                                <i class="fas fa-times-circle text-danger"></i>
+                                <div>
+                                    <strong class="keyword-title">{{ con.keyword|title }}</strong>
+                                    <blockquote class="review-quote">"{{ con.examples.0|truncatechars:80 }}"</blockquote>
+                                </div>
+                            </li>
+                            {% empty %}
+                            <li class="verdict-empty"><i class="fas fa-info-circle mr-2"></i>No significant concerns found.</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
                 </div>
             </div>
-            {% endif %}
-
-            {% if data.description and data.description != "Not found" %}
-            <div class="app-card" style="padding: 2.5rem;">
-                <div style="font-weight: bold; color: white; margin-bottom: 2rem; display: flex; align-items: center; gap: 1rem; font-size: 1.2rem;">
-                    <i class="fas fa-info-circle fa-fw" style="color: #A0AEC0; font-size: 1.3rem;"></i>
-                    <span>Product Highlights</span>
-                </div>
-                <p style="color: #B3BAC5; margin: 0; line-height: 1.7; font-size: 1rem;">{{ data.description|truncatewords:100 }}</p>
-            </div>
-            {% endif %}
         </div>
     </div>
 
-    <!-- Footer -->
-    <div class="text-center" style="padding: 2rem 0; border-top: 1px solid #374151; margin-top: 3rem;">
-        <small style="color: #718096; font-size: 0.9rem;">
-            <i class="fas fa-clock me-1"></i>
-            Analysis generated on {% now "F j, Y, g:i a" %} | 
-            <i class="fas fa-microchip me-1"></i>
-            Powered by AI Sentiment Analysis
+    <div class="footer-note">
+        <small>
+            <i class="fas fa-clock mr-1"></i>Analysis generated on {% now "F j, Y, g:i a" %} | 
+            <i class="fas fa-microchip mr-1"></i>Powered by AI Sentiment Analysis
         </small>
     </div>
 </div>
 {% else %}
-<div id="no-results" class="text-center" style="padding: 5rem 1rem;">
-    <div style="width: 120px; height: 120px; margin: 0 auto 3rem auto; background-color: #2D3748; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
-        <i class="fas fa-search fa-3x" style="color: #A0AEC0;"></i>
-    </div>
-    <h4 style="color: #E5E7EB; margin-bottom: 1rem; font-size: 1.6rem; font-weight: 700;">Ready to Analyze a Product?</h4>
-    <p style="color: #A0AEC0; max-width: 500px; margin: 0 auto; line-height: 1.7; font-size: 1.05rem;">Paste an Amazon product URL above to see customer sentiment, key themes, and an AI summary.</p>
+<div id="no-results" class="placeholder-container">
+    <div class="placeholder-icon-wrapper"><i class="fas fa-search fa-3x"></i></div>
+    <h4 class="placeholder-title">Ready to Analyze a Product?</h4>
+    <p class="placeholder-subtitle">Paste an Amazon product URL above to see customer sentiment, key themes, and an AI summary.</p>
 </div>
 {% endif %}
+{% endblock %}
 
+
+{% block extra_css %}
 <style>
-    @keyframes pulse {
-        50% { opacity: 0.6; }
+    /* --- Key Color Variables --- */
+    :root {
+        --color-background: #1A202C; --color-card: #2D3748; --color-border: #4A5568;
+        --color-text-primary: #E5E7EB; --color-text-secondary: #A0AEC0; --color-text-muted: #718096;
+        --color-primary: #9ae49a; --color-success: #9ae49a; --color-danger: #FF6B6B;
+        --color-warning: #f8c050; --color-info: #4A90E2; --border-radius: 12px;
     }
-    @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(10px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
+
+    /* --- Base & Reusable Components --- */
+    .app-card { background-color: var(--color-card); border-radius: var(--border-radius); padding: 2rem; border: 1px solid var(--color-border); }
+    .btn-primary { background-color: var(--color-primary); color: var(--color-background); }
+    .btn-primary:hover { background-color: #7fdd7f; transform: translateY(-2px); }
+    .btn-secondary { background-color: #3e4a5f; color: var(--color-text-primary); }
+    .btn-secondary:hover { background-color: #4a5568; }
+    .alert-error { margin-top: 1.5rem; background-color: rgba(255, 107, 107, 0.1); color: var(--color-danger); padding: 1rem; border-radius: var(--border-radius); }
+
+    /* --- Form & Input --- */
+    .form-container { display: flex; flex-wrap: wrap; gap: 1rem; }
+    .input-group { flex: 1 1 300px; display: flex; align-items: center; }
+    .input-icon-wrapper { background-color: var(--color-card); padding: 0.9rem 1rem; border-radius: var(--border-radius) 0 0 var(--border-radius); border: 1px solid var(--color-border); border-right: none; }
+    .form-input { width: 100%; border-radius: 0 var(--border-radius) var(--border-radius) 0; margin-left: -1px; background-color: var(--color-background); border: 1px solid var(--color-border); color: var(--color-text-primary); padding: 0.9rem; }
+    .icon-link { color: var(--color-primary); }
+
+    /* --- Loading & Placeholders --- */
+    .loading-container { text-align: center; padding: 2rem 0; }
+    .spinner-border { width: 3.5rem; height: 3.5rem; color: var(--color-primary); }
+    .loading-title { color: var(--color-text-secondary); font-size: 1.1rem; margin-top: 1.5rem; }
+    .loading-subtitle { color: var(--color-text-muted); font-size: 0.9rem; margin-top: 0.5rem; }
+    .progress-bar-container { width: 100%; background: var(--color-background); border-radius: 9999px; height: 8px; margin-top: 1.5rem; }
+    .progress-bar-animated { background: var(--color-primary); height: 100%; width: 100%; animation: pulse 2s infinite ease-in-out; }
+    .placeholder-container { text-align: center; padding: 4rem 1rem; }
+    .placeholder-icon-wrapper { width: 100px; height: 100px; margin: 0 auto 2rem; background-color: var(--color-card); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--color-text-secondary); }
+    .placeholder-title { color: var(--color-text-primary); font-size: 1.5rem; margin-bottom: 0.75rem; }
+    .placeholder-subtitle { color: var(--color-text-secondary); max-width: 500px; margin: 0 auto; line-height: 1.7; }
+
+    /* --- Results Section --- */
+    .product-header { display: flex; flex-wrap: wrap; gap: 2rem; align-items: center; }
+    .product-image-wrapper { flex-shrink: 0; }
+    .product-image { width: 140px; height: 140px; object-fit: contain; border-radius: var(--border-radius); background-color: white; padding: 12px; }
+    .product-details { flex: 1 1 300px; }
+    .product-title { color: white; font-size: 1.75rem; line-height: 1.3; }
+    .product-meta { display: flex; gap: 2.5rem; color: var(--color-text-secondary); margin-top: 1.5rem; align-items: center; flex-wrap: wrap; }
+    .meta-item { display: flex; align-items: center; gap: 0.5rem; }
+    .product-link { flex-shrink: 0; margin-left: auto; }
+    .icon-star { color: var(--color-warning); }
+    .icon-price { color: var(--color-primary); }
     
-    /* Responsive grid for larger screens */
-    @media (min-width: 992px) {
-        #analysis-grid {
-            grid-template-columns: 1fr 2fr !important;
-        }
-    }
+    .analysis-grid { display: grid; grid-template-columns: 1fr; gap: 2rem; }
+    .grid-column { display: flex; flex-direction: column; gap: 2rem; }
+    @media (min-width: 992px) { .analysis-grid { grid-template-columns: 1fr 2fr; } }
+    
+    .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
+    .card-title { font-weight: bold; color: white; font-size: 1.25rem; }
+    
+    .sentiment-score { font-size: 4.5rem; font-weight: 800; line-height: 1; margin-bottom: 0.5rem; }
+    .percent-sign { color: var(--color-text-secondary); font-size: 2.2rem; }
+    .sentiment-subtitle { color: var(--color-text-secondary); margin: 0 0 1.5rem 0; font-size: 1.1rem; }
+    
+    .insight-item { display: flex; justify-content: space-between; align-items: center; color: var(--color-text-secondary); }
+    .insight-item strong { color: var(--color-text-primary); font-weight: 600; }
+    
+    .chart-container { height: 300px; }
+    
+    .verdict-title { font-weight: bold; font-size: 1.15rem; margin-bottom: 1.5rem; display: flex; align-items: center; }
+    .verdict-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 1.5rem; }
+    .verdict-item { display: flex; align-items: flex-start; gap: 1rem; }
+    .verdict-item i { margin-top: 5px; flex-shrink: 0; }
+    .keyword-title { color: var(--color-text-primary); font-weight: 600; }
+    .review-quote { font-size: 0.9rem; color: var(--color-text-secondary); font-style: italic; margin-top: 0.25rem; }
+    .verdict-empty { color: var(--color-text-muted); }
+
+    .footer-note { margin-top: 3rem; text-align: center; color: var(--color-text-muted); }
+    .text-success { color: var(--color-success); }
+    .text-warning { color: var(--color-warning); }
+    .text-danger { color: var(--color-danger); }
+    
+    .fade-in-animation { animation: fadeIn 0.5s ease-in-out; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes pulse { 50% { opacity: 0.6; } }
 </style>
 {% endblock %}
 
+
 {% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 <script>
+    // Form submission loading state
     document.getElementById('analysis-form')?.addEventListener('submit', function(e) {
         const analyzeBtn = document.getElementById('analyze-btn');
         const loadingSpinner = document.getElementById('loading-spinner');
-        
         if (analyzeBtn && loadingSpinner) {
             analyzeBtn.disabled = true;
-            analyzeBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Analyzing...';
+            analyzeBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Analyzing...';
             loadingSpinner.style.display = 'block';
-            
             const resultsSection = document.getElementById('results-section');
-            const noResults = document.getElementById('no-results');
             if (resultsSection) resultsSection.style.display = 'none';
-            if (noResults) noResults.style.display = 'none';
         }
+    });
+
+    // Chart.js rendering
+    document.addEventListener('DOMContentLoaded', function() {
+        {% if data and data.rating_distribution %}
+        const ctx = document.getElementById('ratingChart').getContext('2d');
+        const ratingData = {{ data.rating_distribution|safe }};
+        const chartLabels = Object.keys(ratingData);
+        const chartValues = Object.values(ratingData);
+
+        const gradient = ctx.createLinearGradient(0, 0, 0, 300);
+        gradient.addColorStop(0, 'rgba(154, 228, 154, 0.6)');
+        gradient.addColorStop(1, 'rgba(154, 228, 154, 0.1)');
+
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: chartLabels,
+                datasets: [{
+                    label: 'Number of Reviews',
+                    data: chartValues,
+                    backgroundColor: gradient,
+                    borderColor: '#9ae49a',
+                    borderWidth: 2,
+                    borderRadius: 8,
+                    hoverBackgroundColor: '#9ae49a',
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: { color: 'rgba(74, 85, 104, 0.4)' },
+                        ticks: { color: '#A0AEC0', font: { size: 12 } }
+                    },
+                    x: {
+                        grid: { display: false },
+                        ticks: { color: '#A0AEC0', font: { size: 14 } }
+                    }
+                }
+            }
+        });
+        {% endif %}
     });
 </script>
 {% endblock %}

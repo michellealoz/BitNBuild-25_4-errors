@@ -7,3 +7,6 @@ def landing_page(request):
 def information_view(request):
 
     return render(request, 'main/information.html')
+
+def about_view(request):
+    return render(request, 'main/about.html')
