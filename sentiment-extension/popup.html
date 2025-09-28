@@ -7,9 +7,10 @@
     <link rel="stylesheet" href="popup.css">
 </head>
 <body>
-    <div class="container">
+    <div id="main-view" class="container">
         <div class="header">
             <h1>Review Radar</h1>
+            <button id="view-bookmarks-btn" class="header-btn" title="View Bookmarks"><i class="fas fa-bookmark"></i></button>
         </div>
         <button id="analyze-btn">
             <i class="fas fa-search"></i> Analyze this Product
@@ -29,6 +30,8 @@
                 <h3>Overall Score</h3>
                 <p id="overall-score">_</p>
             </div>
+            
+            <button id="bookmark-btn" class="bookmark-btn"><i class="fas fa-plus-circle mr-2"></i>Bookmark this Product</button>
 
             <div class="card">
                 <h3><i class="fas fa-chart-bar icon-green"></i>Sentiment</h3>
@@ -49,6 +52,16 @@
             </div>
         </div>
     </div>
+
+    <div id="bookmarks-view" class="container hidden">
+        <div class="header">
+            <h1>My Bookmarks</h1>
+            <button id="back-to-main-btn" class="header-btn" title="Back to Analyzer"><i class="fas fa-arrow-left"></i></button>
+        </div>
+        <div id="bookmarks-list-container">
+            </div>
+    </div>
+
     <script src="popup.js"></script>
 </body>
 </html>

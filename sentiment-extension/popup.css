@@ -7,159 +7,69 @@ body {
     padding: 8px;
 }
 
-.container {
-    padding: 8px;
-}
-
-.header {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 16px;
-}
-
-.logo {
-    width: 24px;
-    height: 24px;
-    margin-right: 8px;
-}
-
-h1 {
-    font-size: 18px;
-    color: white;
-    margin: 0;
-}
-
-button {
-    width: 100%;
-    padding: 12px;
-    font-size: 14px;
-    font-weight: bold;
-    color: #1A202C;
-    background-color: #9ae49a;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background-color 0.2s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    margin-bottom: 16px;
-}
-
+.container { padding: 8px; }
+.header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+h1 { font-size: 18px; color: white; margin: 0; }
+button { width: 100%; padding: 12px; font-size: 14px; font-weight: bold; color: #1A202C; background-color: #9ae49a; border: none; border-radius: 8px; cursor: pointer; transition: background-color 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 16px; }
 button:hover { background-color: #7fdd7f; }
 button:disabled { background-color: #555; color: #999; cursor: not-allowed; }
-
 .hidden { display: none; }
-
-.error-box {
-    color: #FF6B6B;
-    background-color: rgba(255, 107, 107, 0.1);
-    border: 1px solid #FF6B6B;
-    border-radius: 8px;
-    padding: 10px;
-    font-size: 12px;
-    text-align: center;
-}
-
+.error-box { color: #FF6B6B; background-color: rgba(255, 107, 107, 0.1); border: 1px solid #FF6B6B; border-radius: 8px; padding: 10px; font-size: 12px; text-align: center; }
 #results { text-align: left; }
-#product-name {
-    font-size: 16px;
-    font-weight: bold;
-    color: white;
-    text-align: center;
-    margin-bottom: 16px;
-}
-
-.card {
-    background-color: #2D3748;
-    border-radius: 8px;
-    padding: 12px;
-    margin-bottom: 12px;
-}
-.card h3 {
-    margin: 0 0 10px 0;
-    font-size: 14px;
-    color: #E5E7EB;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-}
-
-.score-card {
-    background-color: #2D3748;
-    border-left: 4px solid #4A90E2;
-    padding: 12px;
-    margin-bottom: 16px;
-    text-align: center;
-    border-radius: 8px;
-}
+#product-name { font-size: 16px; font-weight: bold; color: white; text-align: center; margin-bottom: 16px; }
+.card { background-color: #2D3748; border-radius: 8px; padding: 12px; margin-bottom: 12px; }
+.card h3 { margin: 0 0 10px 0; font-size: 14px; color: #E5E7EB; display: flex; align-items: center; gap: 6px; }
+.score-card { background-color: #2D3748; border-left: 4px solid #4A90E2; padding: 12px; margin-bottom: 16px; text-align: center; border-radius: 8px; }
 .score-card h3 { justify-content: center; }
-.score-card p {
-    font-size: 28px;
-    font-weight: bold;
-    color: #4A90E2;
-    margin: 0;
-}
-
-.bar-container {
-    width: 100%;
-    background-color: #1A202C;
-    border-radius: 99px;
-    height: 12px;
-}
-.bar.positive {
-    background-color: #9ae49a;
-    height: 100%;
-    border-radius: 99px;
-}
-.sentiment-label {
-    font-size: 12px;
-    color: #A0AEC0;
-    text-align: right;
-    margin: 4px 0 0 0;
-}
-
-.summary-content {
-    font-size: 13px;
-    line-height: 1.6;
-    color: #A0AEC0;
-    margin: 0;
-}
-
-.pros-cons-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-}
+.score-card p { font-size: 28px; font-weight: bold; color: #4A90E2; margin: 0; }
+.bar-container { width: 100%; background-color: #1A202C; border-radius: 99px; height: 12px; }
+.bar.positive { background-color: #9ae49a; height: 100%; border-radius: 99px; }
+.sentiment-label { font-size: 12px; color: #A0AEC0; text-align: right; margin: 4px 0 0 0; }
+.summary-content { font-size: 13px; line-height: 1.6; color: #A0AEC0; margin: 0; }
+.pros-cons-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 .verdict-card h3 { font-size: 15px; margin-bottom: 12px; }
 .verdict-list { list-style: none; padding: 0; margin: 0; font-size: 12px; display: flex; flex-direction: column; gap: 10px; }
 .keyword { font-weight: bold; display: block; }
-.example-quote {
-    font-style: italic;
-    color: #A0AEC0;
-    padding-left: 8px;
-    border-left: 2px solid #4A5568;
-    margin: 4px 0 0 0;
-}
+.example-quote { font-style: italic; color: #A0AEC0; padding-left: 8px; border-left: 2px solid #4A5568; margin: 4px 0 0 0; }
 .empty-list { color: #718096; }
-
 .icon-green { color: #9ae49a; }
 .icon-blue { color: #4A90E2; }
 .icon-red { color: #FF6B6B; }
-
-.spinner {
-    border: 4px solid rgba(255, 255, 255, 0.2);
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    border-left-color: #9ae49a;
-    animation: spin 1s ease infinite;
-    margin: 20px auto;
-}
+.spinner { border: 4px solid rgba(255, 255, 255, 0.2); width: 32px; height: 32px; border-radius: 50%; border-left-color: #9ae49a; animation: spin 1s ease infinite; margin: 20px auto; }
 .loader-text { text-align: center; color: #A0AEC0; }
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+/* --- NEW BOOKMARK STYLES --- */
+.header-btn {
+    width: auto;
+    padding: 8px 10px;
+    margin: 0;
+    background-color: #2D3748;
+    color: #A0AEC0;
 }
+.header-btn:hover { background-color: #4A5568; color: white; }
+.bookmark-btn { background-color: #4A90E2; margin-bottom: 16px; }
+.bookmark-btn:hover { background-color: #3e7ac1; }
+
+#bookmarks-list-container { max-height: 400px; overflow-y: auto; }
+.bookmark-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background-color: #2D3748;
+    padding: 10px;
+    border-radius: 8px;
+    margin-bottom: 8px;
+}
+.bookmark-info { flex-grow: 1; }
+.bookmark-title { font-weight: bold; font-size: 14px; color: white; margin: 0; }
+.bookmark-score { font-size: 12px; color: #A0AEC0; }
+.delete-bookmark-btn {
+    width: auto;
+    padding: 8px 10px;
+    margin: 0;
+    background-color: #4A5568;
+    color: #FF6B6B;
+}
+.delete-bookmark-btn:hover { background-color: #FF6B6B; color: white; }
+.no-bookmarks { text-align: center; color: #718096; padding: 2rem 0; }

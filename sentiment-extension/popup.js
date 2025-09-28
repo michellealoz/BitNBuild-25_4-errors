@@ -1,10 +1,17 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // --- Views and Buttons ---
+    const mainView = document.getElementById('main-view');
+    const bookmarksView = document.getElementById('bookmarks-view');
     const analyzeBtn = document.getElementById('analyze-btn');
+    const viewBookmarksBtn = document.getElementById('view-bookmarks-btn');
+    const backToMainBtn = document.getElementById('back-to-main-btn');
+    const bookmarkBtn = document.getElementById('bookmark-btn'); // **FIX:** Added selector for the bookmark button
+    const bookmarksListContainer = document.getElementById('bookmarks-list-container');
+    
+    // --- UI Elements ---
     const loader = document.getElementById('loader');
     const errorDiv = document.getElementById('error');
     const resultsDiv = document.getElementById('results');
-
-    // --- Result Elements ---
     const productNameEl = document.getElementById('product-name');
     const scoreEl = document.getElementById('overall-score');
     const positiveBarEl = document.getElementById('positive-bar');
@@ -14,7 +21,21 @@ document.addEventListener('DOMContentLoaded', () => {
     const consListEl = document.getElementById('cons-list');
 
     const FASTAPI_ENDPOINT = 'http://127.0.0.1:8001/analyze/';
+    let currentProductData = null; // Holds the data of the currently analyzed product
 
+    // --- Event Listeners for View Switching ---
+    viewBookmarksBtn.addEventListener('click', () => {
+        mainView.classList.add('hidden');
+        bookmarksView.classList.remove('hidden');
+        loadAndRenderBookmarks();
+    });
+
+    backToMainBtn.addEventListener('click', () => {
+        bookmarksView.classList.add('hidden');
+        mainView.classList.remove('hidden');
+    });
+
+    // --- Main Analyze Logic ---
     analyzeBtn.addEventListener('click', () => {
         chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
             const currentTab = tabs[0];
@@ -22,12 +43,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 displayError("Could not get the URL of the current tab.");
                 return;
             }
-            
             loader.classList.remove('hidden');
             resultsDiv.classList.add('hidden');
             errorDiv.classList.add('hidden');
             analyzeBtn.disabled = true;
-
             callBackend(currentTab.url);
         });
     });
@@ -38,19 +57,12 @@ document.addEventListener('DOMContentLoaded', () => {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ url: url }),
         })
-        .then(response => {
-            if (!response.ok) {
-                return response.json().then(err => {
-                    throw new Error(err.detail || `Server error: ${response.status}`);
-                });
-            }
-            return response.json();
-        })
+        .then(res => res.ok ? res.json() : res.json().then(err => Promise.reject(err)))
         .then(data => {
             displayResults(data);
         })
         .catch(error => {
-            displayError(`Connection failed: ${error.message}. Is the local server running?`);
+            displayError(error.detail || `Connection failed: ${error.message}. Is the local server running?`);
         })
         .finally(() => {
             loader.classList.add('hidden');
@@ -69,68 +81,120 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        productNameEl.textContent = data.product_name || 'Product Name Not Found';
+        currentProductData = data; // Save data for bookmarking
+        currentProductData.url = data.product_url || ''; // Ensure URL is saved
 
-        if (data.overall_score) {
-            scoreEl.textContent = `${data.overall_score} / 10`;
-        } else {
-            const rating = parseFloat((data.rating || "0").split(' ')[0]);
-            const positive_percent = data.public_opinion.positive_percent || 0;
-            const score = ((rating / 5 * 10) * 0.6) + ((positive_percent / 10) * 0.4);
-            scoreEl.textContent = `${score.toFixed(1)} / 10`;
-        }
+        productNameEl.textContent = data.product_name || 'Product Name Not Found';
+        const score = data.overall_score || calculateScore(data);
+        scoreEl.textContent = `${score} / 10`;
 
         const positivePercent = data.public_opinion.positive_percent || 0;
         positiveBarEl.style.width = `${positivePercent}%`;
         sentimentTextEl.textContent = `${positivePercent}% Positive`;
         summaryEl.textContent = data.review_summary_generator || 'No summary available.';
-
         populateVerdictList(prosListEl, 'Pros', data.pros_cons_panel.pros, 'icon-green');
         populateVerdictList(consListEl, 'Cons', data.pros_cons_panel.cons, 'icon-red');
 
         resultsDiv.classList.remove('hidden');
     }
-
-    /**
-     * Helper function to build and display the pros and cons lists correctly.
-     */
+    
+    function calculateScore(data) {
+        const rating = parseFloat((data.rating || "0").split(' ')[0]);
+        const positive_percent = data.public_opinion.positive_percent || 0;
+        const score = ((rating / 5 * 10) * 0.6) + ((positive_percent / 10) * 0.4);
+        return score.toFixed(1);
+    }
+    
     function populateVerdictList(element, title, items, iconClass) {
-        element.innerHTML = ''; 
-
+        element.innerHTML = '';
         const titleIcon = title === 'Pros' ? 'fa-thumbs-up' : 'fa-thumbs-down';
         const titleEl = document.createElement('h3');
         titleEl.innerHTML = `<i class="fas ${titleIcon} ${iconClass}"></i>${title}`;
         element.appendChild(titleEl);
-
         const ul = document.createElement('ul');
         ul.className = 'verdict-list';
-
         if (!items || items.length === 0) {
-            const li = document.createElement('li');
-            li.className = 'empty-list';
-            li.textContent = 'N/A';
-            ul.appendChild(li);
+            ul.innerHTML = '<li class="empty-list">N/A</li>';
         } else {
             items.slice(0, 4).forEach(item => {
                 const li = document.createElement('li');
-                
-                // **FIX 1:** Use "keyword" with a lowercase k
-                const keywordEl = document.createElement('span');
-                keywordEl.className = 'keyword';
-                keywordEl.textContent = item.keyword; // Corrected from item.Keyword
-                li.appendChild(keywordEl);
-
-                // **FIX 2:** Use "examples" with a lowercase e
+                li.innerHTML = `<span class="keyword">${item.keyword}</span>`;
                 if (item.examples && item.examples.length > 0) {
                     const example = item.examples[0].length > 50 ? item.examples[0].substring(0, 50) + '...' : item.examples[0];
-                    const quoteEl = document.createElement('blockquote');
-                    quoteEl.className = 'example-quote';
-                    quoteEl.textContent = `"${example}"`;
-                    li.appendChild(quoteEl);
+                    li.innerHTML += `<blockquote class="example-quote">"${example}"</blockquote>`;
                 }
                 ul.appendChild(li);
             });
         }
         element.appendChild(ul);
     }
+
+    // --- **NEW:** Bookmark Functionality ---
+    bookmarkBtn.addEventListener('click', () => {
+        if (!currentProductData) return;
+        
+        getBookmarks(bookmarks => {
+            // Avoid duplicates
+            if (bookmarks.some(b => b.product_name === currentProductData.product_name)) {
+                alert("This product is already bookmarked!");
+                return;
+            }
+            
+            const newBookmarks = [...bookmarks, currentProductData];
+            saveBookmarks(newBookmarks, () => {
+                alert("Product bookmarked!");
+            });
+        });
+    });
+
+    function getBookmarks(callback) {
+        // Use chrome.storage.local for extensions
+        chrome.storage.local.get(['bookmarks'], (result) => {
+            callback(result.bookmarks || []);
+        });
+    }
+
+    function saveBookmarks(bookmarks, callback) {
+        chrome.storage.local.set({ bookmarks }, callback);
+    }
+
+    function loadAndRenderBookmarks() {
+        getBookmarks(bookmarks => {
+            bookmarksListContainer.innerHTML = ''; // Clear current list
+            if (bookmarks.length === 0) {
+                bookmarksListContainer.innerHTML = '<p class="no-bookmarks">You have no saved products.</p>';
+                return;
+            }
+
+            bookmarks.forEach((data, index) => {
+                const score = data.overall_score || calculateScore(data);
+                const item = document.createElement('div');
+                item.className = 'bookmark-item';
+                item.innerHTML = `
+                    <div class="bookmark-info">
+                        <p class="bookmark-title">${data.product_name}</p>
+                        <p class="bookmark-score">Score: ${score} / 10</p>
+                    </div>
+                    <button class="delete-bookmark-btn" data-index="${index}" title="Remove Bookmark"><i class="fas fa-trash-alt"></i></button>
+                `;
+                bookmarksListContainer.appendChild(item);
+            });
+        });
+    }
+
+    // Event delegation for deleting bookmarks from the list
+    bookmarksListContainer.addEventListener('click', (e) => {
+        const deleteBtn = e.target.closest('.delete-bookmark-btn');
+        if (deleteBtn) {
+            const indexToDelete = parseInt(deleteBtn.dataset.index, 10);
+            if (confirm("Are you sure you want to remove this bookmark?")) {
+                getBookmarks(bookmarks => {
+                    const updatedBookmarks = bookmarks.filter((_, index) => index !== indexToDelete);
+                    saveBookmarks(updatedBookmarks, () => {
+                        loadAndRenderBookmarks(); // Re-render the list after deletion
+                    });
+                });
+            }
+        }
+    });
 });
