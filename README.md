@@ -51,13 +51,12 @@
 
 ## 🛠️ Tech Stack
 
-* **Frontend:** HTML / CSS
+* **Frontend:** HTML , CSS , JS
 * **Backend:** Django
-* **Web Scraping:**  BeautifulSoup (if Python used)
-* **NLP Models:** Hugging Face Transformers (e.g., BERT for sentiment analysis)
+* **Web Scraping:**  BeautifulSoup (Python used), FASTAPI
+* **NLP Models:** Hugging Face Transformers ( BERT for sentiment analysis) , FASTAPI
 * **Data Processing:** Python / Pandas / Scikit-learn
-* **Visualization:** Chart.js / D3.js
-* **Storage:** LocalStorage / MongoDB / Firebase (depending on your choice)
+* **Extension Tool:** Javascript
 
 ---
 
