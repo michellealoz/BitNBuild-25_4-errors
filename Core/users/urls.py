@@ -15,4 +15,5 @@ urlpatterns = [
     path('compare/', views.compare_product, name='compare'),
     path('analyzer/', views.analysis_view, name='analyzer'),
     path('records/', views.records_view, name='records'), 
+    path('records/delete/<str:record_type>/<int:record_id>/', views.delete_record_view, name='delete_record'),
 ]

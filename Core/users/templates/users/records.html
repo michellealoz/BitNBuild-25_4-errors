@@ -7,91 +7,261 @@
 
 {% block content %}
 
+<div class="app-card mb-6">
+    <button id="filter-toggle" class="flex justify-between items-center w-full p-4">
+        <span class="font-bold text-white text-lg"><i class="fas fa-filter mr-2"></i>Filter & Search</span>
+        <i id="filter-chevron" class="fas fa-chevron-down transition-transform"></i>
+    </button>
+    <div id="filter-controls" class="p-4 border-t border-gray-700" style="display: none;">
+        <div class="flex flex-wrap items-center justify-between gap-4">
+            <div class="flex items-center gap-2" id="filter-buttons">
+                <button class="filter-btn active" data-filter="all">All</button>
+                <button class="filter-btn" data-filter="analysis">Analyses</button>
+                <button class="filter-btn" data-filter="comparison">Comparisons</button>
+            </div>
+            <div class="flex-grow max-w-sm">
+                <input type="text" id="search-input" placeholder="Search by product name..." class="form-input w-full bg-[#1A202C] border-[#4A5568]">
+            </div>
+        </div>
+    </div>
+</div>
+
 <div id="records-accordion">
     {% if records %}
         {% for record in records %}
-        <div class="app-card mb-4 accordion-item">
+        
+        <div class="app-card accordion-item mb-4" 
+             data-record-type="{{ record.record_type }}" 
+             {% if record.record_type == 'analysis' %}
+                 data-product-name="{{ record.product_name }}"
+             {% elif record.record_type == 'comparison' %}
+                 data-product-name="{{ record.product_name_1 }} {{ record.product_name_2 }}"
+             {% endif %}>
 
             {% if record.record_type == 'analysis' %}
-            <!-- ACCORDION HEADER: SINGLE ANALYSIS -->
             <button class="accordion-header" aria-expanded="false" aria-controls="record-{{ record.id }}">
-                <div style="display: flex; align-items: center; gap: 1rem; flex: 1; overflow: hidden;">
-                    <div style="text-align: left; overflow: hidden;">
-                        <h5 style="color: white; margin: 0; font-size: 1.1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ record.product_name|truncatechars:100 }}</h5>
-                        <small style="color: #A0AEC0;"><i class="fas fa-search me-1"></i>Analyzed on: {{ record.created_at|date:"F j, Y" }}</small>
+                <div class="header-main-content">
+                    <i class="fas fa-search header-icon"></i>
+                    <div class="header-text-content">
+                        <h5 class="header-title">{{ record.product_name|truncatechars:100 }}</h5>
+                        <small class="header-subtitle">Analyzed on: {{ record.created_at|date:"F j, Y" }}</small>
                     </div>
                 </div>
-                <div class="accordion-icon"><i class="fas fa-chevron-down"></i></div>
+                <div class="header-details">
+                    {% with score=record.analysis_data.public_opinion.positive_percent %}
+                    <div class="score-badge {% if score >= 70 %}score-good{% elif score >= 50 %}score-avg{% else %}score-poor{% endif %}">
+                        {{ score }}%
+                    </div>
+                    {% endwith %}
+                    <div class="accordion-icon"><i class="fas fa-chevron-down"></i></div>
+                </div>
             </button>
             
-            <!-- ACCORDION BODY: SINGLE ANALYSIS -->
-            <div id="record-{{ record.id }}" class="accordion-body" style="display: none;">
+            <div id="record-{{ record.id }}" class="accordion-body">
                 {% with data=record.analysis_data %}
                 {% include 'users/partials/analysis_details.html' %}
                 {% endwith %}
+                <div class="record-actions">
+                    <a href="{% url 'analyzer' %}?url={{ record.product_url }}" class="btn btn-secondary"><i class="fas fa-sync-alt mr-2"></i>Re-Analyze</a>
+                    <button class="btn btn-danger delete-btn" data-record-id="{{ record.id }}" data-record-type="analysis"><i class="fas fa-trash-alt mr-2"></i>Delete</button>
+                </div>
             </div>
 
             {% elif record.record_type == 'comparison' %}
-            <!-- ACCORDION HEADER: COMPARISON -->
             <button class="accordion-header" aria-expanded="false" aria-controls="record-{{ record.id }}">
-                <div style="display: flex; align-items: center; gap: 1rem; flex: 1; flex-wrap: wrap; text-align: left; overflow: hidden;">
-                    
-                    <div style="flex: 1; min-width: 150px; overflow: hidden;">
-                        <h5 style="color: white; margin: 0; font-size: 1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ record.product_name_1|truncatechars:50 }}</h5>
-                    </div>
-                    <span style="color: #A0AEC0; font-weight: bold;">VS</span>
-                    
-                    <div style="flex: 1; min-width: 150px; overflow: hidden;">
-                        <h5 style="color: white; margin: 0; font-size: 1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ record.product_name_2|truncatechars:50 }}</h5>
-                        <small style="color: #A0AEC0;"><i class="fas fa-balance-scale me-1"></i>Compared on: {{ record.created_at|date:"F j, Y" }}</small>
+                <div class="header-main-content">
+                    <i class="fas fa-balance-scale header-icon"></i>
+                    <div class="header-text-content comparison">
+                        <div class="comparison-item">
+                            <h5 class="header-title">{{ record.product_name_1|truncatechars:50 }}</h5>
+                            {% if record.analysis_data_1.overall_score > record.analysis_data_2.overall_score %}<span class="winner-badge">🏆 WINNER</span>{% endif %}
+                        </div>
+                        <span class="vs-separator">VS</span>
+                        <div class="comparison-item">
+                            <h5 class="header-title">{{ record.product_name_2|truncatechars:50 }}</h5>
+                             {% if record.analysis_data_2.overall_score > record.analysis_data_1.overall_score %}<span class="winner-badge">🏆 WINNER</span>{% endif %}
+                        </div>
                     </div>
                 </div>
-                <div class="accordion-icon"><i class="fas fa-chevron-down"></i></div>
+                <div class="header-details">
+                     <small class="header-subtitle mr-4">Compared on: {{ record.created_at|date:"F j, Y" }}</small>
+                    <div class="accordion-icon"><i class="fas fa-chevron-down"></i></div>
+                </div>
             </button>
 
-            <!-- ACCORDION BODY: COMPARISON -->
-            <div id="record-{{ record.id }}" class="accordion-body" style="display: none;">
+            <div id="record-{{ record.id }}" class="accordion-body">
                 {% with data1=record.analysis_data_1 data2=record.analysis_data_2 %}
                 {% include 'users/partials/comparison_details.html' %}
                 {% endwith %}
+                 <div class="record-actions">
+                    <a href="{% url 'compare' %}?url1={{ record.product_url_1 }}&url2={{ record.product_url_2 }}" class="btn btn-secondary"><i class="fas fa-sync-alt mr-2"></i>Re-Compare</a>
+                    <button class="btn btn-danger delete-btn" data-record-id="{{ record.id }}" data-record-type="comparison"><i class="fas fa-trash-alt mr-2"></i>Delete</button>
+                </div>
             </div>
             {% endif %}
         </div>
         {% endfor %}
     {% else %}
         <div class="app-card text-center p-8">
-            
-            <div style="width: 80px; height: 80px; margin: 0 auto 1.5rem auto; background-color: #2D3748; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
-                <i class="fas fa-folder-open fa-2x" style="color: #A0AEC0;"></i>
-            </div>
-            <h4 style="color: #E5E7EB; margin-bottom: 0.5rem;">No Records Found</h4>
-            <p style="color: #A0AEC0;">Go to the <a href="{% url 'analyzer' %}" style="color: #9ae49a;">Analyzer</a> or <a href="{% url 'compare' %}" style="color: #9ae49a;">Compare</a> pages to get started!</p>
+            <div class="placeholder-icon-wrapper"><i class="fas fa-folder-open fa-2x"></i></div>
+            <h4 class="placeholder-title">No Records Found</h4>
+            <p class="placeholder-subtitle">Go to the <a href="{% url 'analyzer' %}" class="link">Analyzer</a> or <a href="{% url 'compare' %}" class="link">Compare</a> pages to get started!</p>
         </div>
     {% endif %}
+    <div id="no-results-message" class="app-card text-center p-8" style="display: none;">
+        <h4 class="placeholder-title">No records match your search.</h4>
+    </div>
 </div>
+{% endblock %}
 
-<style>
-    .accordion-header { display: flex; justify-content: space-between; align-items: center; width: 100%; padding: 1rem 1.5rem; background-color: transparent; border: none; cursor: pointer; }
-    .accordion-item { overflow: hidden; transition: background-color 0.3s ease; }
-    .accordion-item:has(.accordion-header[aria-expanded="true"]) { background-color: #2D3748; }
-    .accordion-icon { transition: transform 0.3s ease; }
-    .accordion-header[aria-expanded="true"] .accordion-icon { transform: rotate(180deg); }
-    .accordion-body { border-top: 1px solid #4A5568; }
-</style>
+{% block extra_css %}
+    <style>
+        .accordion-header { display: flex; justify-content: space-between; align-items: center; width: 100%; padding: 1.25rem 1.5rem; background: none; border: none; cursor: pointer; text-align: left; }
+        .accordion-item { overflow: hidden; transition: background-color 0.3s ease; }
+        .accordion-item.open { background-color: #2D3748; }
+        .accordion-body { display: none; padding: 1.5rem; border-top: 1px solid #4A5568; animation: fadeIn 0.5s ease; }
+        .accordion-icon { transition: transform 0.3s ease; }
+        .accordion-header.active .accordion-icon { transform: rotate(180deg); }
+        .header-main-content { display: flex; align-items: center; gap: 1.5rem; flex-grow: 1; min-width: 0; }
+        .header-icon { font-size: 1.5rem; color: #718096; flex-shrink: 0; }
+        .header-text-content { flex-grow: 1; min-width: 0; }
+        .header-title { color: white; font-size: 1.1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin: 0; }
+        .header-subtitle { color: #A0AEC0; font-size: 0.8rem; margin-top: 0.25rem; }
+        .header-details { display: flex; align-items: center; gap: 1.5rem; }
+        .header-text-content.comparison { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
+        .comparison-item { display: flex; align-items: center; gap: 0.5rem; }
+        .vs-separator { color: #A0AEC0; font-weight: bold; }
+        .winner-badge { font-size: 0.7rem; font-weight: bold; color: #000; background-color: #f8c050; padding: 2px 6px; border-radius: 6px; }
+        .score-badge { font-weight: bold; padding: 0.25rem 0.75rem; border-radius: 9999px; }
+        .score-good { background-color: rgba(154, 228, 154, 0.1); color: #9ae49a; }
+        .score-avg { background-color: rgba(248, 192, 80, 0.1); color: #f8c050; }
+        .score-poor { background-color: rgba(255, 107, 107, 0.1); color: #FF6B6B; }
+        .record-actions { padding-top: 1.5rem; border-top: 1px solid #4A5568; display: flex; justify-content: flex-end; gap: 0.75rem; }
+        .btn { padding: 0.5rem 1rem; border-radius: 8px; font-weight: 600; border: none; cursor: pointer; transition: all 0.2s ease; display: inline-flex; align-items: center; }
+        .btn-secondary { background-color: #3e4a5f; color: #E5E7EB; }
+        .btn-secondary:hover { background-color: #4a5568; }
+        .btn-danger { background-color: rgba(255, 107, 107, 0.1); color: #FF6B6B; }
+        .btn-danger:hover { background-color: #FF6B6B; color: white; }
+        .filter-btn { padding: 0.5rem 1rem; background-color: #2D3748; border: 1px solid #4A5568; color: #A0AEC0; border-radius: 8px; font-weight: 500; }
+        .filter-btn:hover { background-color: #3e4a5f; }
+        .filter-btn.active { background-color: #9ae49a; color: #1A202C; border-color: #9ae49a; }
+        .form-input { padding: 0.5rem 1rem; border-radius: 8px; }
+        .placeholder-icon-wrapper { width: 80px; height: 80px; margin: 0 auto 1.5rem; background-color: #2D3748; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #A0AEC0; }
+        .placeholder-title { color: #E5E7EB; font-size: 1.25rem; margin-bottom: 0.5rem; }
+        .placeholder-subtitle { color: #A0AEC0; }
+        .link { color: #9ae49a; text-decoration: underline; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    </style>
 {% endblock %}
 
 {% block extra_js %}
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const accordionHeaders = document.querySelectorAll('.accordion-header');
-        accordionHeaders.forEach(header => {
-            header.addEventListener('click', function () {
-                const isExpanded = this.getAttribute('aria-expanded') === 'true';
-                this.setAttribute('aria-expanded', !isExpanded);
-                document.getElementById(this.getAttribute('aria-controls')).style.display = isExpanded ? 'none' : 'block';
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const accordionItems = document.querySelectorAll('.accordion-item');
+            const filterToggle = document.getElementById('filter-toggle');
+            const filterControls = document.getElementById('filter-controls');
+            const filterChevron = document.getElementById('filter-chevron');
+            const filterButtons = document.querySelectorAll('.filter-btn');
+            const searchInput = document.getElementById('search-input');
+            const noResultsMessage = document.getElementById('no-results-message');
+
+            // --- Collapsible Filter Logic ---
+            filterToggle.addEventListener('click', () => {
+                const isHidden = filterControls.style.display === 'none';
+                filterControls.style.display = isHidden ? 'block' : 'none';
+                filterChevron.classList.toggle('rotate-180', isHidden);
+            });
+
+            // --- Accordion Logic ---
+            accordionItems.forEach(item => {
+                const header = item.querySelector('.accordion-header');
+                const body = item.querySelector('.accordion-body');
+                
+                header.addEventListener('click', () => {
+                    const isExpanded = header.classList.contains('active');
+                    
+                    // Close all other accordions
+                    accordionItems.forEach(otherItem => {
+                        otherItem.classList.remove('open');
+                        otherItem.querySelector('.accordion-header').classList.remove('active');
+                        otherItem.querySelector('.accordion-body').style.display = 'none';
+                    });
+
+                    // If it wasn't already open, open it
+                    if (!isExpanded) {
+                        item.classList.add('open');
+                        header.classList.add('active');
+                        body.style.display = 'block';
+                    }
+                });
+            });
+
+            // --- Filter and Search Logic ---
+            function performFilter() {
+                const activeFilter = document.querySelector('.filter-btn.active').dataset.filter;
+                const searchQuery = searchInput.value.toLowerCase();
+                let visibleCount = 0;
+
+                accordionItems.forEach(item => {
+                    const recordType = item.dataset.recordType;
+                    const productName = item.dataset.productName.toLowerCase();
+
+                    const typeMatch = (activeFilter === 'all' || recordType === activeFilter);
+                    const searchMatch = productName.includes(searchQuery);
+
+                    if (typeMatch && searchMatch) {
+                        item.style.display = 'block';
+                        visibleCount++;
+                    } else {
+                        item.style.display = 'none';
+                    }
+                });
+
+                noResultsMessage.style.display = visibleCount === 0 ? 'block' : 'none';
+            }
+
+            filterButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    filterButtons.forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+                    performFilter();
+                });
+            });
+
+            searchInput.addEventListener('input', performFilter);
+
+            // --- Delete Button Logic ---
+            document.querySelectorAll('.delete-btn').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    e.stopPropagation(); // Prevents the accordion from opening
+                    
+                    const recordId = button.dataset.recordId;
+                    const recordType = button.dataset.recordType;
+                    
+                    if (confirm('Are you sure you want to delete this record? This action cannot be undone.')) {
+                        const url = `/user/records/delete/${recordType}/${recordId}/`;
+                        
+                        fetch(url, {
+                            method: 'POST',
+                            headers: {
+                                'X-CSRFToken': '{{ csrf_token }}',
+                                'Content-Type': 'application/json'
+                            },
+                        })
+                        .then(response => {
+                            if (response.ok) {
+                                button.closest('.accordion-item').remove();
+                            } else {
+                                alert('Error: Could not delete the record.');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Delete error:', error);
+                            alert('An error occurred. Please try again.');
+                        });
+                    }
+                });
             });
         });
-    });
-</script>
+    </script>
 {% endblock %}
-

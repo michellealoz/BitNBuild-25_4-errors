@@ -358,3 +358,32 @@ def extract_key_differences(data1: dict, data2: dict) -> list:
         return ["Both products share very similar strengths according to user reviews."]
         
     return differences
+
+from django.http import JsonResponse
+from django.views.decorators.http import require_POST
+
+@require_POST
+@login_required
+def delete_record_view(request, record_type, record_id):
+    """
+    Deletes a specific record (analysis or comparison) for the logged-in user.
+    """
+    try:
+        if record_type == 'analysis':
+            # Find the specific analysis record belonging to the user
+            record = ProductAnalysis.objects.get(id=record_id, user=request.user)
+        elif record_type == 'comparison':
+            # Find the specific comparison record belonging to the user
+            record = ProductComparison.objects.get(id=record_id, user=request.user)
+        else:
+            return JsonResponse({'status': 'error', 'message': 'Invalid record type.'}, status=400)
+        
+        # Delete the found record
+        record.delete()
+        
+        return JsonResponse({'status': 'success', 'message': 'Record deleted successfully.'})
+
+    except (ProductAnalysis.DoesNotExist, ProductComparison.DoesNotExist):
+        return JsonResponse({'status': 'error', 'message': 'Record not found or you do not have permission to delete it.'}, status=404)
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
